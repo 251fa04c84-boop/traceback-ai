@@ -7,37 +7,28 @@ if (-not (Test-Path $voiceDir)) {
 
 $scenes = @(
   @{
-    id = "scene1_hook"
-    text = "AI can generate thousands of ideas. But can it understand what makes a culture truly resonate?"
+    id = "scene1_alert"
+    text = "It is 2 AM, and your production checkout service is failing for over 40% of paying customers. Generic chatbots cannot help you here, because they lack real tools, telemetry, and execution safety. What engineers need is an agent-native incident workspace."
   },
   @{
-    id = "scene2_problem"
-    text = "Generic AI often combines popular references without understanding how music, food, fashion, and atmosphere actually connect."
+    id = "scene2_telemetry"
+    text = "Meet TraceBack AI, built on Builder.io's Agent-Native architecture. Human engineers and the autonomous AI agent act as equal peers, sharing the exact same action primitives for logs, deployment diffs, and system metrics."
   },
   @{
-    id = "scene3_intro"
-    text = "Meet CultureWeave AI. A cultural experience architect powered by Qloo's taste graph."
+    id = "scene3_investigation"
+    text = "With a single click, TraceBack AI launches an autonomous multi-phase investigation. It inspects container logs, analyzes recent continuous deployment diffs, and formulates a root cause hypothesis grounded in verified code evidence."
   },
   @{
-    id = "scene4_demo"
-    text = "Simply choose a cultural direction, define your audience and budget, and let CultureWeave build a complete experience blueprint."
+    id = "scene4_approval"
+    text = "Crucially, the agent cannot execute mutating commands without human consent. TraceBack AI presents the proposed rollback action, its blast radius, and supporting evidence for explicit operator authorization."
   },
   @{
-    id = "scene5_output"
-    text = "From music and culinary direction to atmosphere, activations, and production planning, every element is designed to work together."
-  },
-  @{
-    id = "scene6_qloo"
-    text = "By grounding recommendations in cultural intelligence, CultureWeave helps creative teams move beyond clichés toward authentic subculture resonance."
-  },
-  @{
-    id = "scene7_closing"
-    text = "CultureWeave AI. Giving agents a better sense of taste."
+    id = "scene5_resolution"
+    text = "Once approved, the rollback executes, and deterministic health probes verify that error rates have dropped back to nominal levels. With complete audit trails and automated post-mortems, TraceBack AI delivers real agent-native reliability."
   }
 )
 
-$ffmpeg = "C:\Users\bharg\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin\ffmpeg.exe"
-
+Write-Host "🎤 Generating offline neural voiceover via System.Speech..."
 foreach ($s in $scenes) {
   $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
   $synth.SelectVoice("Microsoft David Desktop")
@@ -45,11 +36,10 @@ foreach ($s in $scenes) {
   $synth.Volume = 100
 
   $wavPath = Join-Path $voiceDir "$($s.id).wav"
+  Write-Host "   -> Generating: $($s.id).wav"
   $synth.SetOutputToWaveFile($wavPath)
   $synth.Speak($s.text)
   $synth.Dispose()
-
-  Write-Host "Generated: $wavPath"
 }
 
-Write-Host "All voiceover clips generated successfully!"
+Write-Host "✅ All 5 voiceover tracks generated successfully in $voiceDir"
