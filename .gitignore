@@ -30,7 +30,9 @@ yarn-error.log*
 
 # video generation assets
 *.mp4
+*.zip
 video_assets/
+archive/
 
 # typescript
 *.tsbuildinfo
