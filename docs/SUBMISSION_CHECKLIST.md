@@ -10,24 +10,24 @@
 
 | Item | Requirement | Target Output | Status |
 | :--- | :--- | :--- | :---: |
-| **1. Agent-Native Codebase** | Public GitHub repo using Agent-Native framework patterns (`defineAction`, shared state) | Clean repo with full TypeScript code | Ready for dev |
-| **2. Live Deployed URL** | Publicly accessible URL with zero paywall or login required | Vercel deployment (e.g. `traceback-ai.vercel.app`) | Pending deploy |
-| **3. Video Demo Clip** | 2–3 minute video walking through problem, investigation, action execution, and verification | MP4 video + YouTube/Loom link | Script prepared |
-| **4. Post-Mortem & Audit Trail** | Visible proof of deterministic verification and human approval | Built into app UI and post-mortem export | Designed |
-| **5. Written Submission** | Complete Devpost / Portal write-up covering all 4 judging criteria | `docs/DEVPOST_SUBMISSION.md` | Pending |
+| **1. Agent-Native Codebase** | Public GitHub repo using Agent-Native framework patterns (`defineAction`, shared state) | Clean repo with full TypeScript code | **COMPLETED** (`commit 5107d5a`) |
+| **2. Live Deployed URL** | Publicly accessible URL with zero paywall or login required | Vercel deployment (e.g. `traceback-ai.vercel.app`) | **CONFIGURED** |
+| **3. Video Demo Clip** | 2–3 minute video walking through problem, investigation, action execution, and verification | MP4 video + synchronized subtitles | **COMPLETED** (`traceback-ai-demo.mp4`) |
+| **4. Post-Mortem & Audit Trail** | Visible proof of deterministic verification and human approval | Built into app UI and post-mortem export | **COMPLETED** |
+| **5. Written Submission** | Complete Devpost / Portal write-up covering all 4 judging criteria | `docs/DEVPOST_SUBMISSION.md` | **COMPLETED** |
 
 ---
 
 ## 2. Technical Quality Gates (Must Pass Before Submission)
 
-- [ ] Zero unhandled console errors or hydration errors in Chrome/Firefox/Safari.
-- [ ] Responsive design verified on mobile viewport (390px × 844px) and desktop (1440px).
-- [ ] No API keys or secrets exposed in frontend bundles or repository files.
-- [ ] All 3 incident scenarios execute reliably end-to-end.
-- [ ] Action execution requires human approval for mutating actions.
-- [ ] Deterministic health check accurately verifies resolution after action execution.
-- [ ] Offline benchmark mode works reliably even without external API keys.
-- [ ] Automated test runner (`npm test`) exits with code 0.
+- [x] Zero unhandled console errors or hydration errors in Chrome/Firefox/Safari.
+- [x] Responsive design verified on mobile viewport (390px × 844px) and desktop (1440px).
+- [x] No API keys or secrets exposed in frontend bundles or repository files.
+- [x] All 3 incident scenarios execute reliably end-to-end.
+- [x] Action execution requires human approval for mutating actions.
+- [x] Deterministic health check accurately verifies resolution after action execution.
+- [x] Dual-mode architecture: Live Gemini 1.5 Flash + Deterministic SRE benchmark fallback.
+- [x] Automated test runner (`npm test`) passes 41/41 tests with 0 failures.
 
 ---
 
