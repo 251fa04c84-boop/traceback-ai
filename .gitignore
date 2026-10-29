@@ -33,6 +33,7 @@ yarn-error.log*
 *.zip
 video_assets/
 archive/
+publish-to-github.bat
 
 # typescript
 *.tsbuildinfo
