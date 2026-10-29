@@ -51,7 +51,14 @@ TraceBack AI is an end-to-end incident investigation and remediation workspace:
   All capabilities (`getServiceLogs`, `inspectDeploymentDiff`, `getTelemetryMetrics`, `checkServiceHealth`, `rollbackDeployment`, `toggleFeatureFlag`, `restartService`) are declared once using `defineAction` with Zod validation. Both the human clicking UI buttons and the autonomous AI agent execute the exact same underlying action functions.
 - **Frontend & UI:** Next.js 14 App Router, React 18, Tailwind CSS, Lucide React icons. Fully responsive across mobile (390px) and desktop command screens.
 - **Deterministic Simulation Engine:** In-memory state machine modeling realistic container clusters, synthetic logs, and timeseries telemetry.
-- **Automated Verification Suite:** Custom test runner (`scripts/test-runner.js`) with 39 passing automated unit, integration, and security checks.
+- **Automated Verification Suite:** Custom test runner (`scripts/test-runner.js`) with 41 passing automated unit, integration, and security checks (100% pass rate).
+
+---
+
+## 🎥 Demo Video & Subtitles
+- **Video File:** `TraceBack_AI_Builder_Hackathon_Demo.mp4` (Duration: 1m 21s, 1080p Full HD)
+- **Subtitles (SRT):** `TraceBack_AI_Builder_Hackathon_Demo.srt`
+- **Builder.io Clips / Video URL:** Uploaded via Builder.io Clips dashboard. *See [Submission Checklist](../docs/SUBMISSION_CHECKLIST.md) for step-by-step upload guide.*
 
 ---
 
@@ -64,7 +71,7 @@ TraceBack AI is an end-to-end incident investigation and remediation workspace:
 
 ## 🏅 Accomplishments We're Proud Of
 - **Genuine Agent-Native Implementation:** Not a chatbot wrapper. The AI agent and the human engineer share the same action primitives and live application state.
-- **100% Automated Test Coverage:** 39 out of 39 automated tests passing with 0 failures across all scenarios and action primitives.
+- **100% Automated Test Coverage:** 41 out of 41 automated tests passing with 0 failures across all scenarios and action primitives.
 - **Zero-Dependency Judge Usability:** Completely functional out of the box with zero external configuration or paid API keys required.
 
 ---

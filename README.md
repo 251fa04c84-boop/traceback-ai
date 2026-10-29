@@ -6,7 +6,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black.svg)](https://nextjs.org/)
 [![Agent--Native](https://img.shields.io/badge/Agent--Native-Architecture-indigo.svg)](https://github.com/BuilderIO/agent-native)
-[![Tests](https://img.shields.io/badge/Tests-39%2F39%20Passed-emerald.svg)](./docs/TEST_REPORT.md)
+[![Tests](https://img.shields.io/badge/Tests-41%2F41%20Passed-emerald.svg)](./docs/TEST_REPORT.md)
+[![Demo Video](https://img.shields.io/badge/Demo%20Video-Full%20HD%201080p-purple.svg)](./TraceBack_AI_Builder_Hackathon_Demo.mp4)
 
 ---
 
@@ -78,7 +79,7 @@ cd traceback-ai
 # Install dependencies
 npm install
 
-# Run automated test suite (39/39 passing)
+# Run automated test suite (41/41 passing)
 npm test
 
 # Launch local development server
@@ -89,19 +90,28 @@ Open [http://localhost:3000](http://localhost:3000) to view the workspace.
 
 ---
 
-## 6. Project Documentation Suite
+## 6. Official Demo Video & Assets
+
+- **Video File:** [`TraceBack_AI_Builder_Hackathon_Demo.mp4`](./TraceBack_AI_Builder_Hackathon_Demo.mp4) (1080p Full HD, 1m 21s, authentic UI capture)
+- **Closed Captions / Subtitles:** [`TraceBack_AI_Builder_Hackathon_Demo.srt`](./TraceBack_AI_Builder_Hackathon_Demo.srt)
+- **Script & Narration Guide:** [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md)
+
+---
+
+## 7. Project Documentation Suite
 
 - [Official Hackathon Requirements & Audit](./docs/HACKATHON_REQUIREMENTS.md)
+- [Devpost & Official Submission Draft](./docs/DEVPOST_SUBMISSION.md)
 - [System Architecture & Technical Specification](./docs/PROJECT_ARCHITECTURE.md)
 - [Team Work Plan & Allocation](./docs/TEAM_WORK_PLAN.md)
 - [Team Collaboration & Contributing Guide](./docs/CONTRIBUTING.md)
-- [Submission Day Checklist](./docs/SUBMISSION_CHECKLIST.md)
+- [Submission Day Checklist & Clips Guide](./docs/SUBMISSION_CHECKLIST.md)
 - [2-Minute Demo Script & Video Narration](./docs/DEMO_SCRIPT.md)
 - [Automated Test & Verification Report](./docs/TEST_REPORT.md)
 
 ---
 
-## 7. Compliance & Safety
+## 8. Compliance & Safety
 
 - **Zero Client Secrets:** No API keys are bundled or exposed to the client.
 - **Offline Benchmark Mode:** Resilient dual-mode execution ensures 100% judge uptime without external API dependencies.
