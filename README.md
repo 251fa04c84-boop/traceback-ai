@@ -73,7 +73,7 @@ flowchart LR
 ### Setup Commands
 ```bash
 # Clone repository
-git clone https://github.com/251fa04c84-boop/cultureweave-ai.git traceback-ai
+git clone https://github.com/251fa04c84-boop/traceback-ai.git
 cd traceback-ai
 
 # Install dependencies

@@ -12,7 +12,7 @@ Autonomous AI agent and on-call engineers operating as equal peers on shared act
 https://traceback-ai.vercel.app
 
 ## Public GitHub Repository
-https://github.com/251fa04c84-boop/cultureweave-ai *(or target repo: https://github.com/your-team/traceback-ai)*
+https://github.com/251fa04c84-boop/traceback-ai
 
 ---
 
