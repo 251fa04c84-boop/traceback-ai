@@ -30,15 +30,15 @@
 | **Usefulness & Execution** | **40%** | Solving a clear, real-world problem with a complete, robust, working experience rather than an unfinished prototype. | Solves production downtime triage. Provides realistic incident scenarios, live tool diagnostics, deterministic health verifications, and post-mortem audit generation. | In Progress |
 | **Creativity & Design** | **20%** | Distinctive, thoughtful product idea and user interaction model that feels polished and purpose-built. | Developer-grade incident response workspace: incident timeline, live agent thought process, interactive evidence explorer, diff inspector, and human approval gates. | In Progress |
 | **Innovation** | **20%** | Leveraging the AI agent to meaningfully improve the overall workflow beyond generic chatbots. | Agent acts as an active peer SRE: gathers evidence across logs/metrics/deployments, hypothesizes root causes, proposes concrete actions, and awaits human authorization. | In Progress |
-| **Cleverness & Use of Agent-Native** | **20%** | Resourcefully utilizing the Agent-Native framework (`defineAction`, shared state between agent and UI, peer collaboration). | All actions (`getServiceLogs`, `inspectDeploymentDiff`, `checkServiceHealth`, `rollbackDeployment`, `toggleFeatureFlag`) are defined once via `defineAction` with Zod validation. Both human UI clicks and the AI agent execute the exact same action primitives. | In Progress |
+| **Cleverness & Use of Agent-Native** | **20%** | Resourcefully utilizing the official framework and connecting agent, UI, and actions. | TraceBack currently has a custom shared Zod action registry used by the UI and agent. The official `@agent-native/core` package and `defineAction` are not present in `package.json` or source imports. | **Not compliant / blocking** |
 
 ---
 
 ## 3. Technology & Framework Requirements
 
 ### Core Mandate: Builder.io Agent-Native Architecture
-- **Framework Package:** `@agent-native/core` (`import { defineAction } from "@agent-native/core/action"`)
-- **Core Primitive:** `defineAction` with Zod validation schemas.
+- **Framework Package:** `@agent-native/core` (`import { defineAction } from "@agent-native/core/action"`) — **not currently installed or imported in this repository**.
+- **Core Primitive:** `defineAction` with Zod validation schemas — **not yet implemented; the current code uses a project-defined `ActionDefinition` interface and `dispatchAction` function.**
 - **Architectural Tenet:** Actions must not be isolated chatbot tools; they must be unified application actions usable interchangeably by the UI and the AI agent.
 - **State Synchronization:** Bidirectional visibility—when the agent inspects or proposes an action, the UI updates; when the human approves or triggers an action, the agent observes the outcome.
 
@@ -57,7 +57,7 @@
 
 | Requirement | Required Evidence | Current Status | Remaining Work | Risk & Mitigation |
 | :--- | :--- | :--- | :--- | :--- |
-| **Agent-Native Architecture** | Implementation of `defineAction` with Zod schemas for all tools and UI triggers | Architecture Planned | Implement shared action suite in `lib/actions/` | Low. `@agent-native/core` patterns are well documented. |
+| **Agent-Native Architecture** | Official `@agent-native/core` `defineAction` definitions wired to both agent and UI | **Not implemented** | Integrate the official package or migrate the app onto the framework; run clean install, tests, production build, and deployment smoke test | **High / submission blocker** |
 | **Realistic Incident Scenarios** | 3 deterministic incident simulations with realistic logs, metrics, and git diffs | Designed | Build scenario database and state engine | Low. Deterministic simulation prevents flaky demos. |
 | **Human-in-the-Loop Safety** | Consequential actions require explicit human approval panel before execution | Architecture Planned | Build interactive approval modal & audit log | Zero risk. Strictly enforced by server-side gate. |
 | **Deterministic Verification** | System state checked after action; LLM cannot self-certify resolution | Architecture Planned | Implement automated health-check probe after action | Zero risk. Deterministic rules decide resolution state. |
