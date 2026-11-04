@@ -1,9 +1,9 @@
 # TraceBack AI — Automated Test & Verification Report
 
-**Date:** October 29, 2026  
+**Date:** November 4, 2026  
 **Test Suite:** `scripts/test-runner.js` (`npm test`)  
-**Runner:** Node.js v20.18.0 & Next.js 14  
-**Verdict:** **41/41 PASSED (0 FAILED)**  
+**Runner:** Node.js 22.22.0 & Next.js 14  
+**Verdict:** **41/41 PASSED (0 FAILED) in GitHub Actions run #9**  
 
 ---
 
@@ -12,7 +12,7 @@
 | Category | Total Tests | Passed | Failed | Status | Evidence |
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | **Suite 1: Simulation Scenarios** | 4 | 4 | 0 | **PASSED** | 3 deterministic production scenarios (`inc-8921`, `inc-4402`, `inc-7119`) |
-| **Suite 2: Agent-Native Actions** | 7 | 7 | 0 | **PASSED** | `getServiceLogs`, `inspectDeploymentDiff`, `rollbackDeployment`, `toggleFeatureFlag` |
+| **Suite 2: Custom Zod Action Registry** | 7 | 7 | 0 | **PASSED** | `getServiceLogs`, `inspectDeploymentDiff`, `rollbackDeployment`, `toggleFeatureFlag` |
 | **Suite 3: Safety & Human Gate** | 3 | 3 | 0 | **PASSED** | Mutating actions without human approval return `requiresApproval: true` |
 | **Suite 4: Autonomous Investigation**| 10 | 10 | 0 | **PASSED** | 5-phase agentic loop + Model Engine Provenance verification |
 | **Suite 5: Deterministic Verification**| 7 | 7 | 0 | **PASSED** | State transitions to `RESOLVED`, health status `HEALTHY`, post-mortem generated |
@@ -33,12 +33,12 @@
 ======================================================
 
 📦 [Suite 1] Simulation Scenarios Initialization
-  ✅ [PASS] Initialized exactly 3 production incident scenarios
+  ✅ [PASS] Initialized exactly 3 simulated incident scenarios
   ✅ [PASS] Scenario 1 (inc-8921: Checkout Outage) present
   ✅ [PASS] Scenario 2 (inc-4402: Session OOMKilled) present
   ✅ [PASS] Scenario 3 (inc-7119: DB Connection Exhaustion) present
 
-⚙️ [Suite 2] Agent-Native Action Registry & Execution
+⚙️ [Suite 2] Custom Zod Action Registry & Execution
   ✅ [PASS] getServiceLogs action registered
   ✅ [PASS] inspectDeploymentDiff action registered
   ✅ [PASS] rollbackDeployment action registered
@@ -86,7 +86,7 @@
   ✅ [PASS] Incident remains unresolved when rejected
 
 ======================================================
-📊 TEST RESULTS: 39/39 PASSED (0 FAILED)
+📊 TEST RESULTS: 41/41 PASSED (0 FAILED)
 ======================================================
 ```
 

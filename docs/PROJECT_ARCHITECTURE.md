@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0  
 **Status:** Approved for Implementation  
-**Framework:** Builder.io Agent-Native Architecture (`@agent-native/core`)  
+**Framework:** Next.js 14 custom application architecture; official `@agent-native/core` integration is not currently installed.  
 
 ---
 
@@ -64,9 +64,9 @@ flowchart TD
 
 ---
 
-## 3. The Agent-Native Core Pattern (`defineAction`)
+## 3. Current Shared Action Pattern (custom registry; not official `defineAction`)
 
-All application capabilities are defined once in `lib/actions/` using the Agent-Native pattern:
+Application capabilities are currently defined once in `lib/actions/` using a project-defined `ActionDefinition` interface and Zod schemas. This shares handlers between the UI and agent, but it is not the official Builder `defineAction` API:
 
 ```typescript
 import { z } from "zod";
@@ -168,6 +168,6 @@ traceback-ai/
 
 ## 7. Compliance with Hackathon Guidelines
 
-- **Agent-Native Framework:** Implements symmetrical `defineAction` with Zod validation.
+- **Shared Actions:** The human UI and agent call the same project-defined Zod-validated handlers. Official `@agent-native/core` `defineAction` integration remains a required migration item.
 - **Judge-Ready:** Zero setup required; instant 1-click incident selection and investigation.
 - **Mobile Responsive:** Works seamlessly on mobile devices as required by team constraints.
