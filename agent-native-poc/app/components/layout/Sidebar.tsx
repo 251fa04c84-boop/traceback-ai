@@ -14,6 +14,7 @@ import { OrgSwitcher } from "@agent-native/toolkit/app/org";
 import { openCommandMenu } from "@agent-native/toolkit/app/shared";
 import { AgentNativeIcon } from "@agent-native/toolkit/app/shared/AgentNativeIcon";
 import {
+  IconActivity,
   IconEdit,
   IconHome,
   IconLayoutSidebarLeftCollapse,
@@ -150,6 +151,36 @@ function HomeNavLink({ collapsed }: { collapsed: boolean }) {
     );
   }
 
+  return <div className="px-2">{link}</div>;
+}
+
+function IncidentsNavLink({ collapsed }: { collapsed: boolean }) {
+  const location = useLocation();
+  const active = location.pathname.startsWith("/incidents");
+  const link = (
+    <Link
+      to="/incidents"
+      aria-current={active ? "page" : undefined}
+      aria-label={collapsed ? "Incidents" : undefined}
+      className={cn(
+        "flex items-center text-sidebar-accent-foreground transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+        active && "bg-sidebar-accent",
+        collapsed ? "size-8 justify-center rounded-md" : "h-8 w-full gap-3 rounded-lg px-3 text-sm font-medium",
+      )}
+    >
+      <IconActivity className="size-4 shrink-0" strokeWidth={1.8} />
+      <span className={collapsed ? "sr-only" : "truncate"}>Incidents</span>
+    </Link>
+  );
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{link}</TooltipTrigger>
+        <TooltipContent side="right">Incidents</TooltipContent>
+      </Tooltip>
+    );
+  }
   return <div className="px-2">{link}</div>;
 }
 
@@ -408,6 +439,7 @@ export function Sidebar({
         )}
       >
         <HomeNavLink collapsed={collapsed} />
+        <IncidentsNavLink collapsed={collapsed} />
         <ChatThreadsSection collapsed={collapsed} />
       </nav>
 
