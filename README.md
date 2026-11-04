@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black.svg)](https://nextjs.org/)
 [![Agent--Native](https://img.shields.io/badge/Agent--Native-Architecture-indigo.svg)](https://github.com/BuilderIO/agent-native)
-[![Tests](https://img.shields.io/badge/Tests-41%2F41%20Passed-emerald.svg)](./docs/TEST_REPORT.md)
+[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue.svg)](./docs/TEST_REPORT.md)
 [![Demo Video](https://img.shields.io/badge/Demo%20Video-Full%20HD%201080p-purple.svg)](./TraceBack_AI_Builder_Hackathon_Demo.mp4)
 
 ---
@@ -25,7 +25,7 @@ Generic AI chatbots fail in this domain because:
 ## 2. Solution: TraceBack AI
 
 **TraceBack AI** implements Builder.io's **Agent-Native** paradigm:
-- **Shared Primitives:** The human engineer and the AI agent share the exact same tools and action definitions (`defineAction`).
+- **Shared Action Layer:** The human engineer and the AI agent use the same seven Zod-validated action handlers through TraceBack's custom registry. This is an Agent-Native-inspired shared-action design; the official `@agent-native/core` `defineAction` integration is not yet present.
 - **Evidence-Grounded Reasoning:** Every hypothesis cites immutable evidence (log timestamps, commit hashes, metric threshold spikes).
 - **Human-in-the-Loop Safety:** Destructive actions (rollbacks, flag toggles, restarts) require explicit human review and authorization.
 - **Deterministic Verification:** The application deterministically verifies system state after recovery execution; the agent cannot declare an incident resolved without passing active health probes.
@@ -38,7 +38,7 @@ Generic AI chatbots fail in this domain because:
   1. *Checkout Outage (`inc-8921`):* NullPointerException introduced in release `v2.4.1` spiking HTTP 500 error rates to 42.8%.
   2. *Session CrashLoop (`inc-4402`):* Unbounded in-memory token cache causing JVM heap exhaustion (`OOMKilled`).
   3. *DB Connection Exhaustion (`inc-7119`):* Leaked connection pool clients in unreleased async cohort queries.
-- **Agent-Native Actions (`defineAction`):**
+- **Shared Incident Actions (custom Zod registry):**
   - `getServiceLogs`: Filter simulated logs by service, level, and timeframe.
   - `inspectDeploymentDiff`: Retrieve git commit diffs, authors, and modified lines.
   - `getTelemetryMetrics`: Fetch timeseries CPU, memory, error rates, and p99 latency.
@@ -52,11 +52,11 @@ Generic AI chatbots fail in this domain because:
 
 ---
 
-## 4. Agent-Native Architecture
+## 4. Shared Human-and-Agent Action Architecture
 
 ```mermaid
 flowchart LR
-    A[Human Engineer UI] <--> B[defineAction Primitives]
+    A[Human Engineer UI] <--> B[Shared Zod Action Registry]
     C[AI Agent Orchestrator] <--> B
     B --> D[Deterministic Simulation Engine]
     D --> E[Health & Metric Probes]
