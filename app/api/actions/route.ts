@@ -1,32 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { dispatchAction } from "@/lib/actions";
+import { ACTION_REGISTRY, dispatchAction } from "@/lib/actions";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { actionId, input, source = "human", userApprovalGranted = false } = body;
+    const { actionId, input } = body ?? {};
 
-    if (!actionId) {
+    if (typeof actionId !== "string" || !actionId.trim()) {
       return NextResponse.json({ error: "Missing required parameter 'actionId'" }, { status: 400 });
     }
 
-    const incidentId = input?.incidentId || body.incidentId;
-    if (!incidentId) {
+    const action = ACTION_REGISTRY[actionId];
+    if (!action) {
+      return NextResponse.json({ error: `Unknown action '${actionId}'` }, { status: 404 });
+    }
+
+    // This endpoint is intentionally read-only. Never accept approval authority,
+    // execution identity, or mutation permission from an untrusted browser payload.
+    if (action.isMutating) {
+      return NextResponse.json(
+        { error: "Mutating actions must use the explicit approval workflow." },
+        { status: 403 }
+      );
+    }
+
+    const incidentId = input?.incidentId;
+    if (typeof incidentId !== "string" || !incidentId.trim()) {
       return NextResponse.json({ error: "Missing required parameter 'incidentId'" }, { status: 400 });
     }
 
-    const result = await dispatchAction(
-      actionId,
-      input,
-      {
-        incidentId,
-        source,
-        userApprovalGranted
-      }
-    );
+    const result = await dispatchAction(actionId, input, {
+      incidentId,
+      source: "api",
+      userApprovalGranted: false
+    });
 
     return NextResponse.json(result);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to execute action" }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to execute action";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }
