@@ -1,5 +1,5 @@
-const rawAppName = "agent-native-poc";
-const rawAppTitle = "Agent Native Poc";
+const rawAppName = "traceback-ai";
+const rawAppTitle = "TraceBack AI";
 
 const APP_NAME_PLACEHOLDER = "{" + "{APP_NAME}}";
 const APP_TITLE_PLACEHOLDER = "{" + "{APP_TITLE}}";
