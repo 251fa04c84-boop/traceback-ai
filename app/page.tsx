@@ -134,7 +134,7 @@ export default function TraceBackWorkspace() {
   const [copiedReport, setCopiedReport] = useState(false);
   const [manualActionOutput, setManualActionOutput] = useState<string | null>(null);
   const [isExecutingManual, setIsExecutingManual] = useState(false);
-  const [approvalNotice, setApprovalNotice] = useState("Execution is locked until a server-authenticated approver workflow is configured. This demo cannot execute recovery actions.");
+  const [approvalNotice] = useState("Execution is locked until a server-authenticated approver workflow is configured. No recovery action can be executed from this demo.");
 
   // Fetch all incidents
   const loadIncidents = async () => {
@@ -252,10 +252,10 @@ export default function TraceBackWorkspace() {
     }
   };
 
-  // Approval remains intentionally unavailable until server-side identity
-  // and one-time approval challenges are implemented.
-  const handleApproval = async () => {
-    setApprovalNotice("Approval is disabled for safety. No recovery action was executed.");
+  // Recovery approval is intentionally disabled until authenticated
+  // server-side approver identity and one-time approval challenges exist.
+  const handleApproval = async (_approved: boolean) => {
+    return;
   };
 
   // Reset Incident Scenario
@@ -831,46 +831,11 @@ export default function TraceBackWorkspace() {
                   Recovery execution locked
                 </div>
                 <p className="mt-1 text-amber-100/80">{approvalNotice}</p>
-                <p className="mt-1 text-amber-100/70">Investigation and evidence review are available; this screen does not represent an authenticated approval.</p>
+                <p className="mt-1 text-amber-100/70">Investigation and evidence review are available. No authenticated approval is represented here.</p>
               </div>
-            </div>
-          )}
 
-          {/* Investigation Timeline Stream */}
-          <div className="flex-1 bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col overflow-hidden">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-indigo-400" />
-              Agent Investigation Stream
-            </h4>
-
-            {agentSession?.steps ? (
-              <div className="space-y-4 overflow-auto max-h-[500px] pr-1">
-                {agentSession.steps.map((step) => (
-                  <div key={step.id} className="relative pl-6 pb-2 border-l-2 border-slate-800 last:border-transparent">
-                    {/* Circle Node */}
-                    <div
-                      className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 bg-slate-950 flex items-center justify-center ${
-                        step.status === "COMPLETED"
-                          ? "border-emerald-500 text-emerald-400"
-                          : step.status === "BLOCKED_APPROVAL"
-                          ? "border-amber-400 text-amber-400 animate-pulse"
-                          : "border-indigo-500 text-indigo-400"
-                      }`}
-                    >
-                      {step.status === "COMPLETED" && <Check className="w-2.5 h-2.5" />}
-                    </div>
 
                     <div className="text-xs">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-slate-200">{step.title}</span>
-                        <span className="text-[10px] text-slate-500 font-mono">
-                          {new Date(step.timestamp).toLocaleTimeString()}
-                        </span>
-                      </div>
-
-                      {/* Dispatched Action badge */}
-                      {step.actionDispatched && (
-                        <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-bold text-slate-200">{step.title}</span>
                         <span className="text-[10px] text-slate-500 font-mono">
