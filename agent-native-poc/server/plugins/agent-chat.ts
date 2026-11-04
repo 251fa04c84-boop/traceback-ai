@@ -10,6 +10,8 @@ const INITIAL_TOOL_NAMES = [
   "view-screen",
   "navigate",
   "hello",
+  "list-incidents",
+  "get-incident-evidence",
   "provider-api-request",
   "ask-question",
 ];
