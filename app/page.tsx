@@ -134,6 +134,7 @@ export default function TraceBackWorkspace() {
   const [copiedReport, setCopiedReport] = useState(false);
   const [manualActionOutput, setManualActionOutput] = useState<string | null>(null);
   const [isExecutingManual, setIsExecutingManual] = useState(false);
+  const [approvalNotice, setApprovalNotice] = useState("Execution is locked until a server-authenticated approver workflow is configured. This demo cannot execute recovery actions.");
 
   // Fetch all incidents
   const loadIncidents = async () => {
@@ -251,29 +252,10 @@ export default function TraceBackWorkspace() {
     }
   };
 
-  // Human Approval Action
-  const handleApproval = async (approved: boolean) => {
-    if (!selectedId) return;
-    try {
-      const res = await fetch("/api/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "approve",
-          incidentId: selectedId,
-          approved,
-          approverName: "Alex Rivera (Lead SRE)"
-        })
-      });
-      const data = await res.json();
-      if (data.session) {
-        setAgentSession(data.session);
-        await loadIncidentDetail(selectedId);
-        await loadIncidents();
-      }
-    } catch (e) {
-      console.error("Approval submit failed:", e);
-    }
+  // Approval remains intentionally unavailable until server-side identity
+  // and one-time approval challenges are implemented.
+  const handleApproval = async () => {
+    setApprovalNotice("Approval is disabled for safety. No recovery action was executed.");
   };
 
   // Reset Incident Scenario
@@ -843,48 +825,15 @@ export default function TraceBackWorkspace() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleApproval(true)}
-                  className="flex-1 py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/30"
-                >
-                  <Check className="w-4 h-4" />
-                  Authorize & Execute
-                </button>
-                <button
-                  onClick={() => handleApproval(false)}
-                  className="py-2.5 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition flex items-center justify-center gap-1.5 border border-slate-700"
-                >
-                  <X className="w-4 h-4" />
-                  Reject
-                </button>
+              <div className="rounded-lg border border-amber-500/30 bg-amber-950/30 p-3 text-xs text-amber-200">
+                <div className="flex items-center gap-2 font-semibold">
+                  <ShieldAlert className="h-4 w-4 shrink-0" />
+                  Recovery execution locked
+                </div>
+                <p className="mt-1 text-amber-100/80">{approvalNotice}</p>
+                <p className="mt-1 text-amber-100/70">Investigation and evidence review are available; this screen does not represent an authenticated approval.</p>
               </div>
-            </div>
-          )}
 
-          {/* Investigation Timeline Stream */}
-          <div className="flex-1 bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col overflow-hidden">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-indigo-400" />
-              Agent Investigation Stream
-            </h4>
-
-            {agentSession?.steps ? (
-              <div className="space-y-4 overflow-auto max-h-[500px] pr-1">
-                {agentSession.steps.map((step) => (
-                  <div key={step.id} className="relative pl-6 pb-2 border-l-2 border-slate-800 last:border-transparent">
-                    {/* Circle Node */}
-                    <div
-                      className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 bg-slate-950 flex items-center justify-center ${
-                        step.status === "COMPLETED"
-                          ? "border-emerald-500 text-emerald-400"
-                          : step.status === "BLOCKED_APPROVAL"
-                          ? "border-amber-400 text-amber-400 animate-pulse"
-                          : "border-indigo-500 text-indigo-400"
-                      }`}
-                    >
-                      {step.status === "COMPLETED" && <Check className="w-2.5 h-2.5" />}
-                    </div>
 
                     <div className="text-xs">
                       <div className="flex items-center justify-between mb-1">
