@@ -1,248 +1,108 @@
-import {
-  markAgentChatHomeHandoff,
-  navigateWithAgentChatViewTransition,
-} from "@agent-native/core/client/agent-chat";
-import { createAgentNativeAgentKitTransport } from "@agent-native/core/client/agentkit-chat/transport";
-import { useT } from "@agent-native/core/client/i18n";
-import { AgentKitComposer } from "@agent-native/toolkit/app/agentkit/react/components";
-import { useAgentKitControl } from "@agent-native/toolkit/app/agentkit/react/context";
-import { CoreComposerRuntimeProvider } from "@agent-native/toolkit/app/chat/agentkit-chat/composer";
-import { CoreAgentKitRoot } from "@agent-native/toolkit/app/chat/agentkit-chat/index";
-import { useRealtimeVoiceModeOptional } from "@agent-native/toolkit/app/chat/composer";
-import { WaveBackground } from "@agent-native/toolkit/app/shared";
-import { AgentNativeIcon } from "@agent-native/toolkit/app/shared/AgentNativeIcon";
-import {
-  IconBook,
-  IconBrandDiscord,
-  IconBrandGithub,
-  IconUsers,
-} from "@tabler/icons-react";
-import { useState, type ReactNode } from "react";
-import { useNavigate } from "react-router";
-
-import { Button } from "@/components/ui/button";
-import {
-  Item,
-  ItemContent,
-  ItemFooter,
-  ItemMedia,
-  ItemTitle,
-} from "@/components/ui/item";
-import { Separator } from "@/components/ui/separator";
-import { getChatHomeThreadId } from "@/lib/chat-home-thread";
-import {
-  chatHandoffComposerOptions,
-  chatThreadPath,
-  type ChatInitialComposerOptions,
-  type ChatRouteState,
-} from "@/lib/chat-paths";
-import { TAB_ID } from "@/lib/tab-id";
-
-const DOCS_URL = "https://www.agent-native.com/docs";
-const GITHUB_URL = "https://github.com/BuilderIO/agent-native";
-const DISCORD_URL = "https://discord.gg/qm82StQ2NC";
-
-/**
- * The same AgentKit composer the chat page uses, so Connect AI and the model
- * picker look the way they will in chat. Submitting hands the prompt to the
- * full chat page instead of running it here, and voice chat continues there.
- */
-function HomeAgentComposer() {
-  const navigate = useNavigate();
-  const realtimeVoice = useRealtimeVoiceModeOptional();
-  const [threadId] = useState(getChatHomeThreadId);
-  const [transport] = useState(() =>
-    createAgentNativeAgentKitTransport({
-      browserTabId: TAB_ID,
-      surface: "app",
-      adapter: { textFormat: "markdown" },
-    }),
-  );
-
-  function openChat(
-    message: string,
-    options: ChatInitialComposerOptions,
-    onLocalSubmit?: () => void,
-  ) {
-    const state: ChatRouteState = {
-      initialMessage: message,
-      initialComposerOptions: options,
-    };
-    markAgentChatHomeHandoff("chat");
-    navigateWithAgentChatViewTransition(navigate, chatThreadPath(threadId), {
-      state,
-    });
-    onLocalSubmit?.();
-  }
-
-  function startVoiceChat() {
-    // Home shows no transcript, so the session is bound to the thread it
-    // opens rather than to whichever thread is on screen when it starts.
-    void realtimeVoice?.start({ threadId });
-    markAgentChatHomeHandoff("chat");
-    navigateWithAgentChatViewTransition(navigate, chatThreadPath(threadId));
-  }
-
-  return (
-    <div
-      className="agentkit-tokens w-full max-w-[calc(var(--agent-kit-conversation-max-width,47rem)-2rem)] text-start"
-      data-agentkit-composer-size="large"
-    >
-      <CoreComposerRuntimeProvider>
-        <CoreAgentKitRoot
-          transport={transport}
-          clientOptions={{ transportOwnership: "owned" }}
-          threadId={threadId}
-        >
-          <HomeAgentComposerInput
-            threadId={threadId}
-            onSubmit={openChat}
-            onVoiceChatStart={startVoiceChat}
-          />
-        </CoreAgentKitRoot>
-      </CoreComposerRuntimeProvider>
-    </div>
-  );
-}
-
-function HomeAgentComposerInput({
-  threadId,
-  onSubmit,
-  onVoiceChatStart,
-}: {
-  threadId: string;
-  onSubmit: (
-    text: string,
-    options: ChatInitialComposerOptions,
-    onLocalSubmit?: () => void,
-  ) => void;
-  onVoiceChatStart: () => void;
-}) {
-  const t = useT();
-  const control = useAgentKitControl(threadId);
-
-  return (
-    <AgentKitComposer
-      threadId={threadId}
-      requireAgentEngine
-      placeholder={t("chat.composerPlaceholder")}
-      plusMenuMode="hidden"
-      attachmentsEnabled={false}
-      voiceEnabled
-      onVoiceChatStart={onVoiceChatStart}
-      onSubmit={async (text, files, references, options) => {
-        const uploadedAttachments = files.length
-          ? await control.uploadFiles(
-              files.map((file) => ({
-                name: file.name,
-                mediaType: file.type || "application/octet-stream",
-                size: file.size,
-                body: file,
-              })),
-            )
-          : [];
-        onSubmit(
-          text,
-          chatHandoffComposerOptions(options, {
-            references,
-            ...(uploadedAttachments.length ? { uploadedAttachments } : {}),
-          }),
-          options.onLocalSubmit,
-        );
-      }}
-    />
-  );
-}
-
-function ResourceLink({
-  href,
-  icon,
-  children,
-}: {
-  href: string;
-  icon?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <Button asChild variant="outline" size="sm">
-      <a href={href} target="_blank" rel="noreferrer">
-        {icon}
-        {children}
-      </a>
-    </Button>
-  );
-}
-
-function ResourceColumn({
-  icon,
-  title,
-  children,
-}: {
-  icon: ReactNode;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <Item asChild className="content-start px-6 py-8 sm:px-10">
-      <section>
-        <ItemMedia variant="icon">{icon}</ItemMedia>
-        <ItemContent>
-          <ItemTitle role="heading" aria-level={2}>
-            {title}
-          </ItemTitle>
-        </ItemContent>
-        <ItemFooter className="flex-wrap justify-start">{children}</ItemFooter>
-      </section>
-    </Item>
-  );
-}
+import { useActionQuery } from "@agent-native/core/client/hooks";
+import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
+import { Link } from "react-router";
 
 export default function HomePage() {
-  const t = useT();
+  useSetPageTitle("Overview");
+  const { data, isLoading, error } = useActionQuery("list-incidents", {});
 
   return (
-    <div className="flex min-h-full flex-col">
-      <section className="relative isolate flex flex-1 flex-col items-center justify-center gap-6 overflow-hidden px-4 py-16 text-center">
-        <WaveBackground
-          matchPageSurface
-          className="pointer-events-none absolute inset-0 -z-10"
-        />
-        <AgentNativeIcon
-          aria-hidden="true"
-          className="h-8 w-14 text-foreground"
-        />
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          {t("home.title")}
-        </h1>
-        <HomeAgentComposer />
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 p-4 sm:p-6 lg:p-8">
+      <header className="relative overflow-hidden rounded-2xl border bg-card p-6 sm:p-9">
+        <div className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative max-w-3xl space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            TraceBack AI · Incident command
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
+            From incident signal to evidence-backed recovery.
+          </h1>
+          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Investigate outages by connecting telemetry, application logs, and deployment changes.
+            Review the agent's diagnosis and recovery proposal before any action is considered.
+          </p>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Link
+              to="/incidents"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Open incident workspace
+            </Link>
+            <span className="inline-flex min-h-11 items-center rounded-lg border px-4 py-2.5 text-xs font-semibold text-muted-foreground">
+              Read-only benchmark environment
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Incident queue</p>
+            <h2 className="text-xl font-semibold">Scenarios ready to investigate</h2>
+          </div>
+          <Link to="/incidents" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+            View all incidents
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading incident queue">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="h-48 animate-pulse rounded-xl border bg-muted/30" />
+            ))}
+          </div>
+        ) : error ? (
+          <p role="alert" className="rounded-lg border border-destructive/40 p-4 text-sm text-destructive">
+            Unable to load incidents: {error.message}
+          </p>
+        ) : !data?.length ? (
+          <p className="rounded-lg border p-4 text-sm text-muted-foreground">No benchmark incidents are available.</p>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {data.map((incident) => (
+              <Link
+                key={incident.id}
+                to={`/incidents/${incident.id}`}
+                className="group flex min-h-48 flex-col gap-4 rounded-xl border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-mono text-xs text-muted-foreground">{incident.id}</span>
+                  <span className="rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-wide">
+                    {incident.severity}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-base font-semibold leading-snug group-hover:text-primary">{incident.title}</h3>
+                  <p className="text-sm text-muted-foreground">{incident.description}</p>
+                </div>
+                <div className="mt-auto flex items-center justify-between gap-3 border-t pt-3 text-xs text-muted-foreground">
+                  <span>{incident.service}</span>
+                  <span className="font-mono">{incident.activeRelease}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
-      <Separator />
-      <div className="grid md:grid-cols-[1fr_auto_1fr]">
-        <ResourceColumn icon={<IconBook />} title={t("home.docsTitle")}>
-          <ResourceLink href={`${DOCS_URL}/getting-started`}>
-            {t("home.docsGettingStarted")}
-          </ResourceLink>
-          <ResourceLink href={`${DOCS_URL}/getting-started-actions`}>
-            {t("home.docsAddAction")}
-          </ResourceLink>
-          <ResourceLink href={`${DOCS_URL}/getting-started-pages`}>
-            {t("home.docsAddPage")}
-          </ResourceLink>
-          <ResourceLink href={`${DOCS_URL}/key-concepts`}>
-            {t("home.docsKeyConcepts")}
-          </ResourceLink>
-        </ResourceColumn>
-        <Separator orientation="vertical" className="hidden md:block" />
-        <ResourceColumn icon={<IconUsers />} title={t("home.communityTitle")}>
-          <ResourceLink href={GITHUB_URL} icon={<IconBrandGithub />}>
-            GitHub
-          </ResourceLink>
-          <ResourceLink href={DISCORD_URL} icon={<IconBrandDiscord />}>
-            Discord
-          </ResourceLink>
-        </ResourceColumn>
-      </div>
-    </div>
+      <section className="grid gap-3 md:grid-cols-3">
+        <article className="rounded-xl border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">01 · Evidence</p>
+          <h3 className="mt-2 text-sm font-semibold">Shared incident actions</h3>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">The interface and agent read the same validated incident, telemetry, log, and deployment evidence.</p>
+        </article>
+        <article className="rounded-xl border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">02 · Investigation</p>
+          <h3 className="mt-2 text-sm font-semibold">Five-stage reasoning flow</h3>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Observe, correlate, diagnose, prepare a plan, and stop at the human approval gate.</p>
+        </article>
+        <article className="rounded-xl border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">03 · Safety</p>
+          <h3 className="mt-2 text-sm font-semibold">No hidden production actions</h3>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">All supplied scenarios are simulated. The public demo does not connect to or modify live services.</p>
+        </article>
+      </section>
+    </main>
   );
 }
