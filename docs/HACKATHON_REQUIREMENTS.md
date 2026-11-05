@@ -49,7 +49,7 @@ The app uses the Agent-Native Chat starter from `@agent-native/core@0.223.0`, pl
 | Official Agent-Native code in the app | Implemented in the isolated app | `agent-native-poc/actions/` contains `defineAction` actions; the Agent-Native Vercel project targets this folder |
 | Five-stage investigation brief | Implemented in source | New action, incident detail UI, and action tests added; latest CI still needs to pass |
 | Three incident scenarios | Implemented as benchmark data | Manual tests were previously completed in the legacy app; repeat them on the Agent-Native deployment |
-| Runtime deployment | In progress | First runtime smoke test found missing `yjs`; direct dependency and lockfile fix added; verify a fresh deployment |
+| Runtime deployment | Blocked pending redeploy | The generic React Router preset served UI routes but returned 404 for Agent-Native auth/action endpoints. The correct Nitro Vercel preset is now configured in source and project settings. Vercel's free deployment API limit (100/day) blocked the next deployment attempt; retry after the 24-hour reset. Do not use the old preview URL for submission |
 | Agent chat with a configured model | Not yet verified | Confirm an AI provider is configured and test a real chat turn using shared incident actions |
 | Public access without Vercel SSO | Configured on the isolated Vercel project | Verify in an incognito browser; application authentication remains enabled |
 | Public Clips video | Not complete | Record the final Agent-Native app, publish the clip, and verify public access |
