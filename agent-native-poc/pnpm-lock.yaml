@@ -140,6 +140,9 @@ importers:
       use-sync-external-store:
         specifier: ^1.6.0
         version: 1.7.0(react@19.3.1)
+      yjs:
+        specifier: 13.6.33
+        version: 13.6.33
       vite:
         specifier: 8.1.0
         version: 8.1.0(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
