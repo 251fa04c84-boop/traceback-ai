@@ -38,6 +38,20 @@ The Agent-Native application lives in `agent-native-poc/` and is the intended ha
 
 The repository also retains an earlier custom Next.js implementation at the repository root. It is preserved as prior project work and for comparison; it is not the Agent-Native runtime entry point for the hackathon deployment.
 
+## Deployment to Vercel
+
+The Agent-Native app must use the Nitro Vercel preset so the framework server plugins and action endpoints are deployed with the UI. The isolated Vercel project uses `agent-native-poc/` as its root and `agent-native-poc/vercel.json` for the build configuration.
+
+The equivalent release sequence is:
+
+```bash
+pnpm migrate:production
+NITRO_PRESET=vercel pnpm build
+npx vercel deploy --prebuilt
+```
+
+Keep `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `CRON_SECRET` in Vercel's encrypted environment settings. Never commit them.
+
 ## Run locally
 
 Requirements: Node.js 22.22 or newer and pnpm 10.29.1.
