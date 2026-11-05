@@ -86,10 +86,14 @@ describe("TraceBack Agent-Native read-only actions", () => {
     expect(
       getIncidentEvidence.schema.safeParse({ incidentId: "inc-unknown" }).success,
     ).toBe(false);
+    expect(
+      buildInvestigationBrief.schema.safeParse({ incidentId: "inc-unknown" }).success,
+    ).toBe(false);
   });
 
   it("does not expose remediation controls through either read-only action", () => {
     expect(listIncidents.readOnly).toBe(true);
     expect(getIncidentEvidence.readOnly).toBe(true);
+    expect(buildInvestigationBrief.readOnly).toBe(true);
   });
 });
