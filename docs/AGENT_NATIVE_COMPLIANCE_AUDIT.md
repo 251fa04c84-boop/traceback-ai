@@ -40,7 +40,7 @@ Do not describe the approval card as a production-grade authenticated approval s
 
 A separate Vercel project named `traceback-agent-native-preview` was created and linked to the repository with `agent-native-poc/` as its root directory. It uses a dedicated Neon project on the Free plan, separate from the user's RAJ database and separate from the legacy production project.
 
-The first runtime smoke test found a missing `yjs` package. The package was added as a direct dependency and the lockfile updated. A fresh deployment must still verify that the issue is resolved.
+The first runtime smoke test found a missing `yjs` package; it was added as a direct dependency and locked. A later URL smoke test showed the generic React Router deployment omitted Agent-Native auth/action server endpoints (404). The project is now configured for the official Nitro Vercel preset (`NITRO_PRESET=vercel`, `.vercel/output`, `framework: nitro`) with release migrations and a Hobby-compatible daily cron. The new Nitro deployment has not yet been created: Vercel returned its 100-deployments-per-day free-plan limit. The earliest retry is after November 6, 2026 at approximately 9:08 PM IST.
 
 ## Remaining release gates
 
