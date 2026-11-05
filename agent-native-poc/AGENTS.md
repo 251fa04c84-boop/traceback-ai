@@ -29,6 +29,7 @@ For custom branding, keep `server/plugins/agent-native-email-branding.ts` aligne
 | --- | --- |
 | list-incidents | List the three benchmark incidents |
 | get-incident-evidence | Read incident metrics, logs, deployment diffs, and post-mortem evidence |
+| build-investigation-brief | Build the five-stage read-only investigation brief and recovery proposal; stop at the human approval gate |
 
 ## Application state
 
