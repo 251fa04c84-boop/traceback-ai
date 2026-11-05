@@ -167,7 +167,7 @@ export const SCENARIOS: IncidentScenario[] = [
     postMortemTemplate: {
       rootCause: "Unchecked dereference on optional coupon field in PaymentGatewayController.java line 142 introduced in commit a7e89f2.",
       trigger: "Deployment of v2.4.1 to production cluster without null-safe unit test coverage for customers without coupons.",
-      blastRadius: "Checkout API experienced 42.8% error rate affecting approximately 1,420 checkout attempts over 8 minutes.",
+      blastRadius: "Checkout API error rate ranged from 42.8% to a 44.1% peak between 21:40 and 21:45; the latest recorded sample was 43.5%. Approximately 1,420 checkout attempts were affected over 8 minutes.",
       recommendedPrevention: "Implement mandatory static analysis check (SpotBugs/NullAway) in CI pipeline and enforce unit test cases with null coupon payloads."
     }
   },
