@@ -126,6 +126,7 @@ export default function TraceBackWorkspace() {
   const [activeIncident, setActiveIncident] = useState<IncidentDetail | null>(null);
   const [agentSession, setAgentSession] = useState<AgentSession | null>(null);
   const [isInvestigating, setIsInvestigating] = useState(false);
+  const [investigationError, setInvestigationError] = useState<string | null>(null);
   const [telemetryTab, setTelemetryTab] = useState<"logs" | "diff" | "metrics" | "actions">("logs");
   const [logFilter, setLogFilter] = useState<"ALL" | "ERROR" | "WARN">("ALL");
   const [showPostMortemModal, setShowPostMortemModal] = useState(false);
@@ -204,6 +205,7 @@ export default function TraceBackWorkspace() {
   const handleStartInvestigation = async () => {
     if (!selectedId) return;
     setIsInvestigating(true);
+    setInvestigationError(null);
     try {
       const res = await fetch("/api/agent", {
         method: "POST",
@@ -214,12 +216,18 @@ export default function TraceBackWorkspace() {
           apiKey: geminiKey || undefined
         })
       });
-      const data = await res.json();
-      if (data.session) {
-        setAgentSession(data.session);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || `Investigation request failed (HTTP ${res.status}).`);
       }
+      if (!data.session) {
+        throw new Error(data.error || "The investigation returned no session. Please try again.");
+      }
+      setAgentSession(data.session);
     } catch (e) {
+      const message = e instanceof Error ? e.message : "Investigation failed. Please try again.";
       console.error("Investigation failed:", e);
+      setInvestigationError(message);
     } finally {
       setIsInvestigating(false);
     }
@@ -775,12 +783,20 @@ export default function TraceBackWorkspace() {
                     </span>
                   </div>
                   <button
+                    type="button"
                     onClick={handleStartInvestigation}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 underline font-medium"
+                    disabled={isInvestigating}
+                    aria-busy={isInvestigating}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 underline font-medium disabled:cursor-wait disabled:opacity-60"
                   >
-                    Re-analyze
+                    {isInvestigating ? "Re-analyzing…" : "Re-analyze"}
                   </button>
                 </div>
+                {investigationError && (
+                  <p role="alert" className="mt-2 rounded-md border border-rose-500/30 bg-rose-950/30 px-3 py-2 text-xs text-rose-300">
+                    Investigation failed: {investigationError}
+                  </p>
+                )}
 
                 {/* Model Engine Provenance Badge */}
                 <div className="flex items-center justify-between px-3 py-1.5 rounded-md bg-slate-950/40 border border-slate-800/80 text-[11px]">
