@@ -12,7 +12,7 @@ Turn outage signals into traceable root-cause evidence and a human-reviewed reco
 
 ## Live application
 
-https://traceback-agent-native-preview-hackathons8.vercel.app
+https://traceback-agent-native-preview-git-codex-tra-134cf8-hackathons8.vercel.app
 
 *Verify the deployment is Ready, publicly reachable, and that the current commit is the one being demonstrated before using this URL in the form.*
 
