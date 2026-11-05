@@ -17,11 +17,13 @@ The existing root app is Next.js 14 / React 18, while Agent-Native Core 0.223.0 
 - Added action contract tests for all three benchmark incidents and the read-only gate.
 - Replaced stale README and submission documentation with accurate descriptions and disclosure.
 - Created a separate Vercel project rooted at `agent-native-poc/` and a dedicated Neon Free-plan database.
+- Configured the project for the official Nitro Vercel preset, `.vercel/output`, release migrations, a stable auth secret, and a Hobby-compatible daily cron schedule.
+- Added `agent-native-poc/vercel.json` so the deployment build uses `NITRO_PRESET=vercel`.
 
 ## Remaining before submission
 
 1. Confirm the latest Agent-Native CI run passes typecheck, action tests, doctor, and build.
-2. Verify a fresh Vercel deployment after adding `yjs@13.6.33` as a direct runtime dependency.
+2. After the Vercel free deployment API limit resets (earliest November 6, 2026, about 9:08 PM IST), create a fresh deployment with the Nitro preset and verify server endpoints. The prior generic React Router deployment is not a valid Agent-Native preview.
 3. Verify app authentication and configure an AI provider for the agent chat.
 4. Manually test all three incidents on the Agent-Native deployment.
 5. Verify mobile layout and runtime errors.
