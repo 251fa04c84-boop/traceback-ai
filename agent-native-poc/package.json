@@ -1,8 +1,8 @@
 {
   "name": "agent-native-poc",
-  "displayName": "Agent Native Poc",
+  "displayName": "TraceBack AI",
   "private": true,
-  "description": "Workspace app for Agent Native Poc.",
+  "description": "Evidence-first incident investigation workspace built with Agent-Native.",
   "type": "module",
   "scripts": {
     "migrate:production": "tsx scripts/migrate-production.ts",
