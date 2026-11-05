@@ -68,6 +68,7 @@ export default defineAction({
         evidence: [
           ...scenario.logs.map((log) => `${log.id} · ${log.timestamp}: ${log.message}`),
           `Suspect release ${deployment.releaseId} · commit ${deployment.commitHash}: ${deployment.summary}`,
+          `Deployment diff: ${deployment.diff}`,
         ],
       },
       {
