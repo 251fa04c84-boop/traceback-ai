@@ -74,7 +74,7 @@ describe("TraceBack Agent-Native read-only actions", () => {
     const correlation = result.stages.find((stage) => stage.id === "correlate");
     const diagnosis = result.stages.find((stage) => stage.id === "diagnose");
     const evidence = correlation?.evidence.join(" ") ?? "";
-    expect(evidence).toContain("SQLSTATE 53300");
+    expect(evidence).toContain("state: 53300");
     expect(evidence).toContain("HikariPool-1");
     expect(evidence).toContain("QueryExecutor.ts");
     expect(diagnosis?.summary).toContain("client.release()");
