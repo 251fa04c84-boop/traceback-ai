@@ -41,7 +41,7 @@ export default defineAction({
     const scenario = SCENARIOS.find((item) => item.id === incidentId);
     if (!scenario) throw new Error("Incident not found.");
 
-    const latest = scenario.metrics.at(-1);
+    const latest = scenario.metrics[scenario.metrics.length - 1];
     const deployment = scenario.deployments.find((item) => !item.isStable) ?? scenario.deployments[0];
     if (!latest) throw new Error("No telemetry samples are available for this incident.");
     if (!deployment) throw new Error("No deployment evidence is available for this incident.");
