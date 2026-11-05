@@ -12,7 +12,7 @@ Turn outage signals into traceable root-cause evidence and a human-reviewed reco
 
 ## Live application
 
-https://traceback-agent-native-preview-git-codex-tra-134cf8-hackathons8.vercel.app
+**[Add the verified Agent-Native Nitro deployment URL after the server endpoints pass smoke tests.]**
 
 *Verify the deployment is Ready, publicly reachable, and that the current commit is the one being demonstrated before using this URL in the form.*
 
