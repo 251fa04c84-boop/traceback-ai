@@ -49,8 +49,9 @@ describe("TraceBack Agent-Native read-only actions", () => {
         "plan",
         "approval",
       ]);
-      expect(result.stages[4].status).toBe("review-required");
-      expect(result.stages[4].summary).toContain("Execution is locked");
+      const approvalStage = result.stages.find((stage) => stage.id === "approval");
+      expect(approvalStage?.status).toBe("review-required");
+      expect(approvalStage?.summary).toContain("Execution is locked");
       expect(result.recommendedActions.length).toBeGreaterThan(0);
       expect(result.recommendedPrevention).toBeTruthy();
       expect(buildInvestigationBrief.outputSchema.safeParse(result).success).toBe(true);
@@ -61,23 +62,28 @@ describe("TraceBack Agent-Native read-only actions", () => {
 
   it("reports checkout initial, peak, and latest error-rate samples distinctly", async () => {
     const result = await buildInvestigationBrief.run({ incidentId: "inc-8921" });
-    expect(result.stages[0].summary).toContain("43.5%");
-    expect(result.stages[0].evidence.join(" ")).toContain("44.1%");
-    expect(result.stages[1].evidence.join(" ")).toContain("PaymentGatewayController.java");
+    const observation = result.stages.find((stage) => stage.id === "observe");
+    const correlation = result.stages.find((stage) => stage.id === "correlate");
+    expect(observation?.summary).toContain("43.5%");
+    expect(observation?.evidence.join(" ")).toContain("44.1%");
+    expect(correlation?.evidence.join(" ")).toContain("PaymentGatewayController.java");
   });
 
   it("correlates PostgreSQL connection rejection with HikariPool wait timeout", async () => {
     const result = await buildInvestigationBrief.run({ incidentId: "inc-7119" });
-    const evidence = result.stages[1].evidence.join(" ");
+    const correlation = result.stages.find((stage) => stage.id === "correlate");
+    const diagnosis = result.stages.find((stage) => stage.id === "diagnose");
+    const evidence = correlation?.evidence.join(" ") ?? "";
     expect(evidence).toContain("SQLSTATE 53300");
     expect(evidence).toContain("HikariPool-1");
     expect(evidence).toContain("QueryExecutor.ts");
-    expect(result.stages[2].summary).toContain("client.release()");
+    expect(diagnosis?.summary).toContain("client.release()");
   });
 
   it("includes the suspect deployment diff for the session memory incident", async () => {
     const result = await buildInvestigationBrief.run({ incidentId: "inc-4402" });
-    const evidence = result.stages[1].evidence.join(" ");
+    const correlation = result.stages.find((stage) => stage.id === "correlate");
+    const evidence = correlation?.evidence.join(" ") ?? "";
     expect(evidence).toContain("ConcurrentHashMap");
     expect(evidence).toContain("LocalCacheAdapter.java");
   });
