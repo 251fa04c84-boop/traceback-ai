@@ -1,33 +1,44 @@
-# Chat
+# TraceBack AI — Agent-Native application
 
-The minimal agent-native starter app — a clean, ChatGPT-style shell with chat at
-the center, durable threads, standard app navigation, auth, live sync, and
-actions. Start here when you want a real browser app to build on without
-committing to a domain template.
+This directory is the Agent-Native application deployed for the Builder.io Agent-Native Hackathon 2026.
 
-**Live app: [chat.agent-native.com](https://chat.agent-native.com?utm_source=github&utm_medium=referral&utm_content=chat-readme)**
+TraceBack helps on-call engineers investigate incidents by connecting benchmark telemetry, application logs, and deployment diffs. The UI and agent use the same official Agent-Native actions.
 
-Chat is the basic agent-native app starting point. It gives you the app-agent
-loop wired end to end and one example action, so you can add your own UI, data,
-and actions on top.
+## Five-stage workflow
 
-## Features
+1. Observe telemetry and service health.
+2. Correlate timestamped logs with the suspect deployment and code diff.
+3. Diagnose the failure from the supplied evidence.
+4. Prepare an allowlisted recovery proposal for review.
+5. Stop at the human approval gate.
 
-- ChatGPT-style shell with a threads list and durable chat history.
-- Auth, live sync, and application state wired out of the box.
-- The action surface the agent and UI share, plus one example action to copy.
-- A minimal, brandable base for any domain app.
+The app uses deterministic benchmark scenarios. It is not connected to production infrastructure. All incident actions are read-only; recovery proposals are not executed.
 
-## Develop locally
+## Shared Agent-Native actions
 
-Scaffold your own copy and run it:
+- `list-incidents` — read the three available benchmark scenarios.
+- `get-incident-evidence` — retrieve telemetry, logs, deployment history, and post-mortem evidence.
+- `build-investigation-brief` — build the five-stage evidence brief displayed in the UI and available to the agent.
+
+The agent instructions require it to cite concrete evidence, identify benchmark data as simulated, and never claim that a proposed recovery was executed.
+
+## Local development
+
+Requirements: Node.js 22.22 or newer and pnpm 10.29.1.
 
 ```bash
-npx --yes @agent-native/core@latest create my-app --standalone --template chat
-cd my-app
 corepack enable
-pnpm install
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Full docs: [agent-native.com/docs/template-chat](https://agent-native.com/docs/template-chat?utm_source=github&utm_medium=referral&utm_content=chat-readme).
+## Verification
+
+```bash
+pnpm typecheck
+pnpm test
+pnpm agent-native:doctor
+pnpm build
+```
+
+The app uses `DATABASE_URL` for hosted PostgreSQL and `BETTER_AUTH_SECRET` for server-side authentication. Keep both values in your deployment environment; never commit secrets. Do not disable authentication for a shared or public deployment.
