@@ -58,6 +58,30 @@ describe("TraceBack Agent-Native read-only actions", () => {
     },
   );
 
+
+  it("reports checkout initial, peak, and latest error-rate samples distinctly", async () => {
+    const result = await buildInvestigationBrief.run({ incidentId: "inc-8921" });
+    expect(result.stages[0].summary).toContain("43.5%");
+    expect(result.stages[0].evidence.join(" ")).toContain("44.1%");
+    expect(result.stages[1].evidence.join(" ")).toContain("PaymentGatewayController.java");
+  });
+
+  it("correlates PostgreSQL connection rejection with HikariPool wait timeout", async () => {
+    const result = await buildInvestigationBrief.run({ incidentId: "inc-7119" });
+    const evidence = result.stages[1].evidence.join(" ");
+    expect(evidence).toContain("SQLSTATE 53300");
+    expect(evidence).toContain("HikariPool-1");
+    expect(evidence).toContain("QueryExecutor.ts");
+    expect(result.stages[2].summary).toContain("client.release()");
+  });
+
+  it("includes the suspect deployment diff for the session memory incident", async () => {
+    const result = await buildInvestigationBrief.run({ incidentId: "inc-4402" });
+    const evidence = result.stages[1].evidence.join(" ");
+    expect(evidence).toContain("ConcurrentHashMap");
+    expect(evidence).toContain("LocalCacheAdapter.java");
+  });
+
   it("rejects unknown incident IDs at the input schema", () => {
     expect(
       getIncidentEvidence.schema.safeParse({ incidentId: "inc-unknown" }).success,
