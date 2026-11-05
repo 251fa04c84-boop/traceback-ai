@@ -8,7 +8,7 @@ The Agent-Native app is in `agent-native-poc/` and is deployed as a separate Ver
 - **UI/runtime:** React 19, React Router 8, Vite
 - **Actions:** official `defineAction()` definitions with Zod input/output schemas
 - **Data:** deterministic benchmark scenarios imported from the shared TraceBack scenario module
-- **Hosting:** Vercel
+- **Hosting:** Vercel using Agent-Native's Nitro preset (`NITRO_PRESET=vercel`) and `.vercel/output`
 - **Hosted database:** dedicated Neon project for framework application state and auth
 
 ## Shared Agent-Native actions
@@ -34,5 +34,7 @@ The incident detail UI and the Agent-Native chat use the same action registry. T
 The current app is a read-only benchmark demo. It is not connected to live production systems. Proposed rollback/flag/restart operations are not executed. The approval gate is a safety disclosure, not a production-grade authorization workflow.
 
 ## Legacy implementation
+
+The Vercel project is configured with root directory `agent-native-poc/`, framework `nitro`, build command `pnpm migrate:production && NITRO_PRESET=vercel pnpm build`, and output directory `.vercel/output`. The first generic React Router deployment did not mount server endpoints; the Nitro deployment is pending because the Vercel Free-plan deployment API limit (100/day) was reached. Do not use the old preview URL for submission.
 
 The repository root also contains an earlier custom Next.js / React 18 implementation with a custom action registry and simulator. It is retained as prior project work and reference material. It is not the Agent-Native runtime entry point used by the separate hackathon deployment.
