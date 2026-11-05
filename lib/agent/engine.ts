@@ -206,7 +206,7 @@ Analyze and output a JSON response matching:
     // Deterministic Calibrated Fallback (if AI not used or call failed)
     if (!hypothesisText) {
       if (s.id === "inc-8921") {
-        hypothesisText = `Release v2.4.1 (commit a7e89f2 by @Alex Rivera) introduced a breaking regression in PaymentGatewayController.java:142 by removing a null-check on request.getCoupon(). When cart payloads lack promotional coupons, getCoupon() returns null, triggering a NullPointerException and spiking 500 errors to 42.8%.`;
+        hypothesisText = `Release v2.4.1 (commit a7e89f2 by @Alex Rivera) introduced a breaking regression in PaymentGatewayController.java:142 by removing a null-check on request.getCoupon(). When cart payloads lack promotional coupons, getCoupon() returns null, triggering a NullPointerException and with the latest recorded HTTP 500 error rate at 43.5% and a peak of 44.1%.`;
         proposedActionId = "rollbackDeployment";
         proposedParams = { releaseId: s.stableRelease };
         proposedReason = `Rollback ${s.service} from degraded release ${s.activeRelease} to last known stable release ${s.stableRelease}.`;
