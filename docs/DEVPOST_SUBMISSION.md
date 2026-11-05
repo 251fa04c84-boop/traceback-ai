@@ -1,86 +1,83 @@
-# 🏆 Devpost / Official Submission Draft: TraceBack AI
+# TraceBack AI — Official Hackathon Submission Draft
 
-## Project Title
-**TraceBack AI — Agent-Native Incident Investigation & Recovery Workspace**
+> **Draft only. Do not submit until the live app, AI interaction, public Clips video, and submission links have been verified.**
 
-## Tagline (Pitch)
-Autonomous AI agent and on-call engineers operating as equal peers on shared actions, telemetry data, and deterministic recovery verification.
+## Project title
 
----
+**TraceBack AI — Evidence-First Incident Investigation**
 
-## Public Demo URL
-https://traceback-ai.vercel.app
+## Tagline
 
-## Public GitHub Repository
+Turn outage signals into traceable root-cause evidence and a human-reviewed recovery plan.
+
+## Live application
+
+https://traceback-agent-native-preview-hackathons8.vercel.app
+
+*Verify the deployment is Ready, publicly reachable, and that the current commit is the one being demonstrated before using this URL in the form.*
+
+## Source code
+
 https://github.com/251fa04c84-boop/traceback-ai
 
----
+## Public Clips demonstration
 
-## 💡 Inspiration & The Problem
-> *"At 2 AM during a production outage, traditional AI chatbots are completely useless."*
+**[Add the final public Clips URL here after recording and verifying that it opens without login.]**
 
-When critical services fail, engineering teams don’t need an AI that just generates conversational text in a side panel. Chatbots:
-1. Cannot execute real application actions.
-2. Have zero awareness of live telemetry, recent git diffs, or container logs.
-3. Hallucinate that an incident is "resolved" without checking system health.
-4. Cannot be trusted to execute dangerous mutations without structured human authorization.
+## Project description
 
-We built **TraceBack AI** to demonstrate what true **Agent-Native** incident management looks like—unifying the human engineer and the AI agent around shared tools, evidence-grounded hypotheses, strict human safety gates, and deterministic health verification.
+When a production incident occurs, on-call engineers must connect noisy telemetry, application logs, and recent code changes before deciding what to do. TraceBack AI turns that investigation into a structured workflow.
 
----
+The Agent-Native app presents three realistic benchmark incidents: a checkout regression caused by a null coupon dereference, a session service crash loop caused by an unbounded cache, and database connection exhaustion associated with unreleased pooled clients.
 
-## 🚀 What It Does
-TraceBack AI is an end-to-end incident investigation and remediation workspace:
-1. **Interactive Incident Switcher:** Ships with 3 realistic production failure scenarios:
-   - *Checkout Outage (`inc-8921`):* NullPointerException in `v2.4.1` spiking HTTP 500 error rates to 42.8%.
-   - *Session CrashLoop (`inc-4402`):* Unbounded in-memory cache causing JVM heap exhaustion (`OOMKilled`).
-   - *DB Connection Exhaustion (`inc-7119`):* Unreleased Postgres connection pool client on error paths.
-2. **Autonomous Multi-Phase Investigation:** The agent dispatches shared `defineAction` primitives:
-   - Fetches and filters container logs with error stack traces.
-   - Inspects git commit diffs, commit hashes, and commit authors.
-   - Formulates a root-cause hypothesis with cited, immutable evidence lines.
-   - Synthesizes a concrete recovery action.
-3. **Human Approval Gate:** Mutating actions (`rollbackDeployment`, `toggleFeatureFlag`, `restartService`) are intercepted. The user is presented with a clear blast-radius warning, target parameters, and one-click authorization.
-4. **Deterministic Health Verification:** The agent does *not* self-certify resolution. Instead, an active health probe tests endpoints, error rates, and pod states. Only when metrics return to nominal thresholds does the system transition to `RESOLVED`.
-5. **Automated Post-Mortem Generator:** Produces an exportable Markdown post-mortem with exact timeline, MTTR metrics, and preventative action items.
+The engineer can inspect the same evidence the agent uses. TraceBack's shared Agent-Native actions retrieve the incident catalog and evidence, then build a five-stage investigation brief:
 
----
+1. Observe telemetry and service symptoms.
+2. Correlate timestamped logs with deployment metadata and code diffs.
+3. Diagnose the likely cause using the supplied evidence.
+4. Prepare a concrete, allowlisted recovery proposal.
+5. Stop at a human approval gate.
 
-## 🛠️ How We Built It (Agent-Native Architecture)
-- **Agent-Native Core (`@agent-native/core` Pattern):**
-  All capabilities (`getServiceLogs`, `inspectDeploymentDiff`, `getTelemetryMetrics`, `checkServiceHealth`, `rollbackDeployment`, `toggleFeatureFlag`, `restartService`) are declared once using `defineAction` with Zod validation. Both the human clicking UI buttons and the autonomous AI agent execute the exact same underlying action functions.
-- **Frontend & UI:** Next.js 14 App Router, React 18, Tailwind CSS, Lucide React icons. Fully responsive across mobile (390px) and desktop command screens.
-- **Deterministic Simulation Engine:** In-memory state machine modeling realistic container clusters, synthetic logs, and timeseries telemetry.
-- **Automated Verification Suite:** Custom test runner (`scripts/test-runner.js`) with 41 passing automated unit, integration, and security checks (100% pass rate).
+The goal is not to let an LLM claim that an outage is fixed. TraceBack makes the evidence and proposed next step visible, while clearly showing that approval and execution are separate from investigation.
 
----
+## What makes it Agent-Native
 
-## 🎥 Demo Video & Subtitles
-- **Video File:** `TraceBack_AI_Builder_Hackathon_Demo.mp4` (Duration: 1m 21s, 1080p Full HD)
-- **Subtitles (SRT):** `TraceBack_AI_Builder_Hackathon_Demo.srt`
-- **Builder.io Clips / Video URL:** Uploaded via Builder.io Clips dashboard. *See [Submission Checklist](../docs/SUBMISSION_CHECKLIST.md) for step-by-step upload guide.*
+TraceBack uses `defineAction()` from `@agent-native/core`. The UI and the Agent-Native assistant share the same typed incident actions:
 
----
+- `list-incidents`
+- `get-incident-evidence`
+- `build-investigation-brief`
 
-## ⚡ Challenges We Ran Into
-1. **Preventing Agent Self-Certification:** Large Language Models frequently claim a bug is "fixed" as soon as an action is recommended. We decoupled the verdict from the LLM, enforcing that resolution can only be confirmed by deterministic health probes against system metrics.
-2. **Safe Mutating Action Interception:** Ensuring that mutating operations cannot be bypassed by an autonomous agent. We implemented a strict approval gate in the action dispatcher that halts execution and emits `requiresApproval: true` until an explicit human token is granted.
-3. **Mobile Responsive SRE Experience:** On-call engineers frequently respond from mobile phones. We designed a clean, responsive layout with accessible telemetry tabs and one-click approval buttons.
+The interface displays the five-stage brief returned by the shared action, and the agent is instructed to use those actions, cite evidence, distinguish benchmark data from live telemetry, and respect the approval boundary.
 
----
+## Safety and limitations
 
-## 🏅 Accomplishments We're Proud Of
-- **Genuine Agent-Native Implementation:** Not a chatbot wrapper. The AI agent and the human engineer share the same action primitives and live application state.
-- **100% Automated Test Coverage:** 41 out of 41 automated tests passing with 0 failures across all scenarios and action primitives.
-- **Zero-Dependency Judge Usability:** Completely functional out of the box with zero external configuration or paid API keys required.
+The current public demo uses deterministic simulated benchmark data. It is **not connected to live Kubernetes, cloud, database, or customer infrastructure**. The domain actions are read-only. Recovery steps are proposals only; no rollback, feature-flag change, restart, or production remediation is executed. Do not describe the benchmark scenarios as live production telemetry or claim that an incident was fixed.
 
----
+## Built with
 
-## 🧰 Built With
-- `agent-native`
-- `builder-io`
-- `nextjs`
-- `react`
-- `typescript`
-- `zod`
-- `tailwindcss`
+- Builder.io Agent-Native / `@agent-native/core`
+- Agent-Native Toolkit
+- TypeScript, React 19, React Router, Vite, and Zod
+- Vercel for hosting
+- Neon Postgres for the isolated hosted app database
+
+## Originality and third-party work disclosure
+
+The repository contains an earlier custom Next.js incident workspace and deterministic incident scenarios. That earlier work is retained as prior project work.
+
+For this hackathon, the Agent-Native Chat starter template from `@agent-native/core@0.223.0` was adapted into the TraceBack incident workspace. The project-specific additions include incident actions, the five-stage evidence brief, incident pages, agent instructions, and action tests. Other third-party packages are listed in `agent-native-poc/package.json`; their licenses apply.
+
+Before submission, enter the accurate dates and extent of pre-existing work, all creators/team members, and any third-party assets in the official form.
+
+## Creator / team information
+
+- Creator name(s): **[Confirm exact creator/team names]**
+- Contact email: **[Enter the contact email in the official form]**
+- Team members and agreed prize allocation, if applicable: **[Confirm with all members]**
+
+## Submission reminder
+
+Official submission form: https://www.builder.io/hackathon/submit
+
+The entry is not submitted until the form is completed and the receipt is verified.
