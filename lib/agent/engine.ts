@@ -218,7 +218,7 @@ Analyze and output a JSON response matching:
         proposedReason = `Disable leaking in-memory cache flag FF_UNBOUNDED_SESSION_CACHE to halt memory exhaustion.`;
         blastRadius = "medium";
       } else {
-        hypothesisText = `Release v1.9.4 in commit f891d29 omitted client.release() on database connection pool acquisitions in QueryExecutor.ts. This caused 100% database connection pool saturation, leading to HTTP 504 timeouts.`;
+        hypothesisText = `Release v1.9.4 (commit f891d29) acquires a pooled client in QueryExecutor.ts but does not return it in a finally block. The evidence aligns: active connections reached 100/100 at 18:30; log-301 reports PostgreSQL SQLSTATE 53300 (new connections rejected at the server limit); log-302 reports HikariPool waiters timing out after 30,005 ms. These are the server-side exhaustion and application-side wait symptoms of the same connection leak.`;
         proposedActionId = "toggleFeatureFlag";
         proposedParams = { flagId: "FF_ASYNC_ANALYTICS_V2", enabled: false };
         proposedReason = `Disable leaking async analytics feature flag FF_ASYNC_ANALYTICS_V2 to release database connections.`;
