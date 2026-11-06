@@ -1,12 +1,15 @@
 import { useActionQuery } from "@agent-native/core/client/hooks";
 import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
+import { Outlet, useParams } from "react-router";
 
 export function meta() {
   return [{ title: "Incidents · TraceBack AI" }];
 }
 
 export default function IncidentsPage() {
-  useSetPageTitle("Incidents");
+  const { incidentId } = useParams();
+  useSetPageTitle(incidentId ? "Incident evidence" : "Incidents");
+  if (incidentId) return <Outlet />;
   const { data, isLoading, error } = useActionQuery("list-incidents", {});
 
   return (
