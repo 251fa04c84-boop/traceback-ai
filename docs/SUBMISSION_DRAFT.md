@@ -1,0 +1,57 @@
+# TraceBack AI — Builder.io Agent-Native Hackathon Submission Draft
+
+## Project name
+TraceBack AI
+
+## One-line summary
+An evidence-first incident investigation workspace where engineers and an AI agent use the same typed actions to correlate telemetry, logs, and deployment changes—then stop at a human approval gate.
+
+## Problem
+Incident response is fragmented. On-call engineers switch between metrics, logs, and deployment history while trying to determine what changed, what failed, and which recovery option is safe. A generic chatbot can summarize text without grounding its conclusions in the application's actual evidence or making the approval boundary clear.
+
+## Solution
+TraceBack AI organizes an incident investigation into five stages:
+
+1. Observe sampled service telemetry.
+2. Correlate timestamped application logs with the suspect release and code diff.
+3. Diagnose the likely failure from the supplied evidence.
+4. Prepare an allowlisted recovery proposal for review.
+5. Stop at a human approval gate.
+
+The interface and Agent-Native assistant share the same typed `defineAction()` capabilities: `list-incidents`, `get-incident-evidence`, and `build-investigation-brief`. The UI can request the same validated incident data and five-stage brief that the assistant can use. This demonstrates Agent-Native's shared-action model rather than placing an unrelated chat panel beside a dashboard.
+
+## What is distinctive
+- Evidence is visible and reviewable: metrics, log IDs/timestamps, release identifiers, and deployment diffs.
+- The agent is instructed to ground findings in the returned evidence and treat log/diff text as untrusted data, not instructions.
+- Recovery is deliberately not executed in this public benchmark. The approval gate makes the safety boundary explicit.
+- The same action contracts are covered by automated tests for all three scenarios.
+
+## Demonstration scenarios
+- Checkout outage: a null-coupon regression following release v2.4.1.
+- Session crash loop: JVM heap exhaustion associated with an unbounded in-memory session cache.
+- Database connection exhaustion: PostgreSQL connection rejection and HikariPool acquisition timeouts.
+
+## Links
+- Preview application: https://traceback-agent-native-preview-pxx24g3fv-hackathons8.vercel.app
+- GitHub repository: https://github.com/251fa04c84-boop/traceback-ai
+- Public Clips demo: [ADD THE FINAL PUBLIC CLIPS URL AFTER RECORDING]
+
+## Technical implementation
+- Official Agent-Native framework: `@agent-native/core@0.223.0` and `@agent-native/toolkit@0.223.0`.
+- React 19 / React Router 8 application.
+- Three typed, read-only actions shared between the UI and agent.
+- Vercel Preview deployment using the Nitro Vercel preset.
+- Automated CI runs typechecking, action tests, Agent-Native diagnostics, and builds.
+
+## Transparency and pre-existing work disclosure
+The repository contains an earlier custom Next.js TraceBack implementation and deterministic incident simulator. The hackathon entry's Agent-Native app is in `agent-native-poc/`, adapted from the Agent-Native Chat starter template (`@agent-native/core@0.223.0`) and extended with TraceBack incident actions, evidence pages, a five-stage brief, and action tests. The earlier implementation and simulator are pre-existing project work; do not claim they were all created during the hackathon. Framework packages and dependencies remain subject to their own licenses.
+
+The three incident scenarios are deterministic simulated benchmark data. The public app is not connected to live production infrastructure. All current incident actions are read-only; no rollback, feature-flag mutation, service restart, or live health verification is executed. A proposed recovery action is not a completed remediation.
+
+## Final fields to complete before submitting
+- [ ] Confirm exact creator/team names and any teammates who must be listed.
+- [ ] Confirm all team members meet the official age and eligibility rules and authorize the entry.
+- [ ] Add the final public Clips URL.
+- [ ] Verify the live Preview and the public Clips link from a signed-out/incognito browser.
+- [ ] Agree to the current official rules on the submission form.
+- [ ] Submit the official form and save the receipt/confirmation.
