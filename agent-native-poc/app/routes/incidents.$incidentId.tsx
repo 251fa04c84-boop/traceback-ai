@@ -1,5 +1,5 @@
 import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { SCENARIOS } from "../../../lib/simulator/scenarios.js";
 
 const INCIDENT_IDS = ["inc-8921", "inc-4402", "inc-7119"] as const;
@@ -21,7 +21,7 @@ export default function IncidentEvidencePage() {
     return (
       <main className="mx-auto max-w-4xl space-y-4 p-6">
         <h1 className="text-2xl font-semibold">Incident not found</h1>
-        <Link className="text-sm underline" to="/incidents">Back to incidents</Link>
+        <a className="text-sm underline" href="/incidents">Back to incidents</a>
       </main>
     );
   }
@@ -79,7 +79,7 @@ export default function IncidentEvidencePage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 sm:p-6">
-      <Link to="/incidents" className="text-sm text-muted-foreground underline underline-offset-4">← All incidents</Link>
+      <a href="/incidents" className="text-sm text-muted-foreground underline underline-offset-4">← All incidents</a>
       <header className="space-y-2">
         <p className="font-mono text-xs text-muted-foreground">{scenario.id} · {scenario.service}</p>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{scenario.title}</h1>
