@@ -1,6 +1,5 @@
 import { useActionQuery } from "@agent-native/core/client/hooks";
 import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
-import { Link } from "react-router";
 
 export default function HomePage() {
   useSetPageTitle("Overview");
@@ -22,12 +21,12 @@ export default function HomePage() {
             Review the agent's diagnosis and recovery proposal before any action is considered.
           </p>
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Link
-              to="/incidents"
+            <a
+              href="/incidents"
               className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Open incident workspace
-            </Link>
+            </a>
             <span className="inline-flex min-h-11 items-center rounded-lg border px-4 py-2.5 text-xs font-semibold text-muted-foreground">
               Read-only benchmark environment
             </span>
@@ -41,9 +40,9 @@ export default function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Incident queue</p>
             <h2 className="text-xl font-semibold">Scenarios ready to investigate</h2>
           </div>
-          <Link to="/incidents" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+          <a href="/incidents" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
             View all incidents
-          </Link>
+          </a>
         </div>
 
         {isLoading ? (
@@ -61,9 +60,9 @@ export default function HomePage() {
         ) : (
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {data.map((incident) => (
-              <Link
+              <a
                 key={incident.id}
-                to={`/incidents/${incident.id}`}
+                href={`/incidents/${incident.id}`}
                 className="group flex min-h-48 flex-col gap-4 rounded-xl border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <div className="flex items-center justify-between gap-3">
@@ -80,7 +79,7 @@ export default function HomePage() {
                   <span>{incident.service}</span>
                   <span className="font-mono">{incident.activeRelease}</span>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         )}
