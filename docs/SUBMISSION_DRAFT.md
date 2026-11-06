@@ -32,7 +32,7 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 - Database connection exhaustion: PostgreSQL connection rejection and HikariPool acquisition timeouts.
 
 ## Links
-- Preview application: https://traceback-agent-native-preview-p6f7kdsse-hackathons8.vercel.app
+- Preview application: https://traceback-agent-native-preview-p8b5v7qan-hackathons8.vercel.app
 - Source branch (Agent-Native app and latest hackathon changes): https://github.com/251fa04c84-boop/traceback-ai/tree/codex/traceback-agent-native-v2
 - Reviewable draft PR: https://github.com/251fa04c84-boop/traceback-ai/pull/4
 - Public Clips demo: [ADD THE FINAL PUBLIC CLIPS URL AFTER RECORDING]
@@ -42,7 +42,7 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 - React 19 / React Router 8 application.
 - Three typed, read-only actions shared between the UI and agent.
 - Vercel Preview deployment using the Nitro Vercel preset.
-- Automated CI runs typechecking, action tests, Agent-Native diagnostics, and builds.
+- Latest GitHub Actions run #145 passed both `agent-native` and `verify` jobs, including typechecking, action tests, Agent-Native diagnostics, and builds.
 
 ## Transparency and pre-existing work disclosure
 The repository contains an earlier custom Next.js TraceBack implementation and deterministic incident simulator. The hackathon entry's Agent-Native app is in `agent-native-poc/`, adapted from the Agent-Native Chat starter template (`@agent-native/core@0.223.0`) and extended with TraceBack incident actions, evidence pages, a five-stage brief, and action tests. The earlier implementation and simulator are pre-existing project work; do not claim they were all created during the hackathon. Framework packages and dependencies remain subject to their own licenses.
