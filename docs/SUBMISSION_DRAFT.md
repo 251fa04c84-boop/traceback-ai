@@ -22,9 +22,9 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 
 ## What is distinctive
 - Evidence is visible and reviewable: metrics, log IDs/timestamps, release identifiers, and deployment diffs.
-- The agent is instructed to ground findings in the returned evidence and treat log/diff text as untrusted data, not instructions.
+- The agent is instructed to ground findings in returned evidence and treat log/diff text as untrusted data, not instructions.
 - Recovery is deliberately not executed in this public benchmark. The approval gate makes the safety boundary explicit.
-- The same action contracts are covered by automated tests for all three scenarios.
+- Automated action tests cover all three scenarios, output schemas, invalid incident IDs, evidence correlation, five-stage structure, and read-only behavior.
 
 ## Demonstration scenarios
 - Checkout outage: a null-coupon regression following release v2.4.1.
@@ -52,6 +52,6 @@ The three incident scenarios are deterministic simulated benchmark data. The pub
 - [ ] Confirm exact creator/team names and any teammates who must be listed.
 - [ ] Confirm all team members meet the official age and eligibility rules and authorize the entry.
 - [ ] Add the final public Clips URL.
-- [ ] Verify the live Preview and the public Clips link from a signed-out/incognito browser.
+- [ ] Verify the live Preview and public Clips link from a signed-out/incognito browser.
 - [ ] Agree to the current official rules on the submission form.
 - [ ] Submit the official form and save the receipt/confirmation.
