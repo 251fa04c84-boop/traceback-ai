@@ -1,3 +1,4 @@
+import { useActionQuery } from "@agent-native/core/client/hooks";
 import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
 import { useParams } from "react-router";
 import { SCENARIOS } from "../../../lib/simulator/scenarios.js";
@@ -11,7 +12,21 @@ export function meta() {
 export default function IncidentEvidencePage() {
   const { incidentId = "" } = useParams();
   const validIncidentId = INCIDENT_IDS.find((id) => id === incidentId);
+  const selectedIncidentId = validIncidentId ?? "inc-8921";
   useSetPageTitle("Incident evidence");
+
+  // The UI reads the same official Agent-Native actions exposed to the agent.
+  // Local benchmark rendering remains available if the action service is offline.
+  const {
+    data: actionEvidence,
+    isLoading: evidenceLoading,
+    error: evidenceError,
+  } = useActionQuery("get-incident-evidence", { incidentId: selectedIncidentId });
+  const {
+    data: actionBrief,
+    isLoading: briefLoading,
+    error: briefError,
+  } = useActionQuery("build-investigation-brief", { incidentId: selectedIncidentId });
 
   const scenario = validIncidentId
     ? SCENARIOS.find((item) => item.id === validIncidentId)
@@ -30,25 +45,25 @@ export default function IncidentEvidencePage() {
   const deployment = scenario.deployments.find((item) => !item.isStable) ?? scenario.deployments[0];
   const peakErrorRate = Math.max(...scenario.metrics.map((metric) => metric.errorRate));
   const peakLatency = Math.max(...scenario.metrics.map((metric) => metric.latencyP99));
-  const stages = [
+  const fallbackStages = [
     {
       id: "observe",
       title: "Observe",
       summary: latest
-        ? `Latest sample at ${latest.time}: ${latest.errorRate}% error rate and ${latest.latencyP99.toLocaleString()} ms p99 latency.`
+        ? "Latest sample at " + latest.time + ": " + latest.errorRate + "% error rate and " + latest.latencyP99.toLocaleString() + " ms p99 latency."
         : "No telemetry sample is available.",
       evidence: [
-        `Severity: ${scenario.severity} · Service: ${scenario.service}`,
-        `Peak sampled error rate: ${peakErrorRate}% · Peak p99 latency: ${peakLatency.toLocaleString()} ms`,
+        "Severity: " + scenario.severity + " · Service: " + scenario.service,
+        "Peak sampled error rate: " + peakErrorRate + "% · Peak p99 latency: " + peakLatency.toLocaleString() + " ms",
       ],
     },
     {
       id: "correlate",
       title: "Correlate evidence",
-      summary: `Compared ${scenario.logs.length} application log entries with the suspect deployment and its code diff.`,
+      summary: "Compared " + scenario.logs.length + " application log entries with the suspect deployment and its code diff.",
       evidence: [
-        ...scenario.logs.map((log) => `${log.id} · ${log.timestamp}: ${log.message}`),
-        ...(deployment ? [`Suspect release ${deployment.releaseId} · commit ${deployment.commitHash}: ${deployment.summary}`, `Deployment diff: ${deployment.diff}`] : []),
+        ...scenario.logs.map((log) => log.id + " · " + log.timestamp + ": " + log.message),
+        ...(deployment ? ["Suspect release " + deployment.releaseId + " · commit " + deployment.commitHash + ": " + deployment.summary, "Deployment diff: " + deployment.diff] : []),
       ],
     },
     {
@@ -56,14 +71,14 @@ export default function IncidentEvidencePage() {
       title: "Diagnose",
       summary: scenario.postMortemTemplate.rootCause,
       evidence: [
-        `Trigger: ${scenario.postMortemTemplate.trigger}`,
-        `Impact: ${scenario.postMortemTemplate.blastRadius}`,
+        "Trigger: " + scenario.postMortemTemplate.trigger,
+        "Impact: " + scenario.postMortemTemplate.blastRadius,
       ],
     },
     {
       id: "plan",
       title: "Prepare recovery plan",
-      summary: `${scenario.requiredActions.length} allowlisted recovery proposal(s) prepared for human review. No action has been run.`,
+      summary: scenario.requiredActions.length + " allowlisted recovery proposal(s) prepared for human review. No action has been run.",
       evidence: scenario.requiredActions.map((action) => action.explanation),
     },
     {
@@ -76,6 +91,7 @@ export default function IncidentEvidencePage() {
       ],
     },
   ];
+  const stages = actionBrief?.stages ?? fallbackStages;
 
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 p-4 sm:p-6">
@@ -98,11 +114,45 @@ export default function IncidentEvidencePage() {
         ))}
       </section>
 
+      <section className="space-y-3 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="shared-actions-title">
+        <header className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Shared Agent-Native action layer</p>
+          <h2 id="shared-actions-title" className="text-lg font-semibold">Live action results</h2>
+          <p className="text-sm text-muted-foreground">The interface and the assistant use the same typed, read-only incident actions.</p>
+        </header>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <article className="rounded-lg border p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">get-incident-evidence</p>
+            {evidenceLoading ? (
+              <p className="mt-2 text-sm text-muted-foreground">Loading evidence action…</p>
+            ) : actionEvidence ? (
+              <p className="mt-2 text-sm">Action returned {actionEvidence.metrics.length} telemetry samples, {actionEvidence.logs.length} logs, and {actionEvidence.deployments.length} deployment records.</p>
+            ) : evidenceError ? (
+              <p className="mt-2 text-sm text-muted-foreground">Action unavailable. The clearly labelled local benchmark view remains available.</p>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">Waiting for action response.</p>
+            )}
+          </article>
+          <article className="rounded-lg border p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">build-investigation-brief</p>
+            {briefLoading ? (
+              <p className="mt-2 text-sm text-muted-foreground">Building five-stage brief…</p>
+            ) : actionBrief ? (
+              <p className="mt-2 text-sm">Action returned all {actionBrief.stages.length} stages and {actionBrief.recommendedActions.length} recovery proposal(s). Execution remains locked.</p>
+            ) : briefError ? (
+              <p className="mt-2 text-sm text-muted-foreground">Action unavailable. Showing the local benchmark investigation instead.</p>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">Waiting for action response.</p>
+            )}
+          </article>
+        </div>
+      </section>
+
       <section className="space-y-4 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="investigation-title">
         <header className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Agent-Native workflow</p>
           <h2 id="investigation-title" className="text-xl font-semibold">Five-stage investigation</h2>
-          <p className="text-sm text-muted-foreground">Read-only evidence from the local benchmark scenario. Agent actions remain separately available through the Agent-Native action registry.</p>
+          <p className="text-sm text-muted-foreground">Action-backed results are shown when available; the deterministic local benchmark remains as a transparent fallback.</p>
         </header>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           {stages.map((stage, index) => (
@@ -126,17 +176,21 @@ export default function IncidentEvidencePage() {
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border p-4">
             <h3 className="text-sm font-semibold">Proposed recovery actions</h3>
-            {scenario.requiredActions.map((action) => (
+            {(actionBrief?.recommendedActions ?? scenario.requiredActions.map((action) => ({
+              actionId: action.actionId,
+              explanation: action.explanation,
+              parameters: JSON.stringify(action.expectedParams),
+            }))).map((action) => (
               <div key={action.actionId} className="mt-3 border-t pt-3 first:border-0 first:pt-0">
                 <p className="font-mono text-xs font-semibold">{action.actionId}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{action.explanation}</p>
-                <p className="mt-2 break-all font-mono text-[11px] text-muted-foreground">Parameters: {JSON.stringify(action.expectedParams)}</p>
+                <p className="mt-2 break-all font-mono text-[11px] text-muted-foreground">Parameters: {action.parameters}</p>
               </div>
             ))}
           </div>
           <div className="rounded-lg border p-4">
             <h3 className="text-sm font-semibold">Prevention recommendation</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{scenario.postMortemTemplate.recommendedPrevention}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{actionBrief?.recommendedPrevention ?? scenario.postMortemTemplate.recommendedPrevention}</p>
             <p className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-xs leading-relaxed text-muted-foreground">
               Human approval is required. This benchmark demo is read-only and is not connected to live infrastructure. No recovery action has been executed.
             </p>
@@ -147,7 +201,7 @@ export default function IncidentEvidencePage() {
       <section className="grid gap-5 lg:grid-cols-2">
         <div className="space-y-3 rounded-xl border bg-card p-4 sm:p-5">
           <h2 className="text-lg font-semibold">Application logs</h2>
-          {scenario.logs.map((log) => (
+          {(actionEvidence?.logs ?? scenario.logs).map((log) => (
             <article key={log.id} className="space-y-2 border-t pt-3 first:border-0 first:pt-0">
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="font-semibold">{log.level}</span>
@@ -160,7 +214,7 @@ export default function IncidentEvidencePage() {
         </div>
         <div className="space-y-3 rounded-xl border bg-card p-4 sm:p-5">
           <h2 className="text-lg font-semibold">Deployment evidence</h2>
-          {scenario.deployments.map((item) => (
+          {(actionEvidence?.deployments ?? scenario.deployments).map((item) => (
             <article key={item.releaseId} className="space-y-2 border-t pt-3 first:border-0 first:pt-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-sm font-semibold">{item.releaseId}</span>
@@ -177,9 +231,9 @@ export default function IncidentEvidencePage() {
       <section className="space-y-3 rounded-xl border bg-card p-4 sm:p-5">
         <h2 className="text-lg font-semibold">Evidence summary</h2>
         <dl className="space-y-3 text-sm">
-          <div><dt className="font-semibold">Root cause</dt><dd className="mt-1 text-muted-foreground">{scenario.postMortemTemplate.rootCause}</dd></div>
-          <div><dt className="font-semibold">Trigger</dt><dd className="mt-1 text-muted-foreground">{scenario.postMortemTemplate.trigger}</dd></div>
-          <div><dt className="font-semibold">Blast radius</dt><dd className="mt-1 text-muted-foreground">{scenario.postMortemTemplate.blastRadius}</dd></div>
+          <div><dt className="font-semibold">Root cause</dt><dd className="mt-1 text-muted-foreground">{actionEvidence?.rootCause ?? scenario.postMortemTemplate.rootCause}</dd></div>
+          <div><dt className="font-semibold">Trigger</dt><dd className="mt-1 text-muted-foreground">{actionEvidence?.trigger ?? scenario.postMortemTemplate.trigger}</dd></div>
+          <div><dt className="font-semibold">Blast radius</dt><dd className="mt-1 text-muted-foreground">{actionEvidence?.blastRadius ?? scenario.postMortemTemplate.blastRadius}</dd></div>
         </dl>
       </section>
     </main>
