@@ -1,6 +1,6 @@
 import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
 import { Link, useParams } from "react-router";
-import { SCENARIOS } from "../../lib/simulator/scenarios.js";
+import { SCENARIOS } from "../../../lib/simulator/scenarios.js";
 
 const INCIDENT_IDS = ["inc-8921", "inc-4402", "inc-7119"] as const;
 
