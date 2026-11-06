@@ -1,6 +1,5 @@
 import { useActionQuery } from "@agent-native/core/client/hooks";
 import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
-import { Link } from "react-router";
 
 export function meta() {
   return [{ title: "Incidents · TraceBack AI" }];
@@ -54,12 +53,12 @@ export default function IncidentsPage() {
                 <div><dt className="text-muted-foreground">Active release</dt><dd className="mt-1 font-mono">{incident.activeRelease}</dd></div>
                 <div><dt className="text-muted-foreground">Stable release</dt><dd className="mt-1 font-mono">{incident.stableRelease}</dd></div>
               </dl>
-              <Link
-                to={`/incidents/${incident.id}`}
+              <a
+                href={`/incidents/${incident.id}`}
                 className="mt-auto inline-flex min-h-10 items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
               >
                 Review evidence
-              </Link>
+              </a>
             </article>
           ))}
         </section>
