@@ -7,14 +7,13 @@ import {
 import actionsRegistry from "../../.generated/actions-registry.js";
 
 const INITIAL_TOOL_NAMES = [
-  "view-screen",
-  "navigate",
+  // Keep the first-turn tool surface deliberately small. Generic browser and
+  // provider tools caused unnecessary tool discovery for simple chat prompts.
+  // These are the only capabilities the public incident demo needs up front.
   "hello",
   "list-incidents",
   "get-incident-evidence",
   "build-investigation-brief",
-  "provider-api-request",
-  "ask-question",
 ];
 
 export default createAgentChatPlugin({
