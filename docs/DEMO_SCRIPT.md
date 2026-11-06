@@ -5,7 +5,7 @@ Target length: 100–120 seconds. Record the actual Agent-Native app, not the le
 ## Mandatory preflight
 
 - Use the latest Preview deployment:
-  https://traceback-agent-native-preview-pxx24g3fv-hackathons8.vercel.app
+  https://traceback-agent-native-preview-p8b5v7qan-hackathons8.vercel.app
 - Sign in before recording if prompted.
 - Verify the incident queue, all three evidence routes, and the Shared Agent-Native action layer.
 - Verify at least one successful Agent-Native chat run that invokes the TraceBack actions. Current Gemini quota/rate-limit failures are known; do not record or claim a successful run until it is actually observed.
