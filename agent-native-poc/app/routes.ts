@@ -1,15 +1,12 @@
-import { type RouteConfig, route } from "@react-router/dev/routes";
+import { type RouteConfig } from "@react-router/dev/routes";
 import { flatRoutes } from "@react-router/fs-routes";
 
-// Register the public showcase as an explicit "/" path. Keep all other
-// workspace routes file-based and exclude the showcase file from discovery.
-export default [
-  route("/", "./routes/_index.tsx"),
-  ...(await flatRoutes({
-    ignoredRouteFiles: [
-      "**/*.test.{ts,tsx}",
-      "**/*.spec.{ts,tsx}",
-      "**/_index.tsx",
-    ],
-  })),
-] satisfies RouteConfig;
+// The public landing page is served at /demo. Nitro redirects / to that
+// route before the React Router catch-all; keep the framework index unused.
+export default flatRoutes({
+  ignoredRouteFiles: [
+    "**/*.test.{ts,tsx}",
+    "**/*.spec.{ts,tsx}",
+    "**/_index.tsx",
+  ],
+}) satisfies RouteConfig;
