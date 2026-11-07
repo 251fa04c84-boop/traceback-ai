@@ -228,15 +228,25 @@ Analyze and output a JSON response matching:
 }`;
 
         const aiOutput = await queryGeminiLive(prompt, effectiveKey);
-        if (aiOutput.hypothesis && aiOutput.proposedActionId) {
-          hypothesisText = aiOutput.hypothesis;
-          proposedActionId = aiOutput.proposedActionId;
-          proposedParams = aiOutput.proposedParams || proposedParams;
-          proposedReason = aiOutput.proposedReason || proposedReason;
-          blastRadius = aiOutput.blastRadius || blastRadius;
-          session.modelUsed = "Gemini Live AI (Autonomous)";
-          session.isLiveAI = true;
+        const allowlistedProposal = s.requiredActions.find((candidate) => {
+          if (candidate.actionId !== aiOutput.proposedActionId) return false;
+          const expected = candidate.expectedParams;
+          const proposed = aiOutput.proposedParams;
+          const expectedKeys = Object.keys(expected);
+          const proposedKeys = Object.keys(proposed);
+          return expectedKeys.length === proposedKeys.length &&
+            expectedKeys.every((key) => proposed[key] === expected[key]);
+        });
+        if (!allowlistedProposal) {
+          throw new Error("Gemini proposal did not match this incident's allowlisted action and exact parameters");
         }
+        hypothesisText = aiOutput.hypothesis;
+        proposedActionId = allowlistedProposal.actionId;
+        proposedParams = allowlistedProposal.expectedParams;
+        proposedReason = aiOutput.proposedReason || proposedReason;
+        blastRadius = aiOutput.blastRadius || blastRadius;
+        session.modelUsed = "Gemini Live AI (proposal only; human approval required)";
+        session.isLiveAI = true;
       } catch (err: any) {
         console.warn("Live Gemini API call failed, falling back to deterministic calibration:", err.message);
       }
