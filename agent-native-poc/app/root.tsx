@@ -54,8 +54,8 @@ const THEME_INIT_SCRIPT = getThemeInitScript();
 const LOCALE_INIT_SCRIPT = getLocaleInitScript();
 
 // Keep this list synchronized with workspaceAppPublicPaths in server/plugins/auth.ts.
-// The public root renders only the static synthetic benchmark showcase.
-const PUBLIC_PATHS = ["/"];
+// The root redirects to /demo; both public routes render only synthetic fixtures.
+const PUBLIC_PATHS = ["/", "/demo"];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
