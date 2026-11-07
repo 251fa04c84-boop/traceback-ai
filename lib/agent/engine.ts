@@ -20,11 +20,18 @@ function stripMarkdownCodeFences(value: string): string {
     .trim();
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 10_000): Promise<Response> {
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs = 10_000
+): Promise<{ response: Response; body: string }> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, { ...init, signal: controller.signal });
+    const response = await fetch(url, { ...init, signal: controller.signal });
+    // Read the body before clearing the timer so stalled response streams are bounded too.
+    const body = await response.text();
+    return { response, body };
   } finally {
     clearTimeout(timeout);
   }
@@ -38,7 +45,7 @@ async function queryGeminiLive(prompt: string, apiKey: string) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
-        const res = await fetchWithTimeout(url, {
+        const { response: res, body: responseBody } = await fetchWithTimeout(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -49,7 +56,7 @@ async function queryGeminiLive(prompt: string, apiKey: string) {
 
         if (!res.ok) {
           const retryable = res.status === 429 || res.status === 503;
-          const errorText = (await res.text()).slice(0, 1000);
+          const errorText = responseBody.slice(0, 1000);
           if (retryable && attempt < 2) {
             await new Promise((resolve) => setTimeout(resolve, 500 * (2 ** attempt)));
             continue;
@@ -57,7 +64,7 @@ async function queryGeminiLive(prompt: string, apiKey: string) {
           throw new Error(`Model ${model} returned HTTP ${res.status}: ${errorText}`);
         }
 
-        const data: unknown = await res.json();
+        const data: unknown = JSON.parse(responseBody);
         const responseText = (data as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> })
           .candidates?.[0]?.content?.parts?.[0]?.text;
         if (!responseText) throw new Error(`Model ${model} returned an empty response`);
