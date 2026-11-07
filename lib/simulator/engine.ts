@@ -258,7 +258,7 @@ class IncidentSimulator {
 **Severity:** \`${scenario.severity}\` | **Service:** \`${scenario.service}\`  
 **Detected At:** ${scenario.detectedAt}  
 **Status:** **${scenario.status}** (${state.currentHealth})  
-**Simulation MTTR:** ${duration}  
+**Mean Time to Recovery (MTTR):** ${duration}  
 
 > This report describes deterministic benchmark data only. No production infrastructure was changed.
 
