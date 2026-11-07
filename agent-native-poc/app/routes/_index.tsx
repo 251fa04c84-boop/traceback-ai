@@ -41,7 +41,7 @@ export default function PublicDemoPage() {
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <span className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1.5 font-semibold text-emerald-200">PUBLIC READ-ONLY DEMO</span>
             <span className="rounded-full border border-white/10 px-3 py-1.5 text-slate-300">SIMULATED BENCHMARK DATA</span>
-            <a href="/sign-in" className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-100">Sign in to workspace</a>
+            <a href="/sign-in?return=%2Fincidents" className="rounded-lg bg-white px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-100">Sign in to workspace</a>
           </div>
         </header>
 
