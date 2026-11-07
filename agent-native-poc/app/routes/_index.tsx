@@ -52,14 +52,15 @@ export default function PublicDemoPage() {
               Incident response that shows its work.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300">
-              TraceBack correlates service metrics, application logs, and deployment diffs into an explainable investigation. It prepares a bounded recovery proposal, then stops at a human approval gate.
+              TraceBack correlates service metrics, application logs, and deployment diffs into an explainable investigation. In the signed-in workspace, a human can approve an isolated recovery simulation and inspect its before/after metrics and action audit trail.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#incidents" className="rounded-lg bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-cyan-200">Explore benchmark incidents</a>
               <a href="#workflow" className="rounded-lg border border-white/15 px-5 py-3 text-sm font-semibold text-slate-100 hover:bg-white/5">See the investigation workflow</a>
+              <a href="/sign-in?return=%2Fincidents%2Finc-8921" className="rounded-lg border border-cyan-300/30 px-5 py-3 text-sm font-semibold text-cyan-200 hover:bg-cyan-300/10">Try recovery lab · sign in</a>
             </div>
             <p className="mt-5 max-w-xl text-xs leading-5 text-slate-500">
-              This public surface is intentionally read-only. It contains no customer records, live telemetry, provider credentials, or remediation controls.
+              This public surface is intentionally read-only. It contains no customer records, live telemetry, provider credentials, or remediation controls. The separate signed-in recovery lab changes synthetic benchmark state only; it is not connected to production.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-cyan-950/20">
@@ -81,13 +82,13 @@ export default function PublicDemoPage() {
                 <p className="mt-2 text-3xl font-semibold tabular-nums">3</p>
               </div>
               <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <p className="text-xs text-slate-400">Automated remediation</p>
-                <p className="mt-2 text-3xl font-semibold text-amber-200">0</p>
+                <p className="text-xs text-slate-400">Approval-gated recovery action</p>
+                <p className="mt-2 text-3xl font-semibold text-emerald-200">1</p>
               </div>
             </div>
             <div className="mt-5 rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200">Safety invariant</p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">Evidence can inform a proposal. It cannot authorize an operation. A human approval and a separately authenticated execution path are required.</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">Evidence can inform a proposal, but cannot authorize it. A human must approve the recovery call. The recovery lab changes synthetic benchmark state only; no production system is connected.</p>
             </div>
           </div>
         </section>
