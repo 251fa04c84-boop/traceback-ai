@@ -1,4 +1,4 @@
-import { useActionQuery } from "@agent-native/core/client/hooks";
+import { useActionMutation, useActionQuery } from "@agent-native/core/client/hooks";
 import { useSetPageTitle } from "@agent-native/toolkit/app-shell";
 import { useParams } from "react-router";
 import { SCENARIOS } from "../../../lib/simulator/scenarios.js";
@@ -27,6 +27,9 @@ export default function IncidentEvidencePage() {
     isLoading: briefLoading,
     error: briefError,
   } = useActionQuery("build-investigation-brief", { incidentId: selectedIncidentId });
+
+  // This UI control and the agent chat call the exact same approval-gated action.
+  const recovery = useActionMutation("execute-recovery-simulation");
 
   const scenario = validIncidentId
     ? SCENARIOS.find((item) => item.id === validIncidentId)
@@ -118,7 +121,7 @@ export default function IncidentEvidencePage() {
         <header className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Shared Agent-Native action layer</p>
           <h2 id="shared-actions-title" className="text-lg font-semibold">Live action results</h2>
-          <p className="text-sm text-muted-foreground">The interface and the assistant use the same typed, read-only incident actions.</p>
+          <p className="text-sm text-muted-foreground">The interface and assistant share the same typed actions; recovery is a separate approval-gated operation.</p>
         </header>
         <div className="grid gap-3 sm:grid-cols-2">
           <article className="rounded-lg border p-3">
@@ -146,6 +149,89 @@ export default function IncidentEvidencePage() {
             )}
           </article>
         </div>
+      </section>
+
+      <section className="space-y-4 rounded-xl border border-cyan-500/30 bg-card p-4 sm:p-5" aria-labelledby="recovery-simulation-title">
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-2xl space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Human-controlled recovery lab</p>
+            <h2 id="recovery-simulation-title" className="text-xl font-semibold">Execute and verify a recovery plan</h2>
+            <p className="text-sm text-muted-foreground">
+              Your click explicitly approves this isolated benchmark simulation. The agent can propose the same action, but its call pauses for human approval first.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => recovery.mutate({ incidentId: selectedIncidentId })}
+            disabled={recovery.isPending}
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {recovery.isPending ? "Running simulation…" : "Approve & run recovery simulation"}
+          </button>
+        </header>
+        {recovery.error ? (
+          <p role="alert" className="rounded-lg border border-destructive/40 p-3 text-sm text-destructive">
+            Simulation could not run: {recovery.error.message}
+          </p>
+        ) : null}
+        {recovery.data ? (
+          <div className="space-y-4 border-t pt-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <article className="rounded-lg border p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Before · {recovery.data.before.health}</p>
+                <p className="mt-2 text-2xl font-semibold">{recovery.data.before.latestErrorRate}%</p>
+                <p className="text-xs text-muted-foreground">Error rate</p>
+                <p className="mt-2 text-sm">{recovery.data.before.latestP99Latency.toLocaleString()} ms p99</p>
+                <p className="mt-1 text-xs text-muted-foreground">Release {recovery.data.before.activeRelease}</p>
+              </article>
+              <article className="rounded-lg border border-emerald-500/40 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">After · {recovery.data.after.health}</p>
+                <p className="mt-2 text-2xl font-semibold">{recovery.data.after.latestErrorRate}%</p>
+                <p className="text-xs text-muted-foreground">Simulated error rate</p>
+                <p className="mt-2 text-sm">{recovery.data.after.latestP99Latency.toLocaleString()} ms p99</p>
+                <p className="mt-1 text-xs text-muted-foreground">Release {recovery.data.after.activeRelease}</p>
+              </article>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold">Recovery execution and verification</h3>
+                <span className="rounded-full border border-emerald-500/40 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                  {recovery.data.verification.status}
+                </span>
+              </div>
+              <ul className="mt-3 space-y-2 text-sm">
+                {recovery.data.actions.map((action, index) => (
+                  <li key={action.actionId + "-" + index} className="border-t pt-2 first:border-0 first:pt-0">
+                    <p className="font-mono text-xs font-semibold">{action.actionId} · {action.success ? "SUCCESS" : "FAILED"}</p>
+                    <p className="mt-1 text-muted-foreground">{action.message}</p>
+                  </li>
+                ))}
+              </ul>
+              <ul className="mt-3 space-y-1 border-t pt-3 text-xs text-muted-foreground">
+                {recovery.data.verification.evidence.map((item, index) => <li key={index}>{item}</li>)}
+              </ul>
+            </div>
+            <details className="rounded-lg border p-4">
+              <summary className="cursor-pointer text-sm font-semibold">View action audit trail ({recovery.data.auditTrail.length} entries)</summary>
+              <ol className="mt-3 space-y-2">
+                {recovery.data.auditTrail.map((entry) => (
+                  <li key={entry.id} className="border-t pt-2 first:border-0 first:pt-0">
+                    <p className="text-xs font-semibold">{entry.actionId} · {entry.status} · {entry.resultingHealth}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{entry.timestamp} · {entry.executedBy}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{entry.notes}</p>
+                  </li>
+                ))}
+              </ol>
+            </details>
+            <p className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3 text-xs leading-relaxed text-muted-foreground">
+              {recovery.data.safetyNotice}
+            </p>
+          </div>
+        ) : (
+          <p className="border-t pt-3 text-xs text-muted-foreground">
+            No recovery has been run in this session. The simulator only changes synthetic benchmark state; it cannot reach production services.
+          </p>
+        )}
       </section>
 
       <section className="space-y-4 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="investigation-title">
@@ -192,7 +278,7 @@ export default function IncidentEvidencePage() {
             <h3 className="text-sm font-semibold">Prevention recommendation</h3>
             <p className="mt-2 text-sm text-muted-foreground">{actionBrief?.recommendedPrevention ?? scenario.postMortemTemplate.recommendedPrevention}</p>
             <p className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-xs leading-relaxed text-muted-foreground">
-              Human approval is required. This benchmark demo is read-only and is not connected to live infrastructure. No recovery action has been executed.
+              {recovery.data ? "The isolated recovery simulation completed above. Its health result is synthetic and does not confirm any live infrastructure recovery." : "Human approval is required. This benchmark view is not connected to live infrastructure. No recovery action has been executed."}
             </p>
           </div>
         </div>
