@@ -1,60 +1,43 @@
 # Builder.io Agent-Native Hackathon 2026 — Submission Checklist
 
-**Submission Portal:** [Builder.io Hackathon](https://www.builder.io/hackathon/)  
-**Deadline:** November 9, 2026 at 11:59 PM PT (Nov 10, 2026 at 1:29 PM IST)  
-**Target Completion:** November 3, 2026 (Internal Code Freeze)  
+**Deadline:** November 9, 2026 at 11:59 PM PT (November 10 at 13:29 IST).  
+**Official form:** https://www.builder.io/hackathon/submit  
+**Rules:** https://www.builder.io/hackathon/rules
 
----
+## Engineering release gates
 
-## 1. Hackathon Deliverables Checklist
+- [ ] Latest Agent-Native Vercel deployment is Ready on the exact PR head commit.
+- [ ] Runtime smoke test succeeds; no missing package or server crash.
+- [ ] Public app URL opens without Vercel SSO or access request.
+- [ ] App authentication and sign-up flow work.
+- [ ] AI provider is configured; agent completes a real chat turn using shared TraceBack actions.
+- [ ] Incident list returns all three scenarios.
+- [ ] Checkout investigation shows latest 43.5%, peak 44.1%, and initial 42.8% accurately.
+- [ ] Session investigation cites OOMKilled and unbounded cache evidence.
+- [ ] Database investigation connects SQLSTATE 53300 with HikariPool timeout evidence.
+- [ ] All five stages render for all three incidents.
+- [ ] Unknown incident IDs fail safely.
+- [ ] The public app clearly labels all scenarios as simulated and read-only.
+- [ ] Agent never claims an action was executed or an incident was resolved.
+- [ ] Typecheck, action tests, Agent-Native doctor, build, and CI pass on the exact candidate commit.
+- [ ] Mobile and desktop layouts are checked manually.
 
-| Item | Requirement | Target Output | Status |
-| :--- | :--- | :--- | :---: |
-| **1. Agent-Native Codebase** | Public GitHub repo using Agent-Native framework patterns (`defineAction`, shared state) | Clean repo with full TypeScript code | **COMPLETED** (`commit 5107d5a`) |
-| **2. Live Deployed URL** | Publicly accessible URL with zero paywall or login required | Vercel deployment (e.g. `traceback-ai.vercel.app`) | **CONFIGURED** |
-| **3. Video Demo Clip** | 2–3 minute video walking through problem, investigation, action execution, and verification | MP4 video (1080p, 1m 21s) + SRT subtitles | **COMPLETED** (`TraceBack_AI_Builder_Hackathon_Demo.mp4`) |
-| **4. Post-Mortem & Audit Trail** | Visible proof of deterministic verification and human approval | Built into app UI and post-mortem export | **COMPLETED** |
-| **5. Written Submission** | Complete Devpost / Portal write-up covering all 4 judging criteria | `docs/DEVPOST_SUBMISSION.md` | **COMPLETED** |
+## Public demo gates
 
----
+- [ ] Record the actual Agent-Native app using `docs/DEMO_SCRIPT.md`.
+- [ ] Do not record the legacy Next.js dashboard as the Agent-Native app.
+- [ ] Publish a public Clips video that opens without login or access request.
+- [ ] Check the video and audio, ensure no personal secrets are visible, and verify the URL while signed out.
+- [ ] Add the public Clips URL to the submission draft.
 
-## 2. Technical Quality Gates (Must Pass Before Submission)
+## Official submission
 
-- [x] Zero unhandled console errors or hydration errors in Chrome/Firefox/Safari.
-- [x] Responsive design verified on mobile viewport (390px × 844px) and desktop (1440px).
-- [x] No API keys or secrets exposed in frontend bundles or repository files.
-- [x] All 3 incident scenarios execute reliably end-to-end.
-- [x] Action execution requires human approval for mutating actions.
-- [x] Deterministic health check accurately verifies resolution after action execution.
-- [x] Dual-mode architecture: Live Gemini 1.5 Flash + Deterministic SRE benchmark fallback.
-- [x] Automated test runner (`npm test`) passes 41/41 tests with 0 failures.
-- [x] Demo video verified: 100% TraceBack AI screens, zero legacy assets, duration 1m 21s.
+- [ ] Confirm every creator/team member meets the eligibility requirements.
+- [ ] Disclose the earlier custom Next.js work and the Agent-Native Chat starter template.
+- [ ] Include all relevant third-party libraries/assets and accurate work dates.
+- [ ] Enter project title, description, contact details, GitHub link, live app URL, and public Clips URL.
+- [ ] Agree to the Official Rules.
+- [ ] Submit before the deadline.
+- [ ] Verify the confirmation receipt and save it.
 
----
-
-## 3. Builder.io Clips & Video Upload Instructions
-
-> **Important Disclosure:** Builder.io Clips requires browser session authentication with your personal Builder.io account. For security, this cannot and should not be automated programmatically via command line. Follow these exact steps:
-
-1. **Locate Demo Files on Your Machine:**
-   - Video: `TraceBack_AI_Builder_Hackathon_Demo.mp4` (in the project root: `c:\Users\bharg\OneDrive\Desktop\hackathon\TraceBack_AI_Builder_Hackathon_Demo.mp4`)
-   - Closed Captions: `TraceBack_AI_Builder_Hackathon_Demo.srt`
-2. **Open Builder.io Hackathon Portal:**
-   - Navigate to [https://www.builder.io/hackathon](https://www.builder.io/hackathon) and sign in.
-3. **Upload via Builder.io Clips / Submission Form:**
-   - On your project submission page, locate the **Demo Video / Clip** input field.
-   - If prompted for a file upload or Builder.io Clip, drag and drop `TraceBack_AI_Builder_Hackathon_Demo.mp4`.
-   - If the portal requests a YouTube / Loom / public video URL as fallback or primary, you can also upload the file to YouTube (as "Unlisted" or "Public") or Loom and paste that URL.
-   - Upload the subtitle file `TraceBack_AI_Builder_Hackathon_Demo.srt` for automatic closed captioning.
-4. **Devpost Submission:**
-   - Copy the resulting Clip URL (or public video URL) into the **Video Demo Link** field in `docs/DEVPOST_SUBMISSION.md`.
-
----
-
-## 4. Submission Day Action Sequence
-
-1. **T-24 Hours:** Code freeze. Run end-to-end test suite on deployed Vercel URL.
-2. **T-12 Hours:** Record final 2-minute video demo using the approved demo script.
-3. **T-6 Hours:** Populate the official Builder.io submission form with write-up, video URL, GitHub link, and live demo link.
-4. **T-2 Hours:** Verify all links open in an incognito window.
-5. **T-1 Hour:** Final submission confirmation and screenshot archived.
+**Do not mark a box complete based only on source code or a successful build. Verify the deployed experience.**

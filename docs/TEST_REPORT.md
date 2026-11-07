@@ -1,98 +1,49 @@
-# TraceBack AI — Automated Test & Verification Report
+# TraceBack AI — Verification Report
 
-**Date:** November 4, 2026  
-**Test Suite:** `scripts/test-runner.js` (`npm test`)  
-**Runner:** Node.js 22.22.0 & Next.js 14  
-**Verdict:** **41/41 PASSED (0 FAILED) in GitHub Actions run #9**  
+**Last updated:** November 5, 2026  
+**Scope:** Agent-Native application under `agent-native-poc/`
 
----
+## Current status
 
-## 1. Test Suite Summary Matrix
+**Not yet submission-ready.** Source changes are present, but the latest candidate still needs a clean CI run and deployed browser smoke test.
 
-| Category | Total Tests | Passed | Failed | Status | Evidence |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **Suite 1: Simulation Scenarios** | 4 | 4 | 0 | **PASSED** | 3 deterministic production scenarios (`inc-8921`, `inc-4402`, `inc-7119`) |
-| **Suite 2: Custom Zod Action Registry** | 7 | 7 | 0 | **PASSED** | `getServiceLogs`, `inspectDeploymentDiff`, `rollbackDeployment`, `toggleFeatureFlag` |
-| **Suite 3: Safety & Human Gate** | 3 | 3 | 0 | **PASSED** | Mutating actions without human approval return `requiresApproval: true` |
-| **Suite 4: Autonomous Investigation**| 10 | 10 | 0 | **PASSED** | 5-phase agentic loop + Model Engine Provenance verification |
-| **Suite 5: Deterministic Verification**| 7 | 7 | 0 | **PASSED** | State transitions to `RESOLVED`, health status `HEALTHY`, post-mortem generated |
-| **Suite 6: Multi-Scenario Testing** | 6 | 6 | 0 | **PASSED** | Scenarios 2 (OOM) and 3 (DB exhaustion) remediated and verified |
-| **Suite 7: Rejection Flow** | 4 | 4 | 0 | **PASSED** | Human rejection halts action; incident remains unresolved safely |
-| **Total** | **41** | **41** | **0** | **100% PASS** | Zero regressions |
+## Implemented checks
 
----
+- Three deterministic benchmark scenarios are defined: `inc-8921`, `inc-4402`, and `inc-7119`.
+- Agent-Native read-only actions exist for incident listing, evidence retrieval, and the five-stage investigation brief.
+- Action tests cover the incident catalog, schema-valid evidence for each incident, unknown IDs, five-stage output, and the read-only boundary.
+- The five-stage action returns Observe, Correlate Evidence, Diagnose, Prepare Recovery Plan, and Human Approval Gate.
+- The Agent-Native detail route displays the same investigation brief returned by the shared action.
+- The generic legacy Next.js action API rejects mutating actions; the old approval endpoint fails closed.
 
-## 2. Verified Test Execution Log
+## Issues found and addressed
 
-```text
-> traceback-ai@1.0.0 test
-> node scripts/test-runner.js
+### Checkout metric explanation
+The dashboard time series records 42.8% at 21:40, a 44.1% peak at 21:42, and 43.5% at 21:45. The scenario summary and deterministic fallback now explain these values as initial, peak, and latest samples rather than presenting them as conflicting measurements.
 
-======================================================
-🧪 TRACEBACK AI — AGENT-NATIVE AUTOMATED TEST RUNNER
-======================================================
+### Database connection evidence
+The Postgres scenario records 100/100 active connections, PostgreSQL SQLSTATE 53300, and a HikariPool timeout after 30,005 ms. The root-cause explanation now connects server-side connection exhaustion with application-side pool acquisition timeouts.
 
-📦 [Suite 1] Simulation Scenarios Initialization
-  ✅ [PASS] Initialized exactly 3 simulated incident scenarios
-  ✅ [PASS] Scenario 1 (inc-8921: Checkout Outage) present
-  ✅ [PASS] Scenario 2 (inc-4402: Session OOMKilled) present
-  ✅ [PASS] Scenario 3 (inc-7119: DB Connection Exhaustion) present
+### Agent-Native runtime packaging
+The first hosted runtime smoke test failed because the deployment could not resolve the `yjs` package imported by a framework component. `yjs@13.6.33` was added as a direct dependency and locked. A fresh deployment must still prove that this fixes the runtime failure.
 
-⚙️ [Suite 2] Custom Zod Action Registry & Execution
-  ✅ [PASS] getServiceLogs action registered
-  ✅ [PASS] inspectDeploymentDiff action registered
-  ✅ [PASS] rollbackDeployment action registered
-  ✅ [PASS] toggleFeatureFlag action registered
-  ✅ [PASS] getServiceLogs executed successfully
-  ✅ [PASS] getServiceLogs retrieved ERROR logs
-  ✅ [PASS] Logs contain NullPointerException evidence
-  ✅ [PASS] inspectDeploymentDiff executed successfully
-  ✅ [PASS] inspectDeploymentDiff accurately identifies active release v2.4.1
-  ✅ [PASS] inspectDeploymentDiff identifies commit hash a7e89f2
+## Verification still required
 
-🛡️ [Suite 3] Safety Protocol & Human Approval Interception
-  ✅ [PASS] Mutating action rollbackDeployment blocked when approval is false
-  ✅ [PASS] Response flags requiresApproval: true
-  ✅ [PASS] Approval details specify high blast radius
+| Check | Status |
+| --- | --- |
+| Latest GitHub Actions run on the current PR head | Queued / not yet verified |
+| Agent-Native typecheck | Pending current-head CI result |
+| Agent-Native action tests | Added; pending current-head CI result |
+| Agent-Native doctor | Pending current-head CI result |
+| Agent-Native production build | Pending current-head CI result |
+| Latest Vercel deployment | Pending after runtime dependency fix |
+| Browser smoke test on latest deployment | Not yet completed |
+| Agent chat with configured model provider | Not yet completed |
+| Mobile viewport review | Not yet completed |
+| Public Clips recording and signed-out access check | Not yet completed |
 
-🤖 [Suite 4] Autonomous Agent Investigation Loop
-  ✅ [PASS] Agent completed 5-phase investigation loop
-  ✅ [PASS] Phase 1: Telemetry Analysis completed
-  ✅ [PASS] Phase 2: Log Evaluation completed
-  ✅ [PASS] Phase 3: Diff Inspection completed
-  ✅ [PASS] Phase 4: Root Cause Hypothesis formulated
-  ✅ [PASS] Phase 5: Recovery Plan synthesized
-  ✅ [PASS] Agent halts at human approval gate
-  ✅ [PASS] Proposed action is rollbackDeployment
-  ✅ [PASS] Proposed target release is v2.4.0
+## Scope and honesty
 
-✅ [Suite 5] Human Approval Execution & Deterministic Verification
-  ✅ [PASS] Human approval recorded
-  ✅ [PASS] Deterministic health check confirmed resolution
-  ✅ [PASS] Incident status transitioned to RESOLVED
-  ✅ [PASS] System health status transitioned to HEALTHY
-  ✅ [PASS] Active release successfully rolled back to v2.4.0
-  ✅ [PASS] Generated complete Post-Mortem report
-  ✅ [PASS] Post-mortem includes MTTR metric
+The earlier legacy Next.js app had a user-reported manual test run through all five stages for the three benchmark scenarios. That is not a substitute for testing the Agent-Native deployment.
 
-🔬 [Suite 6] Multi-Scenario Verification (Memory Leak & Connection Sizing)
-  ✅ [PASS] Scenario 2 proposes disabling unbounded cache flag
-  ✅ [PASS] Scenario 2 resolved and verified
-  ✅ [PASS] Scenario 3 proposes disabling leaking analytics flag
-  ✅ [PASS] Scenario 3 resolved and verified
-
-🚫 [Suite 7] Operator Rejection Flow
-  ✅ [PASS] Approval recorded as rejected
-  ✅ [PASS] Incident remains unresolved when rejected
-
-======================================================
-📊 TEST RESULTS: 41/41 PASSED (0 FAILED)
-======================================================
-```
-
----
-
-## 3. Known Limitations & Edge Cases Handled
-
-1. **Non-Destructive Simulation:** Actions operate against an in-memory state engine representing realistic Kubernetes and service topologies. Real external infrastructure mutations are safely abstracted to ensure reliable hackathon judging without risk of infrastructure billing or security exposure.
-2. **Deterministic Fallback:** Agent reasoning operates deterministically based on structured log/diff telemetry, ensuring the system can be evaluated in offline or rate-limited environments.
+All supplied incident data is simulated benchmark data. The current Agent-Native actions are read-only. A recovery proposal is not an executed remediation, and no live infrastructure health probe or production resolution is claimed.

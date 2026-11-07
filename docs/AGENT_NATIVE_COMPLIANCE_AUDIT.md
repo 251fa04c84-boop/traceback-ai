@@ -1,65 +1,59 @@
 # TraceBack AI — Agent-Native Compliance and Release Audit
 
-**Audit date:** November 4, 2026  
-**Repository reviewed:** `251fa04c84-boop/traceback-ai`  
-**Base branch:** `main`  
-**Purpose:** Correct the submission claims and record the verified work still required before representing this project as an official Agent-Native implementation.
+**Updated:** November 5, 2026  
+**Candidate branch:** `codex/traceback-agent-native-v2`  
+**Legacy production app:** `main` / root Next.js project  
+**Agent-Native app:** `agent-native-poc/`  
+**Candidate Vercel project:** `traceback-agent-native-preview` (separate project; does not replace the legacy site)
 
 ## Executive finding
 
-TraceBack has a useful incident-response workflow and a custom shared action layer. The human-facing application and the agent orchestrator both dispatch the same project-defined actions from `lib/actions/`. However, the current repository does **not** implement the official Builder Agent-Native framework API.
+The repository now contains a real Agent-Native application under `agent-native-poc/`. It uses `@agent-native/core@0.223.0`, the framework Vite/React Router integration, and official `defineAction()` actions. Its UI and Agent-Native chat load the same domain actions through the framework action registry.
 
-The official hackathon rules require a functional application built using Agent-Native. The official Builder example imports `defineAction` from `@agent-native/core/action`. The current `package.json` contains no `@agent-native/core` dependency, and the source has no import of that package. The project-defined `ActionDefinition` interface in `lib/actions/types.ts` is not the official API.
+The earlier root Next.js application remains a separate custom implementation. It is not the official Agent-Native runtime and is retained as prior work/reference. The separate Agent-Native app is the intended hackathon entry point.
 
-**Result: official framework compliance is not verified and must be treated as a submission blocker until implemented and tested.** Do not claim that TraceBack currently uses official `defineAction`.
+## Framework implementation
 
-## Verified repository facts
+The Agent-Native app includes:
 
-- The app is built with Next.js 14.2.15 and React 18.3.1.
-- Action schemas are defined with Zod in `lib/actions/`.
-- `lib/actions/index.ts` owns a custom `ACTION_REGISTRY` and `dispatchAction` function.
-- The agent orchestrator calls `dispatchAction` for telemetry, logs, and deployment inspection.
-- The API action route also calls `dispatchAction`.
-- Mutating handlers independently check `userApprovalGranted` before changing simulator state.
-- The simulator provides three deterministic incident scenarios.
-- The GitHub Actions workflow runs `npm ci`, `npm test`, and `npm run build` on Node 22.22.0.
-- PR #1 added the CI workflow and is merged into `main`.
+- `list-incidents` — read-only incident catalog.
+- `get-incident-evidence` — read-only telemetry, log, deployment, and post-mortem evidence.
+- `build-investigation-brief` — read-only five-stage investigation brief.
+- Incident catalog and incident evidence routes using `useActionQuery`.
+- A TraceBack overview page and incident navigation.
+- Agent instructions that require evidence citations, benchmark disclosure, and respect for the approval gate.
+- Action contract tests for the three benchmark incidents, output schemas, invalid IDs, and read-only behavior.
 
-## Official framework compatibility risk
+## Safety boundary
 
-The official framework repository currently documents Node.js 22.22 or later and its current package metadata declares React 19.2.7 or later as a peer dependency. TraceBack currently uses React 18.3.1 with Next.js 14.2.15.
+The Agent-Native public demo uses deterministic benchmark scenarios. It is not connected to live infrastructure.
 
-Installing the current framework package blindly may introduce peer-dependency conflicts and a large dependency surface. A package-only change is not enough: official action definitions must be wired into the actual human and agent execution paths, and the result must pass a clean dependency install, all tests, a production build, and a live deployment smoke test.
+- The three TraceBack domain actions are read-only.
+- Recovery actions are displayed as proposals only.
+- The approval stage explicitly states that execution is locked.
+- No rollback, feature-flag change, restart, or live health probe is performed by this app.
+- The earlier custom Next.js API rejects mutating generic actions and its approval endpoint fails closed.
 
-Do not merge a dependency migration until those checks pass. If a compatible integration cannot be completed safely, migrate the app to a framework-supported starter on a separate branch while preserving the current deployment as a fallback.
+Do not describe the approval card as a production-grade authenticated approval system. Authenticated approver identity, one-time server challenges, execution receipts, and durable audit workflow for real mutations are not implemented.
 
-## Additional release-integrity issues to verify
+## Deployment architecture
 
-1. The repository's `package-lock.json` root metadata currently identifies the package as `cultureweave-ai`, while `package.json` identifies it as `traceback-ai`.
-2. The lockfile root dependency list does not exactly mirror the current `package.json` dependency list. Because CI runs `npm ci`, verify a clean install from the current branch rather than relying on an earlier workflow result.
-3. The README badge and `docs/TEST_REPORT.md` contain historical test-count claims. The checked-in test runner's printed summary must be reconciled with those claims by running the exact current commit.
-4. The README references a local MP4 file, but the official rules require a public Clips demonstration that judges can view without a login or access request. A repository video alone does not establish that requirement.
-5. A deployed URL and a successful GitHub build do not prove the public Clips recording or hackathon submission has been completed.
+A separate Vercel project named `traceback-agent-native-preview` was created and linked to the repository with `agent-native-poc/` as its root directory. It uses a dedicated Neon project on the Free plan, separate from the user's RAJ database and separate from the legacy production project.
 
-## Required completion checklist
+The first runtime smoke test found a missing `yjs` package; it was added as a direct dependency and locked. A later URL smoke test showed the generic React Router deployment omitted Agent-Native auth/action server endpoints (404). The project is now configured for the official Nitro Vercel preset (`NITRO_PRESET=vercel`, `.vercel/output`, `framework: nitro`) with release migrations and a Hobby-compatible daily cron. The new Nitro deployment has not yet been created: Vercel returned its 100-deployments-per-day free-plan limit. The earliest retry is after November 6, 2026 at approximately 9:08 PM IST.
 
-- [ ] Integrate the official `@agent-native/core` `defineAction` API, or migrate to a framework-supported Agent-Native application architecture.
-- [ ] Ensure the official action definitions are the actual shared execution layer for both UI and agent; do not create unused wrapper definitions solely to satisfy a code search.
-- [ ] Preserve server-side approval checks and deterministic post-action health verification.
-- [ ] Regenerate and commit a consistent lockfile.
-- [ ] Run clean `npm ci`, `npm test`, and `npm run build` in GitHub Actions.
-- [ ] Verify all three incident scenarios and both approval and rejection flows in the deployed app.
-- [ ] Verify the deployed commit matches the tested commit.
-- [ ] Record and publish the required public Clips demonstration.
-- [ ] Submit the project through the official form before the deadline and verify receipt.
+## Remaining release gates
 
-## Sources
+- [ ] Latest Agent-Native GitHub Actions run passes typecheck, action tests, doctor, and build.
+- [ ] Fresh Vercel deployment is Ready on the latest PR head.
+- [ ] Runtime smoke test confirms no missing module/server crash.
+- [ ] Public sign-up/sign-in works and the app opens without Vercel SSO.
+- [ ] Configure an AI provider and verify the agent can call shared incident actions.
+- [ ] Test all three incident routes and all five investigation stages on the deployed app.
+- [ ] Verify the app is usable on mobile and desktop.
+- [ ] Record a public Clips video and verify signed-out access.
+- [ ] Complete the official submission form and verify receipt.
 
-- Official rules: https://www.builder.io/hackathon/rules
-- Hackathon overview and scoring: https://www.builder.io/hackathon
-- Official framework repository: https://github.com/BuilderIO/agent-native
-- Framework getting-started guide: https://github.com/BuilderIO/agent-native/blob/main/packages/core/docs/content/getting-started.mdx
+## Submission honesty
 
-## Submission honesty note
-
-Until the checklist above is complete, describe the current implementation as a **custom shared-action incident-response app**, not as a fully integrated official Agent-Native app. This is a compliance and credibility safeguard, not a judgment that the product idea has no value.
+The framework integration exists in the separate Agent-Native app. The legacy root Next.js app remains custom. The public Agent-Native demo is benchmark-only and read-only. Do not claim live production diagnostics, production remediation, or deterministic live resolution.

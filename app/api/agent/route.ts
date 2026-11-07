@@ -12,17 +12,18 @@ export async function GET(request: NextRequest) {
 
     const session = agentOrchestrator.getSession(incidentId);
     return NextResponse.json({ session });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to retrieve session" }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to retrieve session";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { action, incidentId, approved, approverName, apiKey } = body;
+    const { action, incidentId, apiKey } = body ?? {};
 
-    if (!incidentId) {
+    if (typeof incidentId !== "string" || !incidentId.trim()) {
       return NextResponse.json({ error: "Missing required 'incidentId'" }, { status: 400 });
     }
 
@@ -32,15 +33,18 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "approve") {
-      if (typeof approved !== "boolean") {
-        return NextResponse.json({ error: "Parameter 'approved' must be boolean" }, { status: 400 });
-      }
-      const session = await agentOrchestrator.submitApproval(incidentId, approved, approverName);
-      return NextResponse.json({ success: true, session });
+      // Fail closed: browser-provided booleans and display names are not
+      // authenticated approval authority. Keep execution disabled until a
+      // server-authenticated approver and one-time approval challenge exist.
+      return NextResponse.json(
+        { error: "Approval execution is temporarily disabled until server-side approver authentication is configured." },
+        { status: 403 }
+      );
     }
 
     return NextResponse.json({ error: `Unsupported agent action: ${action}` }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Agent operation failed" }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Agent operation failed";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

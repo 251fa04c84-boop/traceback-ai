@@ -34,3 +34,38 @@ jobs:
 
       - name: Build production application
         run: npm run build
+
+  agent-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: agent-native-poc
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.0"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.1
+
+      - name: Install Agent-Native dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck Agent-Native app
+        run: pnpm typecheck
+
+      - name: Test Agent-Native actions
+        run: pnpm test
+
+      - name: Run Agent-Native doctor
+        run: pnpm agent-native:doctor
+
+      - name: Build Agent-Native app
+        run: pnpm build

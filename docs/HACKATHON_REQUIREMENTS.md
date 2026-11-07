@@ -1,65 +1,64 @@
-# Builder.io Agent-Native Hackathon 2026 — Official Requirements & Audit
+# Builder.io Agent-Native Hackathon 2026 — Requirements and Readiness
 
-**Access Date:** October 28, 2026  
-**Primary Source:** [Builder.io Hackathon](https://www.builder.io/hackathon/)  
-**Framework Repository:** [BuilderIO/agent-native](https://github.com/BuilderIO/agent-native)  
+**Checked:** November 5, 2026  
+**Official rules:** https://www.builder.io/hackathon/rules  
+**Hackathon overview:** https://www.builder.io/hackathon  
+**Framework:** https://github.com/BuilderIO/agent-native
 
----
+## Deadline
 
-## 1. Verified Hackathon Overview
+**Monday, November 9, 2026 at 11:59 PM Pacific Time**  
+Equivalent to **Tuesday, November 10 at 07:59 UTC / 13:29 India Standard Time**.
 
-| Item | Official Specification | Verification Status | Source URL |
-| :--- | :--- | :--- | :--- |
-| **Event Name** | Builder.io Agent-Native Hackathon | Verified | [builder.io/hackathon](https://www.builder.io/hackathon/) |
-| **Start Date** | October 27, 2026 (open immediately) | Verified | [builder.io/hackathon](https://www.builder.io/hackathon/) |
-| **Kickoff Webinar** | Thursday, October 29, 2026 at 8:30 AM PT | Verified | [builder.io/hackathon](https://www.builder.io/hackathon/) |
-| **Submission Deadline** | **November 9, 2026 at 11:59 PM PT** (Nov 10, 1:29 PM IST) | Verified | [builder.io/hackathon](https://www.builder.io/hackathon/) |
-| **Prize Pool** | $10,000 USD total across 5 cash tiers + community spotlights | Verified | [builder.io/hackathon](https://www.builder.io/hackathon/) |
-| **Team Size** | Teams permitted (our team: 4 members) | Verified | [builder.io/hackathon](https://www.builder.io/hackathon/) |
-| **Eligibility** | Global, age 18+ or age of majority, free to enter | Verified | [builder.io/hackathon](https://www.builder.io/hackathon/) |
+Submit before the deadline and verify the confirmation receipt. A public repository or a recorded Clips video does not, by itself, submit an entry.
 
-> [!NOTE]  
-> **Deadline Clarification:** The initial prompt referenced November 2, 2026. Official verification of `builder.io/hackathon` confirms the official submission deadline is **November 9, 2026 at 11:59 PM PT**. We will target internal feature completion by November 3, 2026 to ensure ample testing and buffer.
+## Official entry requirements
 
----
+1. Build a functional application using Agent-Native.
+2. Submit original work or meaningful new development completed during the hackathon (which began October 27, 2026).
+3. Identify pre-existing work, templates, libraries, third-party assets, and what changed during the event.
+4. Provide a project description, creator/team details, contact information, and an accessible demonstration.
+5. Record a **public Clips demonstration** showing the actual application in use. The recording must be viewable without a login or access request.
+6. Submit the required details and public Clips URL through the official project submission form.
+7. Agree to the Official Rules and confirm eligibility. Every participant must be at least 18 or the age of legal majority in their jurisdiction, whichever is higher.
 
-## 2. Official Judging Criteria & Weights
+## Judging rubric
 
-| Criterion | Weight | Official Description / Judge Intent | How TraceBack AI Aligns | Status |
-| :--- | :---: | :--- | :--- | :---: |
-| **Usefulness & Execution** | **40%** | Solving a clear, real-world problem with a complete, robust, working experience rather than an unfinished prototype. | Solves production downtime triage. Provides realistic incident scenarios, live tool diagnostics, deterministic health verifications, and post-mortem audit generation. | In Progress |
-| **Creativity & Design** | **20%** | Distinctive, thoughtful product idea and user interaction model that feels polished and purpose-built. | Developer-grade incident response workspace: incident timeline, live agent thought process, interactive evidence explorer, diff inspector, and human approval gates. | In Progress |
-| **Innovation** | **20%** | Leveraging the AI agent to meaningfully improve the overall workflow beyond generic chatbots. | Agent acts as an active peer SRE: gathers evidence across logs/metrics/deployments, hypothesizes root causes, proposes concrete actions, and awaits human authorization. | In Progress |
-| **Cleverness & Use of Agent-Native** | **20%** | Resourcefully utilizing the official framework and connecting agent, UI, and actions. | TraceBack currently has a custom shared Zod action registry used by the UI and agent. The official `@agent-native/core` package and `defineAction` are not present in `package.json` or source imports. | **Not compliant / blocking** |
+| Criterion | Weight | TraceBack focus |
+| --- | ---: | --- |
+| Usefulness and Execution | 40% | A complete incident investigation flow with traceable telemetry, logs, deployment evidence, and a reviewable plan |
+| Creativity and Design | 20% | A focused incident command workspace rather than a generic chat wrapper |
+| Innovation | 20% | An agent that correlates operational evidence and prepares a recovery plan for human review |
+| Cleverness and Use of Agent-Native | 20% | Official `defineAction` capabilities shared by the agent and the UI |
 
----
+## TraceBack implementation disclosure
 
-## 3. Technology & Framework Requirements
+### Existing project work
+The repository retains an earlier custom Next.js incident workspace and deterministic incident scenarios. It is preserved as prior project work and must not be represented as newly authored Agent-Native framework code.
 
-### Core Mandate: Builder.io Agent-Native Architecture
-- **Framework Package:** `@agent-native/core` (`import { defineAction } from "@agent-native/core/action"`) — **not currently installed or imported in this repository**.
-- **Core Primitive:** `defineAction` with Zod validation schemas — **not yet implemented; the current code uses a project-defined `ActionDefinition` interface and `dispatchAction` function.**
-- **Architectural Tenet:** Actions must not be isolated chatbot tools; they must be unified application actions usable interchangeably by the UI and the AI agent.
-- **State Synchronization:** Bidirectional visibility—when the agent inspects or proposes an action, the UI updates; when the human approves or triggers an action, the agent observes the outcome.
+### Hackathon development
+The Agent-Native app under `agent-native-poc/` adapts the official Chat starter template for TraceBack. The project adds typed read-only actions for listing incidents, retrieving incident evidence, and producing a five-stage investigation brief; incident routes; TraceBack-specific agent instructions; action tests; and a domain-specific overview.
 
----
+### Template and third-party dependencies
+The app uses the Agent-Native Chat starter from `@agent-native/core@0.223.0`, plus the framework Toolkit and packages declared in `agent-native-poc/package.json`. Their upstream licenses apply. Disclose the template and third-party packages in the entry.
 
-## 4. Mandatory Submission Deliverables
+## Current readiness audit — November 5
 
-1. **Working Application:** Fully deployed, interactive web application accessible publicly by judges without paywalls or required credentials.
-2. **Video Demo:** Public video demo clip (2–3 minutes) walking through the working app and agent-native workflow.
-3. **Source Code:** Public GitHub repository containing clear documentation, architecture diagrams, and reproduction steps.
-4. **Devpost / Portal Submission Form:** Written pitch, architecture summary, and tool usage explanations.
+| Requirement | Status | Evidence / remaining work |
+| --- | --- | --- |
+| Official Agent-Native code in the app | Implemented in the isolated app | `agent-native-poc/actions/` contains `defineAction` actions; the Agent-Native Vercel project targets this folder |
+| Five-stage investigation brief | Implemented in source | New action, incident detail UI, and action tests added; latest CI still needs to pass |
+| Three incident scenarios | Implemented as benchmark data | Manual tests were previously completed in the legacy app; repeat them on the Agent-Native deployment |
+| Runtime deployment | Blocked pending redeploy | The generic React Router preset served UI routes but returned 404 for Agent-Native auth/action endpoints. The correct Nitro Vercel preset is now configured in source and project settings. Vercel's free deployment API limit (100/day) blocked the next deployment attempt; retry after the 24-hour reset. Do not use the old preview URL for submission |
+| Agent chat with a configured model | Not yet verified | Confirm an AI provider is configured and test a real chat turn using shared incident actions |
+| Public access without Vercel SSO | Configured on the isolated Vercel project | Verify in an incognito browser; application authentication remains enabled |
+| Public Clips video | Not complete | Record the final Agent-Native app, publish the clip, and verify public access |
+| Official submission | Not complete | Complete the form and confirm receipt |
 
----
+## Submission links
 
-## 5. Audit Matrix: Requirements vs. Implementation
+- Rules: https://www.builder.io/hackathon/rules
+- Submission form: https://www.builder.io/hackathon/submit
+- Clips: https://clips.agent-native.com/
 
-| Requirement | Required Evidence | Current Status | Remaining Work | Risk & Mitigation |
-| :--- | :--- | :--- | :--- | :--- |
-| **Agent-Native Architecture** | Official `@agent-native/core` `defineAction` definitions wired to both agent and UI | **Not implemented** | Integrate the official package or migrate the app onto the framework; run clean install, tests, production build, and deployment smoke test | **High / submission blocker** |
-| **Realistic Incident Scenarios** | 3 deterministic incident simulations with realistic logs, metrics, and git diffs | Designed | Build scenario database and state engine | Low. Deterministic simulation prevents flaky demos. |
-| **Human-in-the-Loop Safety** | Consequential actions require explicit human approval panel before execution | Architecture Planned | Build interactive approval modal & audit log | Zero risk. Strictly enforced by server-side gate. |
-| **Deterministic Verification** | System state checked after action; LLM cannot self-certify resolution | Architecture Planned | Implement automated health-check probe after action | Zero risk. Deterministic rules decide resolution state. |
-| **Zero-Cost Deployment** | Publicly accessible on Vercel or Render free tier | Planned | Deploy Next.js full-stack app to Vercel | Low. Keep API keys server-side with sensible fallbacks. |
-
+Do not mark any item complete until the exact current deployment or submission receipt has been checked.

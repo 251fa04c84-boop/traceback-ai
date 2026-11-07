@@ -126,6 +126,7 @@ export default function TraceBackWorkspace() {
   const [activeIncident, setActiveIncident] = useState<IncidentDetail | null>(null);
   const [agentSession, setAgentSession] = useState<AgentSession | null>(null);
   const [isInvestigating, setIsInvestigating] = useState(false);
+  const [investigationError, setInvestigationError] = useState<string | null>(null);
   const [telemetryTab, setTelemetryTab] = useState<"logs" | "diff" | "metrics" | "actions">("logs");
   const [logFilter, setLogFilter] = useState<"ALL" | "ERROR" | "WARN">("ALL");
   const [showPostMortemModal, setShowPostMortemModal] = useState(false);
@@ -134,6 +135,7 @@ export default function TraceBackWorkspace() {
   const [copiedReport, setCopiedReport] = useState(false);
   const [manualActionOutput, setManualActionOutput] = useState<string | null>(null);
   const [isExecutingManual, setIsExecutingManual] = useState(false);
+  const approvalNotice = "Execution is locked until a server-authenticated approver workflow is configured. No recovery action can be executed from this demo.";
 
   // Fetch all incidents
   const loadIncidents = async () => {
@@ -203,6 +205,7 @@ export default function TraceBackWorkspace() {
   const handleStartInvestigation = async () => {
     if (!selectedId) return;
     setIsInvestigating(true);
+    setInvestigationError(null);
     try {
       const res = await fetch("/api/agent", {
         method: "POST",
@@ -213,12 +216,18 @@ export default function TraceBackWorkspace() {
           apiKey: geminiKey || undefined
         })
       });
-      const data = await res.json();
-      if (data.session) {
-        setAgentSession(data.session);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || `Investigation request failed (HTTP ${res.status}).`);
       }
+      if (!data.session) {
+        throw new Error(data.error || "The investigation returned no session. Please try again.");
+      }
+      setAgentSession(data.session);
     } catch (e) {
+      const message = e instanceof Error ? e.message : "Investigation failed. Please try again.";
       console.error("Investigation failed:", e);
+      setInvestigationError(message);
     } finally {
       setIsInvestigating(false);
     }
@@ -251,30 +260,8 @@ export default function TraceBackWorkspace() {
     }
   };
 
-  // Human Approval Action
-  const handleApproval = async (approved: boolean) => {
-    if (!selectedId) return;
-    try {
-      const res = await fetch("/api/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "approve",
-          incidentId: selectedId,
-          approved,
-          approverName: "Alex Rivera (Lead SRE)"
-        })
-      });
-      const data = await res.json();
-      if (data.session) {
-        setAgentSession(data.session);
-        await loadIncidentDetail(selectedId);
-        await loadIncidents();
-      }
-    } catch (e) {
-      console.error("Approval submit failed:", e);
-    }
-  };
+  // Approval execution is intentionally unavailable until authenticated
+  // server-side approver identity and one-time approval challenges exist.
 
   // Reset Incident Scenario
   const handleReset = async () => {
@@ -796,12 +783,20 @@ export default function TraceBackWorkspace() {
                     </span>
                   </div>
                   <button
+                    type="button"
                     onClick={handleStartInvestigation}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 underline font-medium"
+                    disabled={isInvestigating}
+                    aria-busy={isInvestigating}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 underline font-medium disabled:cursor-wait disabled:opacity-60"
                   >
-                    Re-analyze
+                    {isInvestigating ? "Re-analyzing…" : "Re-analyze"}
                   </button>
                 </div>
+                {investigationError && (
+                  <p role="alert" className="mt-2 rounded-md border border-rose-500/30 bg-rose-950/30 px-3 py-2 text-xs text-rose-300">
+                    Investigation failed: {investigationError}
+                  </p>
+                )}
 
                 {/* Model Engine Provenance Badge */}
                 <div className="flex items-center justify-between px-3 py-1.5 rounded-md bg-slate-950/40 border border-slate-800/80 text-[11px]">
@@ -843,21 +838,13 @@ export default function TraceBackWorkspace() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleApproval(true)}
-                  className="flex-1 py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/30"
-                >
-                  <Check className="w-4 h-4" />
-                  Authorize & Execute
-                </button>
-                <button
-                  onClick={() => handleApproval(false)}
-                  className="py-2.5 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition flex items-center justify-center gap-1.5 border border-slate-700"
-                >
-                  <X className="w-4 h-4" />
-                  Reject
-                </button>
+              <div className="rounded-lg border border-amber-500/30 bg-amber-950/30 p-3 text-xs text-amber-200">
+                <div className="flex items-center gap-2 font-semibold">
+                  <ShieldAlert className="h-4 w-4 shrink-0" />
+                  Recovery execution locked
+                </div>
+                <p className="mt-1 text-amber-100/80">{approvalNotice}</p>
+                <p className="mt-1 text-amber-100/70">Investigation and evidence review are available. No authenticated approval is represented here.</p>
               </div>
             </div>
           )}
