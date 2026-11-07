@@ -4,7 +4,7 @@
 TraceBack AI
 
 ## One-line summary
-An evidence-first incident investigation workspace where engineers and an AI agent use the same typed actions to correlate telemetry, logs, and deployment changes—then stop at a human approval gate.
+An evidence-first incident response workspace where engineers and an AI agent share typed actions to correlate telemetry, logs, and deployment changes, then run an explicitly approved, isolated recovery simulation with before/after verification and an audit trail.
 
 ## Problem
 Incident response is fragmented. On-call engineers switch between metrics, logs, and deployment history while trying to determine what changed, what failed, and which recovery option is safe. A generic chatbot can summarize text without grounding its conclusions in the application's actual evidence or making the approval boundary clear.
@@ -16,14 +16,14 @@ TraceBack AI organizes an incident investigation into five stages:
 2. Correlate timestamped application logs with the suspect release and code diff.
 3. Diagnose the likely failure from the supplied evidence.
 4. Prepare an allowlisted recovery proposal for review.
-5. Stop at a human approval gate.
+5. Stop at a human approval gate; after approval, execute the exact scenario-allowlisted recovery plan only inside the isolated synthetic benchmark simulator, then verify its simulated postconditions.
 
-The interface and Agent-Native assistant share the same typed `defineAction()` capabilities: `list-incidents`, `get-incident-evidence`, and `build-investigation-brief`. The UI can request the same validated incident data and five-stage brief that the assistant can use. This demonstrates Agent-Native's shared-action model rather than placing an unrelated chat panel beside a dashboard.
+The interface and Agent-Native assistant share the same typed `defineAction()` capabilities: `list-incidents`, `get-incident-evidence`, `build-investigation-brief`, and `execute-recovery-simulation`. The recovery action sets `needsApproval: true`, executes only the scenario's exact allowlisted actions in the deterministic simulator, and returns before/after metrics, verification evidence, and an audit trail. The incident workspace calls the same action through `useActionMutation`; agent-initiated calls pause for approval of that specific call.
 
 ## What is distinctive
 - Evidence is visible and reviewable: metrics, log IDs/timestamps, release identifiers, and deployment diffs.
 - The agent is instructed to ground findings in returned evidence and treat log/diff text as untrusted data, not instructions.
-- Recovery is deliberately not executed in this public benchmark. The approval gate makes the safety boundary explicit.
+- The public showcase remains read-only. The authenticated workspace adds an approval-gated recovery simulation that changes only synthetic benchmark state; it never calls production services.
 - Automated action tests cover all three scenarios, output schemas, invalid incident IDs, evidence correlation, five-stage structure, and read-only behavior.
 - Public demo pages and action HTTP endpoints are separated: the showcase is public/read-only, while the three action endpoints return HTTP 401 without authentication.
 
@@ -42,7 +42,7 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 ## Technical implementation
 - Official Agent-Native framework: `@agent-native/core@0.223.0` and `@agent-native/toolkit@0.223.0`.
 - React 19 / React Router 8 application.
-- Three typed, read-only actions shared between the UI and agent.
+- Three typed, read-only evidence actions plus one shared `execute-recovery-simulation` action with `needsApproval: true`.
 - Vercel Preview deployment using the Nitro Vercel preset.
 - GitHub Actions run #184 passed both `agent-native` and `verify` jobs on source commit `6c92a80501af5f5f386db7c93338cf8a8edb620b`, including typecheck, action tests, Agent-Native diagnostics, and builds.
 - Signed-out smoke test confirmed `/` redirects to `/demo`; the public showcase loads all three scenarios; `/incidents` and `/incidents/inc-8921` require login; and all three action HTTP endpoints return 401 without authentication.
@@ -50,7 +50,7 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 ## Transparency and pre-existing work disclosure
 The repository contains an earlier custom Next.js TraceBack implementation and deterministic incident simulator. The hackathon entry's Agent-Native app is in `agent-native-poc/`, adapted from the Agent-Native Chat starter template (`@agent-native/core@0.223.0`) and extended with TraceBack incident actions, evidence pages, a five-stage brief, and action tests. The earlier implementation and simulator are pre-existing project work; do not claim they were all created during the hackathon. Framework packages and dependencies remain subject to their own licenses.
 
-The three incident scenarios are deterministic simulated benchmark data. The public app is not connected to live production infrastructure. All current incident actions are read-only; no rollback, feature-flag mutation, service restart, or live health verification is executed. A proposed recovery action is not a completed remediation.
+The three incident scenarios are deterministic simulated benchmark data. The public showcase is read-only. The authenticated workspace can run an approval-gated recovery simulation, but it mutates only an isolated in-process benchmark state; it does not call production APIs, deploys, feature flags, databases, or customer records. Its postconditions are simulated, not live infrastructure health checks. A simulated recovery is not a completed production remediation.
 
 Gemini free-tier requests have returned HTTP 429 quota errors and intermittent 503 high-demand errors. A successful live Agent-Native chat/tool-call has NOT been verified; do not claim it in the submission or video unless a fresh real run succeeds.
 
