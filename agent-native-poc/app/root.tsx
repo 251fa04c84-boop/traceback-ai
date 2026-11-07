@@ -1,5 +1,4 @@
 import { configureTracking } from "@agent-native/core/client/analytics";
-import { ClientOnly } from "@agent-native/core/client/ui";
 import { appPath } from "@agent-native/core/client/api-path";
 import { useDbSync } from "@agent-native/core/client/hooks";
 import { createAgentNativeQueryClient } from "@agent-native/core/client/hooks";
@@ -198,9 +197,7 @@ export default function Root() {
           <Outlet />
         ) : (
           <>
-            <ClientOnly>
-              <DbSyncSetup />
-            </ClientOnly>
+            <DbSyncSetup />
             <AppContent />
           </>
         )}
