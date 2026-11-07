@@ -1,4 +1,5 @@
 import { configureTracking } from "@agent-native/core/client/analytics";
+import { ClientOnly } from "@agent-native/core/client/ui";
 import { appPath } from "@agent-native/core/client/api-path";
 import { useDbSync } from "@agent-native/core/client/hooks";
 import { createAgentNativeQueryClient } from "@agent-native/core/client/hooks";
@@ -52,6 +53,10 @@ export const links: LinksFunction = () => [
 
 const THEME_INIT_SCRIPT = getThemeInitScript();
 const LOCALE_INIT_SCRIPT = getLocaleInitScript();
+
+// Keep this list synchronized with workspaceAppPublicPaths in server/plugins/auth.ts.
+// The public root renders only the static synthetic benchmark showcase.
+const PUBLIC_PATHS = ["/"];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -180,15 +185,25 @@ export default function Root() {
   // The path, not the visitor, picks the shell, so the SSR shell stays one
   // cached page per URL.
   const { pathname } = useLocation();
+  const isPublicPath = PUBLIC_PATHS.includes(pathname);
   return (
     <AppToolkitProvider>
       <AppProviders
         queryClient={queryClient}
         skeletonLayout={skeletonLayoutForPath(pathname)}
         i18n={{ catalog: i18nCatalog }}
+        isPublicPath={isPublicPath}
       >
-        <DbSyncSetup />
-        <AppContent />
+        {isPublicPath ? (
+          <Outlet />
+        ) : (
+          <>
+            <ClientOnly>
+              <DbSyncSetup />
+            </ClientOnly>
+            <AppContent />
+          </>
+        )}
       </AppProviders>
     </AppToolkitProvider>
   );
