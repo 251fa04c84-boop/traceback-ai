@@ -44,7 +44,7 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 - React 19 / React Router 8 application.
 - Three typed, read-only actions shared between the UI and agent.
 - Vercel Preview deployment using the Nitro Vercel preset.
-- GitHub Actions run #178 passed both `agent-native` and `verify` jobs on source commit `db3610f0bd4fe10b3ee4946a63608fb38497ce54`, including typecheck, action tests, Agent-Native diagnostics, and builds.
+- GitHub Actions run #184 passed both `agent-native` and `verify` jobs on source commit `6c92a80501af5f5f386db7c93338cf8a8edb620b`, including typecheck, action tests, Agent-Native diagnostics, and builds.
 - Signed-out smoke test confirmed `/` redirects to `/demo`; the public showcase loads all three scenarios; `/incidents` and `/incidents/inc-8921` require login; and all three action HTTP endpoints return 401 without authentication.
 
 ## Transparency and pre-existing work disclosure
