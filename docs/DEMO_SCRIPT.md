@@ -9,9 +9,10 @@ Target length: 100–120 seconds. Record the actual Agent-Native app and the pub
 - Confirm the deployment is READY. The root URL redirects to `/demo`.
 - Open the public demo in a signed-out/incognito browser. It must show all three synthetic scenarios, correlated logs, deployment diffs, and proposed recovery actions.
 - Confirm that `/incidents`, `/home`, and the three `/_agent-native/actions/*` endpoints do not expose private workspace/action data without authentication.
-- The private workspace may be recorded only after signing in with the user's own account and confirming the actual incident queue/action results.
-- Gemini free-tier chat has previously returned HTTP 429 quota errors and intermittent 503 errors. A successful live Agent-Native chat/tool-call has NOT been verified. Do not record or claim a successful run until it is actually observed.
-- If live chat is unavailable, record only the working public showcase and accurately describe the shared typed actions as the app's implementation—not as a live tool call shown in the clip.
+- Sign in with the user's own account and open `/incidents/inc-8921`. Confirm the new “Approve & run recovery simulation” control is visible and the result shows before/after metrics, every required action, verification evidence, and the audit trail.
+- The recovery action is a deterministic synthetic benchmark simulation. It does not connect to production, and its verification is not a live infrastructure health check.
+- Gemini free-tier chat has previously returned HTTP 429 quota errors and intermittent 503 errors. A successful live Agent-Native chat/tool-call has NOT been verified. Do not record or claim a successful live agent call until it is actually observed.
+- If live chat is unavailable, record the real UI-triggered recovery simulation and accurately describe `execute-recovery-simulation` as the shared Agent-Native action; do not pretend the assistant invoked it in the clip.
 - Keep credentials, API keys, private account information, and browser developer tools out of frame.
 
 ## Shot list and narration
@@ -36,15 +37,15 @@ Target length: 100–120 seconds. Record the actual Agent-Native app and the pub
 
 **Narration:** “The other scenarios demonstrate different failure modes: an unbounded session cache exhausting JVM heap, and a database connection leak exhausting the pool. Each diagnosis is tied to its own evidence.”
 
-### 1:15–1:38 — Recovery proposal and safety boundary
-**Screen:** Show the proposed rollback/feature-flag actions and human approval notice.
+### 1:15–1:38 — Human approval and verified simulation
+**Screen:** In the signed-in workspace, click “Approve & run recovery simulation”. Show before/after error rate and p99 latency, the applied allowlisted actions, the simulated verification verdict, and expand the audit trail.
 
-**Narration:** “TraceBack prepares a bounded recovery proposal and explains why it is recommended. This public benchmark is read-only and is not connected to live infrastructure. No rollback, feature-flag mutation, service restart, or production health check is executed.”
+**Narration:** “After reviewing the recovery proposal, a human explicitly approves a deterministic simulation. TraceBack applies only the actions allowlisted for this incident, checks every required step, and returns before/after metrics with an audit trail. This is a synthetic benchmark—not a production rollback or live health check.”
 
 ### 1:38–1:55 — Agent-Native implementation
-**Screen:** If signed in and verified, show the actual shared-action workspace and real action results. Otherwise, remain on the public page and show the five-stage workflow.
+**Screen:** Show the `execute-recovery-simulation` action definition with `needsApproval: true`. If a real chat call has been verified, show its approval affordance; otherwise do not imply that the model invoked it. Finish on the public showcase.
 
-**Narration:** “The Agent-Native workspace defines shared, typed actions for incident listing, evidence retrieval, and investigation briefs. The UI and assistant use the same action contracts. The public showcase stays read-only, while private action endpoints require authentication.”
+**Narration:** “The UI and in-app agent share the same typed recovery action. Agent-initiated recovery calls require approval of that specific call; the UI button is an explicit human action. Public evidence remains read-only, and the recovery lab is limited to synthetic benchmark state.”
 
 ## Final recording checks
 
