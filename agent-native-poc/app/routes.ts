@@ -1,11 +1,10 @@
-import { type RouteConfig, index } from "@react-router/dev/routes";
+import { type RouteConfig, route } from "@react-router/dev/routes";
 import { flatRoutes } from "@react-router/fs-routes";
 
-// Register the public root explicitly. The preview runtime returned a 404 for
-// "/" despite the filesystem _index route being present, so keep this route
-// deterministic and let flatRoutes discover the remaining workspace routes.
+// Register the public showcase as an explicit "/" path. Keep all other
+// workspace routes file-based and exclude the showcase file from discovery.
 export default [
-  index("./routes/_index.tsx"),
+  route("/", "./routes/_index.tsx"),
   ...(await flatRoutes({
     ignoredRouteFiles: [
       "**/*.test.{ts,tsx}",
