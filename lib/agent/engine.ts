@@ -1,38 +1,77 @@
 import { AgentInvestigationSession, InvestigationStep } from "./types";
 import { dispatchAction } from "../actions";
 import { simulator } from "../simulator/engine";
+import { z } from "zod";
+
+const GeminiOutputSchema = z.object({
+  hypothesis: z.string().min(1).max(4000),
+  thought: z.string().max(4000).default(""),
+  proposedActionId: z.enum(["rollbackDeployment", "toggleFeatureFlag", "restartService"]),
+  proposedParams: z.record(z.unknown()).default({}),
+  proposedReason: z.string().max(2000).default(""),
+  blastRadius: z.enum(["low", "medium", "high", "critical"]).default("high")
+}).strict();
+
+function stripMarkdownCodeFences(value: string): string {
+  return value.trim()
+    .replace(/^\uFEFF/, "")
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 10_000): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 async function queryGeminiLive(prompt: string, apiKey: string) {
-  // Try modern 2026 models with automatic fallback
   const candidateModels = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-2.0-flash"];
   let lastError: Error | null = null;
 
   for (const model of candidateModels) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.1
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const res = await fetchWithTimeout(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
+          })
+        });
+
+        if (!res.ok) {
+          const retryable = res.status === 429 || res.status === 503;
+          const errorText = (await res.text()).slice(0, 1000);
+          if (retryable && attempt < 2) {
+            await new Promise((resolve) => setTimeout(resolve, 500 * (2 ** attempt)));
+            continue;
           }
-        })
-      });
+          throw new Error(`Model ${model} returned HTTP ${res.status}: ${errorText}`);
+        }
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Model ${model} Error ${res.status}: ${errorText}`);
+        const data: unknown = await res.json();
+        const responseText = (data as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> })
+          .candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!responseText) throw new Error(`Model ${model} returned an empty response`);
+
+        const parsed: unknown = JSON.parse(stripMarkdownCodeFences(responseText));
+        return GeminiOutputSchema.parse(parsed);
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        if (attempt < 2 && (lastError.name === "AbortError" || /fetch|network|timeout/i.test(lastError.message))) {
+          await new Promise((resolve) => setTimeout(resolve, 500 * (2 ** attempt)));
+          continue;
+        }
+        break;
       }
-
-      const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error(`Model ${model} returned empty response`);
-      return JSON.parse(text);
-    } catch (err: any) {
-      lastError = err;
     }
   }
 
