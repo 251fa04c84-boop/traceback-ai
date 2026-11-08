@@ -15,7 +15,7 @@ services:
     rootDir: agent-native-poc
     buildCommand: corepack enable && corepack prepare pnpm@10.29.1 --activate && pnpm install --frozen-lockfile && pnpm build
     startCommand: pnpm start
-    healthCheckPath: /
+    healthCheckPath: /demo
     envVars:
       - key: NODE_VERSION
         value: 22.22.0
