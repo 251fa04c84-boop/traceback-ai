@@ -5,7 +5,7 @@
 
 ## Current status
 
-**CI-verified hardening candidate.** GitHub Actions run #42455284945 passed both `verify` and `agent-native` jobs on commit `04c3d8cefc93a183cb1369cb8e73b71ceef1c4be`. This includes frozen-lockfile installation, typecheck, action tests, Agent-Native doctor, and both production builds. The latest Vercel Preview deployment for this exact head is still pending; the preceding Preview commit passed public-demo smoke testing.
+**CI-verified hardening candidate.** GitHub Actions run #42455284945 passed both `verify` and `agent-native` jobs on commit `04c3d8cefc93a183cb1369cb8e73b71ceef1c4be`. This includes frozen-lockfile installation, typecheck, action tests, Agent-Native doctor, and both production builds. The Vercel Preview for the hardening code reached READY on commit `609a212dc3eeb7924e1779dccc797892066d889d`. A fresh public browser smoke test passed all three incident cards, the read-only boundary, signed-out redirect to sign-in, and mobile layout. Later commits after `609a` are documentation-only; their Preview redeploys may still be queued.
 
 ## Implemented checks
 
@@ -39,8 +39,8 @@ The first hosted runtime smoke test failed because the deployment could not reso
 | Agent-Native doctor | Pending current-head CI result |
 | Agent-Native production build | Pending current-head CI result |
 | Latest Vercel deployment | Pending after runtime dependency fix |
-| Public demo browser QA | Passed read-only inspection of all three incident cards, log/diff presence, recovery explanations, and narrow mobile layout on the prior Preview |
-| Latest Preview deployment for hardening head | Pending / queued at time of report |
+| Public demo browser QA | Passed on READY hardening Preview: all three incident cards, logs/diffs, recovery proposals, public read-only boundary, signed-out redirect, and narrow mobile layout |
+| Hardening code Preview (`609a`) | READY; latest public smoke test passed. Later branch commits are documentation-only. |
 | Browser smoke test of the authenticated recovery action | Pending; requires user sign-in |
 | Agent chat with configured model provider | Not yet completed |
 | Mobile viewport review | Not yet completed |
