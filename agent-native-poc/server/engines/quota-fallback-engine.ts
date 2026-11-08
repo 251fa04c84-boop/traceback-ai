@@ -32,16 +32,32 @@ function incidentIdFromMessages(
     : undefined;
 }
 
+function recoveryActionInHistory(
+  messages: EngineStreamOptions["messages"],
+): boolean {
+  return messages.some((message) =>
+    message.content.some(
+      (part) =>
+        (part.type === "tool-call" && part.name === "execute-recovery-simulation") ||
+        (part.type === "tool-result" && part.toolName === "execute-recovery-simulation"),
+    ),
+  );
+}
+
 async function deterministicFallback(
   messages: EngineStreamOptions["messages"],
 ): Promise<string> {
   const incidentId = incidentIdFromMessages(messages);
+  const recoveryNote = recoveryActionInHistory(messages)
+    ? "A recovery action appears in this conversation history. This fallback cannot determine whether it was approved or completed. Use the actual Agent-Native approval card and Activity/audit result as the source of truth; do not submit a duplicate recovery request."
+    : "This fallback emits no recovery tool calls. Any recovery execution remains behind the actual Agent-Native human approval flow.";
   if (!incidentId) {
     return [
       "DETERMINISTIC FALLBACK — Gemini is rate-limited (HTTP 429).",
       "AI chat could not complete this turn, and this turn will not retry the exhausted provider.",
       "I can still prepare a deterministic, template-based incident brief from the synthetic benchmark data. Choose one incident: inc-8921 (checkout), inc-4402 (session/auth), or inc-7119 (analytics database).",
-      "This fallback is not live AI analysis, and no recovery action has been executed.",
+      "This fallback is not live AI analysis.",
+      recoveryNote,
     ].join("\n\n");
   }
 
@@ -61,7 +77,8 @@ async function deterministicFallback(
     diagnose ? `DIAGNOSIS HYPOTHESIS\n${diagnose.summary}\n${diagnose.evidence.join("\n")}` : "",
     plan ? `PROPOSED RECOVERY — NOT EXECUTED\n${plan.summary}\n${plan.evidence.join("\n")}` : "",
     approval ? `HUMAN APPROVAL GATE\n${approval.summary}` : "",
-    "All incident evidence is synthetic. No production infrastructure was changed. Recovery remains behind the Agent-Native human approval flow.",
+    "All incident evidence is synthetic. No production infrastructure was changed by this fallback.",
+    recoveryNote,
   ]
     .filter(Boolean)
     .join("\n\n");
