@@ -129,17 +129,17 @@ export default function IncidentEvidencePage() {
   const stages = actionBrief?.stages ?? fallbackStages;
 
   return (
-    <main className="mx-auto w-full max-w-6xl space-y-6 p-4 sm:p-6">
+    <main className="tb-workspace tb-incident-detail mx-auto w-full max-w-6xl space-y-6 p-4 sm:p-6">
       <a href="/incidents" className="text-sm text-muted-foreground underline underline-offset-4">← All incidents</a>
-      <header className="space-y-2">
+      <header className="tb-section-heading space-y-2">
         <p className="font-mono text-xs text-muted-foreground">{scenario.id} · {scenario.service}</p>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{scenario.title}</h1>
+        <h1 className="tb-display text-2xl font-semibold tracking-tight sm:text-3xl">{scenario.title}</h1>
         <p className="text-sm text-muted-foreground">Simulated benchmark evidence. No live infrastructure is connected.</p>
       </header>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="tb-metric-grid grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {scenario.metrics.map((metric) => (
-          <article key={metric.time} className="rounded-xl border bg-card p-4">
+          <article key={metric.time} className="tb-metric-card rounded-xl border bg-card p-4">
             <p className="text-xs text-muted-foreground">{metric.time}</p>
             <p className="mt-2 text-xl font-semibold">{metric.errorRate}%</p>
             <p className="text-xs text-muted-foreground">Error rate</p>
@@ -149,15 +149,15 @@ export default function IncidentEvidencePage() {
         ))}
       </section>
 
-      <section className="space-y-4 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="evidence-chain-title">
+      <section className="tb-panel space-y-4 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="evidence-chain-title">
         <header className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Evidence graph · inspectable provenance</p>
           <h2 id="evidence-chain-title" className="text-xl font-semibold">How TraceBack formed this hypothesis</h2>
           <p className="text-sm text-muted-foreground">The diagnosis is a deterministic template hypothesis, not a verified root cause. Follow the synthetic benchmark evidence from observed signals to the suspected change; correlation is not proof of production causality.</p>
         </header>
-        <ol className="grid gap-3 lg:grid-cols-4">
+        <ol className="tb-evidence-grid grid gap-3 lg:grid-cols-4">
           {evidenceChain.map((node, index) => (
-            <li key={node.id} className="min-w-0 rounded-lg border p-3">
+            <li key={node.id} className="tb-evidence-card min-w-0 rounded-lg border p-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-cyan-700">{node.label}</span>
                 {index < evidenceChain.length - 1 ? <span className="text-xs text-muted-foreground">leads to →</span> : <span className="text-xs text-muted-foreground">assessment</span>}
@@ -177,7 +177,7 @@ export default function IncidentEvidencePage() {
         </ol>
       </section>
 
-      <section className="space-y-3 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="shared-actions-title">
+      <section className="tb-panel space-y-3 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="shared-actions-title">
         <header className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Shared Agent-Native action layer</p>
           <h2 id="shared-actions-title" className="text-lg font-semibold">Live action results</h2>
@@ -211,7 +211,7 @@ export default function IncidentEvidencePage() {
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-cyan-500/30 bg-card p-4 sm:p-5" aria-labelledby="recovery-simulation-title">
+      <section className="tb-recovery-panel space-y-4 rounded-xl border border-cyan-500/30 bg-card p-4 sm:p-5" aria-labelledby="recovery-simulation-title">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Human-controlled recovery lab</p>
