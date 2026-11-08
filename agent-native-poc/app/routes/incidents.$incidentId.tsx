@@ -234,6 +234,28 @@ export default function IncidentEvidencePage() {
         ) : null}
         {recovery.data ? (
           <div className="space-y-4 border-t pt-4">
+            {(() => {
+              const errorDelta = recovery.data.before.latestErrorRate - recovery.data.after.latestErrorRate;
+              const latencyDelta = recovery.data.before.latestP99Latency - recovery.data.after.latestP99Latency;
+              return (
+                <div className="grid gap-3 sm:grid-cols-2" aria-label="Simulated recovery metric deltas">
+                  <article className="rounded-lg border p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Error-rate change</p>
+                    <p className={errorDelta >= 0 ? "mt-2 text-2xl font-semibold text-emerald-700" : "mt-2 text-2xl font-semibold text-rose-700"}>
+                      {errorDelta > 0 ? "−" : errorDelta < 0 ? "+" : ""}{Math.abs(errorDelta).toFixed(2)} percentage points
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{errorDelta >= 0 ? "Simulated improvement" : "Simulated regression"} · before minus after</p>
+                  </article>
+                  <article className="rounded-lg border p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">P99 latency change</p>
+                    <p className={latencyDelta >= 0 ? "mt-2 text-2xl font-semibold text-emerald-700" : "mt-2 text-2xl font-semibold text-rose-700"}>
+                      {latencyDelta > 0 ? "−" : latencyDelta < 0 ? "+" : ""}{Math.abs(latencyDelta).toLocaleString()} ms
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{latencyDelta >= 0 ? "Simulated improvement" : "Simulated regression"} · before minus after</p>
+                  </article>
+                </div>
+              );
+            })()}
             <div className="grid gap-3 sm:grid-cols-2">
               <article className="rounded-lg border p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Before · {recovery.data.before.health}</p>
