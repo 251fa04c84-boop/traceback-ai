@@ -48,6 +48,36 @@ export default function IncidentEvidencePage() {
   const deployment = scenario.deployments.find((item) => !item.isStable) ?? scenario.deployments[0];
   const peakErrorRate = Math.max(...scenario.metrics.map((metric) => metric.errorRate));
   const peakLatency = Math.max(...scenario.metrics.map((metric) => metric.latencyP99));
+  const evidenceChain = [
+    {
+      id: "telemetry",
+      label: "1 · Signal",
+      title: scenario.metrics.length + " telemetry samples",
+      detail: "Peak error rate " + peakErrorRate + "% · peak p99 " + peakLatency.toLocaleString() + " ms",
+      sources: scenario.metrics.map((metric) => metric.time + " · " + metric.errorRate + "% errors · " + metric.latencyP99.toLocaleString() + " ms p99"),
+    },
+    {
+      id: "logs",
+      label: "2 · Runtime evidence",
+      title: scenario.logs.length + " correlated log entries",
+      detail: "Application errors and warnings from " + scenario.service,
+      sources: scenario.logs.map((log) => log.id + " · " + log.level + " · " + log.message),
+    },
+    {
+      id: "change",
+      label: "3 · Change evidence",
+      title: deployment.releaseId + " · " + deployment.commitHash,
+      detail: deployment.summary,
+      sources: [deployment.diff],
+    },
+    {
+      id: "diagnosis",
+      label: "4 · Diagnosis",
+      title: "Likely root cause",
+      detail: scenario.postMortemTemplate.rootCause,
+      sources: ["Trigger: " + scenario.postMortemTemplate.trigger, "Impact: " + scenario.postMortemTemplate.blastRadius],
+    },
+  ];
   const fallbackStages = [
     {
       id: "observe",
@@ -115,6 +145,34 @@ export default function IncidentEvidencePage() {
             <p className="mt-1 text-xs text-muted-foreground">CPU {metric.cpuUsage}% · Memory {metric.memoryUsage}%</p>
           </article>
         ))}
+      </section>
+
+      <section className="space-y-4 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="evidence-chain-title">
+        <header className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Evidence graph · inspectable provenance</p>
+          <h2 id="evidence-chain-title" className="text-xl font-semibold">Why TraceBack reached this diagnosis</h2>
+          <p className="text-sm text-muted-foreground">Follow the benchmark evidence from observed signals to the suspected change and diagnosis. Relationships are correlations in this synthetic dataset, not proof of production causality.</p>
+        </header>
+        <ol className="grid gap-3 lg:grid-cols-4">
+          {evidenceChain.map((node, index) => (
+            <li key={node.id} className="min-w-0 rounded-lg border p-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-cyan-700">{node.label}</span>
+                {index < evidenceChain.length - 1 ? <span className="text-xs text-muted-foreground">leads to →</span> : <span className="text-xs text-muted-foreground">assessment</span>}
+              </div>
+              <h3 className="mt-3 text-sm font-semibold">{node.title}</h3>
+              <p className="mt-2 break-words text-xs leading-relaxed text-muted-foreground">{node.detail}</p>
+              <details className="mt-3 border-t pt-3">
+                <summary className="cursor-pointer text-xs font-semibold">Inspect source evidence ({node.sources.length})</summary>
+                <ul className="mt-2 max-h-56 space-y-2 overflow-y-auto text-xs text-muted-foreground">
+                  {node.sources.map((source, sourceIndex) => (
+                    <li key={node.id + "-source-" + sourceIndex} className="break-words rounded-md bg-muted/50 p-2">{source}</li>
+                  ))}
+                </ul>
+              </details>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="space-y-3 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="shared-actions-title">
