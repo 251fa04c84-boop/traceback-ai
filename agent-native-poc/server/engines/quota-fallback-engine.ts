@@ -75,7 +75,7 @@ async function deterministicFallback(
     observe ? `OBSERVE\n${observe.summary}\n${observe.evidence.join("\n")}` : "",
     correlate ? `CORRELATE\n${correlate.summary}\n${correlate.evidence.join("\n")}` : "",
     diagnose ? `DIAGNOSIS HYPOTHESIS\n${diagnose.summary}\n${diagnose.evidence.join("\n")}` : "",
-    plan ? `PROPOSED RECOVERY — NOT EXECUTED\n${plan.summary}\n${plan.evidence.join("\n")}` : "",
+    plan ? `PROPOSED RECOVERY\n${plan.summary}\n${plan.evidence.join("\n")}` : "",
     approval ? `HUMAN APPROVAL GATE\n${approval.summary}` : "",
     "All incident evidence is synthetic. No production infrastructure was changed by this fallback.",
     recoveryNote,
