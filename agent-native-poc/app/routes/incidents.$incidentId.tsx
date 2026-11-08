@@ -73,9 +73,9 @@ export default function IncidentEvidencePage() {
     {
       id: "diagnosis",
       label: "4 · Diagnosis",
-      title: "Likely root cause",
-      detail: scenario.postMortemTemplate.rootCause,
-      sources: ["Trigger: " + scenario.postMortemTemplate.trigger, "Impact: " + scenario.postMortemTemplate.blastRadius],
+      title: "Template-based hypothesis",
+      detail: "Deterministic Fallback — template-based hypothesis, not a verified root cause. " + scenario.postMortemTemplate.rootCause,
+      sources: ["Trigger hypothesis: " + scenario.postMortemTemplate.trigger, "Potential impact: " + scenario.postMortemTemplate.blastRadius, "Synthetic benchmark evidence; correlation does not establish production causality."],
     },
   ];
   const fallbackStages = [
@@ -102,10 +102,12 @@ export default function IncidentEvidencePage() {
     {
       id: "diagnose",
       title: "Diagnose",
-      summary: scenario.postMortemTemplate.rootCause,
+      summary: "Deterministic Fallback — template-based hypothesis, not a verified root cause. " + scenario.postMortemTemplate.rootCause,
       evidence: [
-        "Trigger: " + scenario.postMortemTemplate.trigger,
-        "Impact: " + scenario.postMortemTemplate.blastRadius,
+        "This diagnosis comes from the benchmark scenario template, not live AI analysis or independent causal verification.",
+        "Trigger hypothesis: " + scenario.postMortemTemplate.trigger,
+        "Potential impact: " + scenario.postMortemTemplate.blastRadius,
+        "Synthetic benchmark evidence; correlation does not establish production causality.",
       ],
     },
     {
@@ -150,8 +152,8 @@ export default function IncidentEvidencePage() {
       <section className="space-y-4 rounded-xl border bg-card p-4 sm:p-5" aria-labelledby="evidence-chain-title">
         <header className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Evidence graph · inspectable provenance</p>
-          <h2 id="evidence-chain-title" className="text-xl font-semibold">Why TraceBack reached this diagnosis</h2>
-          <p className="text-sm text-muted-foreground">Follow the benchmark evidence from observed signals to the suspected change and diagnosis. Relationships are correlations in this synthetic dataset, not proof of production causality.</p>
+          <h2 id="evidence-chain-title" className="text-xl font-semibold">How TraceBack formed this hypothesis</h2>
+          <p className="text-sm text-muted-foreground">The diagnosis is a deterministic template hypothesis, not a verified root cause. Follow the synthetic benchmark evidence from observed signals to the suspected change; correlation is not proof of production causality.</p>
         </header>
         <ol className="grid gap-3 lg:grid-cols-4">
           {evidenceChain.map((node, index) => (
