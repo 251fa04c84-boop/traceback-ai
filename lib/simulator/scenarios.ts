@@ -167,7 +167,7 @@ export const SCENARIOS: IncidentScenario[] = [
     postMortemTemplate: {
       rootCause: "Unchecked dereference on optional coupon field in PaymentGatewayController.java line 142 introduced in commit a7e89f2.",
       trigger: "Deployment of v2.4.1 to production cluster without null-safe unit test coverage for customers without coupons.",
-      blastRadius: "Checkout API experienced 42.8% error rate affecting approximately 1,420 checkout attempts over 8 minutes.",
+      blastRadius: "Checkout API error rate ranged from 42.8% to a 44.1% peak between 21:40 and 21:45; the latest recorded sample was 43.5%. Approximately 1,420 checkout attempts were affected over 8 minutes.",
       recommendedPrevention: "Implement mandatory static analysis check (SpotBugs/NullAway) in CI pipeline and enforce unit test cases with null coupon payloads."
     }
   },
@@ -327,9 +327,9 @@ export const SCENARIOS: IncidentScenario[] = [
       }
     ],
     postMortemTemplate: {
-      rootCause: "Unreleased database pool client on cohort query error paths in QueryExecutor.ts leading to rapid connection pool saturation.",
-      trigger: "Enabling FF_ASYNC_ANALYTICS_V2 which triggered cohort aggregations.",
-      blastRadius: "Analytics dashboard and reporting APIs timed out with HTTP 504 for 25 minutes.",
+      rootCause: "Release v1.9.4 (commit f891d29) acquires a pooled client in QueryExecutor.ts but does not return it with client.release() in a finally block. As requests accumulate, active connections reach the 100-connection ceiling; PostgreSQL then rejects new connections with SQLSTATE 53300, while HikariPool waiters time out after 30,005 ms.",
+      trigger: "The v1.9.4 asynchronous user-telemetry cohort query path was enabled by FF_ASYNC_ANALYTICS_V2, increasing concurrent pooled-client acquisitions without guaranteed cleanup.",
+      blastRadius: "At 18:30, active connections reached 100/100 with a 36.7% error rate and 12,400 ms p99 latency. At 18:35, connections remained at 100/100, error rate rose to 38.2%, and p99 reached 13,200 ms. Logs show PostgreSQL SQLSTATE 53300 followed by HikariPool acquisition timeouts after 30,005 ms.",
       recommendedPrevention: "Enforce automatic resource cleanup using try-finally or pooled query helper wrappers that auto-release connections."
     }
   }

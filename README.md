@@ -1,118 +1,102 @@
-# ⚡ TraceBack AI — Agent-Native Incident Investigation & Recovery Workspace
+# TraceBack AI — Evidence-First Incident Investigation
 
-> **Built for the Builder.io Agent-Native Hackathon 2026**  
-> *Autonomous AI agent and human engineers operating as equal peers on shared actions, telemetry data, and deterministic recovery state.*
+TraceBack AI helps an on-call engineer move from noisy incident evidence to a clear, reviewable recovery proposal. It combines a human-facing incident workspace with an Agent-Native assistant that uses the same typed actions and benchmark data.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2-black.svg)](https://nextjs.org/)
-[![Agent--Native](https://img.shields.io/badge/Agent--Native-Architecture-indigo.svg)](https://github.com/BuilderIO/agent-native)
-[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue.svg)](./docs/TEST_REPORT.md)
-[![Demo Video](https://img.shields.io/badge/Demo%20Video-Full%20HD%201080p-purple.svg)](./TraceBack_AI_Builder_Hackathon_Demo.mp4)
+**Built for the Builder.io Agent-Native Hackathon 2026.**
 
----
+## The workflow
 
-## 1. Problem Statement
+1. **Observe** — inspect error rate, p99 latency, resource usage, and connection counts.
+2. **Correlate evidence** — connect timestamped application logs to the suspect release and code diff.
+3. **Diagnose** — form an evidence-grounded explanation and show the trigger and impact.
+4. **Prepare a recovery plan** — present allowlisted recovery proposals and their parameters for review.
+5. **Human approval gate** — stop before execution. This public benchmark app is read-only and is not connected to production infrastructure.
 
-When production outages occur at 2 AM, software engineering teams are inundated with thousands of raw log lines, fluctuating metric dashboards, and ambiguous git deployments.
+The incident UI and the Agent-Native assistant share the official framework actions. The agent can inspect the same incident records and build the same five-stage investigation brief shown in the interface.
 
-Generic AI chatbots fail in this domain because:
-- **Opaque Chat Bubbles:** They merely summarize text in a side panel without access to executable application actions.
-- **Unverified Hallucinations:** They claim an issue is "fixed" without inspecting actual system telemetry.
-- **Unsafe Mutations:** They lack structured human authorization gates, making autonomous action too risky for production infrastructure.
+## Demonstration scenarios
 
----
+| Incident | Evidence | Proposed response |
+| --- | --- | --- |
+| `inc-8921` — Checkout outage | Null coupon dereference after release `v2.4.1`; error rate peaked at 44.1% in the supplied time series | Review rollback to `v2.4.0` |
+| `inc-4402` — Session crash loop | JVM heap exhaustion, OOMKilled pods, and an unbounded in-memory session cache | Review disabling `FF_UNBOUNDED_SESSION_CACHE`; separately assess service restart |
+| `inc-7119` — Database connection exhaustion | 100/100 active connections, PostgreSQL SQLSTATE 53300, and HikariPool acquisition timeouts | Review disabling `FF_ASYNC_ANALYTICS_V2` |
 
-## 2. Solution: TraceBack AI
+**Important:** These are deterministic benchmark scenarios, not live production telemetry. The app does not connect to customer infrastructure and does not execute rollbacks, feature-flag changes, or restarts. A proposed action is not a completed action.
 
-**TraceBack AI** implements Builder.io's **Agent-Native** paradigm:
-- **Shared Action Layer:** The human engineer and the AI agent use the same seven Zod-validated action handlers through TraceBack's custom registry. This is an Agent-Native-inspired shared-action design; the official `@agent-native/core` `defineAction` integration is not yet present.
-- **Evidence-Grounded Reasoning:** Every hypothesis cites immutable evidence (log timestamps, commit hashes, metric threshold spikes).
-- **Human-in-the-Loop Safety:** Destructive actions (rollbacks, flag toggles, restarts) require explicit human review and authorization.
-- **Deterministic Verification:** The application deterministically verifies system state after recovery execution; the agent cannot declare an incident resolved without passing active health probes.
+## Agent-Native implementation
 
----
+The Agent-Native application lives in `agent-native-poc/` and is the intended hackathon app entry point.
 
-## 3. Core Product Features
+- `@agent-native/core` 0.223.0 and `@agent-native/toolkit` 0.223.0.
+- React 19 and React Router 8.
+- `defineAction()` read-only capabilities shared by the UI and agent:
+  - `list-incidents`
+  - `get-incident-evidence`
+  - `build-investigation-brief`
+- The agent instructions require evidence-based findings, disclosure of benchmark data, and strict respect for the human approval gate.
 
-- **3 Deterministic Production Outage Scenarios:**
-  1. *Checkout Outage (`inc-8921`):* NullPointerException introduced in release `v2.4.1` spiking HTTP 500 error rates to 42.8%.
-  2. *Session CrashLoop (`inc-4402`):* Unbounded in-memory token cache causing JVM heap exhaustion (`OOMKilled`).
-  3. *DB Connection Exhaustion (`inc-7119`):* Leaked connection pool clients in unreleased async cohort queries.
-- **Shared Incident Actions (custom Zod registry):**
-  - `getServiceLogs`: Filter simulated logs by service, level, and timeframe.
-  - `inspectDeploymentDiff`: Retrieve git commit diffs, authors, and modified lines.
-  - `getTelemetryMetrics`: Fetch timeseries CPU, memory, error rates, and p99 latency.
-  - `checkServiceHealth`: Deterministic health probes.
-  - `rollbackDeployment`: Safe rollback to last known stable release.
-  - `toggleFeatureFlag`: Live operational flag disabling.
-  - `restartService`: Rolling pod restart.
-- **Human Approval Card:** Clear blast-radius indicators (`LOW`, `MEDIUM`, `HIGH`) and one-click authorization.
-- **Audit Trail & Post-Mortem Generator:** Generates exportable Markdown incident post-mortems with MTTR calculation.
-- **100% Mobile Responsive:** Optimized for both mobile devices (on-call phones) and desktop command centers.
+The repository also retains an earlier custom Next.js implementation at the repository root. It is preserved as prior project work and for comparison; it is not the Agent-Native runtime entry point for the hackathon deployment.
 
----
+## Deployment to Vercel
 
-## 4. Shared Human-and-Agent Action Architecture
+The Agent-Native app must use the Nitro Vercel preset so the framework server plugins and action endpoints are deployed with the UI. The isolated Vercel project uses `agent-native-poc/` as its root and `agent-native-poc/vercel.json` for the build configuration.
 
-```mermaid
-flowchart LR
-    A[Human Engineer UI] <--> B[Shared Zod Action Registry]
-    C[AI Agent Orchestrator] <--> B
-    B --> D[Deterministic Simulation Engine]
-    D --> E[Health & Metric Probes]
-    E --> F[Verified Incident State]
-```
+The equivalent release sequence is:
 
----
-
-## 5. Quick Start & Local Setup
-
-### Prerequisites
-- Node.js v18+ or v20+
-
-### Setup Commands
 ```bash
-# Clone repository
-git clone https://github.com/251fa04c84-boop/traceback-ai.git
-cd traceback-ai
-
-# Install dependencies
-npm install
-
-# Run automated test suite (41/41 passing)
-npm test
-
-# Launch local development server
-npm run dev
+pnpm migrate:production
+NITRO_PRESET=vercel pnpm build
+npx vercel deploy --prebuilt
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the workspace.
+Keep `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `CRON_SECRET` in Vercel's encrypted environment settings. Never commit them.
 
----
+## Run locally
 
-## 6. Official Demo Video & Assets
+Requirements: Node.js 22.22 or newer and pnpm 10.29.1.
 
-- **Video File:** [`TraceBack_AI_Builder_Hackathon_Demo.mp4`](./TraceBack_AI_Builder_Hackathon_Demo.mp4) (1080p Full HD, 1m 21s, authentic UI capture)
-- **Closed Captions / Subtitles:** [`TraceBack_AI_Builder_Hackathon_Demo.srt`](./TraceBack_AI_Builder_Hackathon_Demo.srt)
-- **Script & Narration Guide:** [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md)
+```bash
+cd agent-native-poc
+corepack enable
+pnpm install --frozen-lockfile
+pnpm dev
+```
 
----
+Open the local URL printed by the Agent-Native CLI.
 
-## 7. Project Documentation Suite
+## Verification
 
-- [Official Hackathon Requirements & Audit](./docs/HACKATHON_REQUIREMENTS.md)
-- [Devpost & Official Submission Draft](./docs/DEVPOST_SUBMISSION.md)
-- [System Architecture & Technical Specification](./docs/PROJECT_ARCHITECTURE.md)
-- [Team Work Plan & Allocation](./docs/TEAM_WORK_PLAN.md)
-- [Team Collaboration & Contributing Guide](./docs/CONTRIBUTING.md)
-- [Submission Day Checklist & Clips Guide](./docs/SUBMISSION_CHECKLIST.md)
-- [2-Minute Demo Script & Video Narration](./docs/DEMO_SCRIPT.md)
-- [Automated Test & Verification Report](./docs/TEST_REPORT.md)
+From `agent-native-poc/`:
 
----
+```bash
+pnpm typecheck
+pnpm test
+pnpm agent-native:doctor
+pnpm build
+```
 
-## 8. Compliance & Safety
+The GitHub Actions workflow also runs checks for the Agent-Native app. Passing a build is not, by itself, proof that the deployed runtime or the complete user journey works; use the public preview and test each incident before submission.
 
-- **Zero Client Secrets:** No API keys are bundled or exposed to the client.
-- **Offline Benchmark Mode:** Resilient dual-mode execution ensures 100% judge uptime without external API dependencies.
-- **Strict Authorization:** All mutating actions strictly enforce `userApprovalGranted: true`.
+## Hackathon work disclosure
+
+- **Existing project work:** the repository contains an earlier TraceBack Next.js incident workspace and its deterministic incident simulator. That work is retained as prior project work, not represented as newly authored Agent-Native framework code.
+- **Hackathon development:** the Agent-Native application scaffold was adapted into TraceBack, including incident-list and evidence actions, a five-stage investigation action, shared agent instructions, incident routes, and action contract tests.
+- **Framework template:** the Agent-Native Chat starter template from `@agent-native/core@0.223.0` was used as the starting point and modified for this incident-investigation domain.
+- **Third-party code:** framework packages and other dependencies are declared in `agent-native-poc/package.json` and locked in `agent-native-poc/pnpm-lock.yaml`. Their respective licenses apply. Do not imply the framework starter or third-party packages were authored by this project.
+
+Before submitting, disclose the dates and extent of any pre-existing work accurately in the official form.
+
+## Submission checklist
+
+- [ ] Verify the public deployment and all three incident routes.
+- [ ] Verify the agent can use the shared incident actions with an AI provider configured.
+- [ ] Record a public Clips demonstration that can be viewed without login.
+- [ ] Include the project description, repository, deployment, and public Clips URL in the official form.
+- [ ] Confirm the submission receipt.
+
+Official rules: https://www.builder.io/hackathon/rules  
+Submission form: https://www.builder.io/hackathon/submit  
+Clips: https://clips.agent-native.com/
+
+**A project is not submitted merely by publishing this repository or recording a Clips video. Submit the form and verify receipt before the deadline.**

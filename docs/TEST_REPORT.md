@@ -1,98 +1,84 @@
-# TraceBack AI — Automated Test & Verification Report
+# TraceBack AI — Verification Report
 
-**Date:** November 4, 2026  
-**Test Suite:** `scripts/test-runner.js` (`npm test`)  
-**Runner:** Node.js 22.22.0 & Next.js 14  
-**Verdict:** **41/41 PASSED (0 FAILED) in GitHub Actions run #9**  
+**Last updated:** November 8, 2026  
+**Latest documentation branch head:** `005d08e98031894a3d1306d3fd80ed9571d7164e`  
+**Verified application code:** `2189847f0a941c293841014bad97c9bd5fc00817`  
+**Latest report commit before this refresh:** `005d08e98031894a3d1306d3fd80ed9571d7164e`
 
----
+## Current status
 
-## 1. Test Suite Summary Matrix
+**The latest completed CI run passed on `1e54a72`; documentation-only commits have since advanced the branch to `005d08e`.** Run #42463146365 completed successfully with both `verify` and `agent-native` jobs passing on `1e54a72`. The current docs-only head has not yet reported a completed GitHub Actions run. The latest confirmed READY Preview is for `1e54a72`; no claim is made that the later docs-only commits have a READY deployment.
 
-| Category | Total Tests | Passed | Failed | Status | Evidence |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **Suite 1: Simulation Scenarios** | 4 | 4 | 0 | **PASSED** | 3 deterministic production scenarios (`inc-8921`, `inc-4402`, `inc-7119`) |
-| **Suite 2: Custom Zod Action Registry** | 7 | 7 | 0 | **PASSED** | `getServiceLogs`, `inspectDeploymentDiff`, `rollbackDeployment`, `toggleFeatureFlag` |
-| **Suite 3: Safety & Human Gate** | 3 | 3 | 0 | **PASSED** | Mutating actions without human approval return `requiresApproval: true` |
-| **Suite 4: Autonomous Investigation**| 10 | 10 | 0 | **PASSED** | 5-phase agentic loop + Model Engine Provenance verification |
-| **Suite 5: Deterministic Verification**| 7 | 7 | 0 | **PASSED** | State transitions to `RESOLVED`, health status `HEALTHY`, post-mortem generated |
-| **Suite 6: Multi-Scenario Testing** | 6 | 6 | 0 | **PASSED** | Scenarios 2 (OOM) and 3 (DB exhaustion) remediated and verified |
-| **Suite 7: Rejection Flow** | 4 | 4 | 0 | **PASSED** | Human rejection halts action; incident remains unresolved safely |
-| **Total** | **41** | **41** | **0** | **100% PASS** | Zero regressions |
+- Latest completed CI: root dependency install, automated tests, production build; Agent-Native dependency install, typecheck, action tests, doctor, and production build.
+- Latest confirmed READY Preview deployment: `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy`, built from `1e54a72`.
+- Latest Preview URL: https://traceback-agent-native-preview-qhc0956yc-hackathons8.vercel.app/demo
+- The application source remains the previously browser-tested code commit `2189847`; commits after `1e54a72` are documentation corrections only.
+- The exact application-code Preview at `2189847` was browser-tested for public showcase rendering, evidence expansion, long-text wrapping, and signed-out route protection. The latest deployment is a later docs-only deployment; no new authenticated or mobile browser test is implied.
+- Production deployment has not been targeted. The Agent-Native Preview uses a separate Neon project named `traceback-ai-preview`; migration history was inspected read-only. No Production database or deployment was targeted.
 
----
+## Implemented product capabilities
 
-## 2. Verified Test Execution Log
+- Three deterministic synthetic benchmark incidents: `inc-8921`, `inc-4402`, and `inc-7119`.
+- Shared typed Agent-Native actions for incident listing, evidence retrieval, investigation brief generation, and approval-gated recovery simulation.
+- Five-stage investigation: Observe, Correlate Evidence, Diagnose, Prepare Recovery Plan, Human Approval Gate.
+- Public four-step inspectable evidence graph on each incident card: telemetry signal, runtime logs, deployment/code change, and likely diagnosis. The interface explicitly labels these as synthetic correlations, not proof of production causality.
+- Authenticated recovery lab uses the shared `execute-recovery-simulation` action. The action declares `needsApproval: true`, enforces scenario-specific allowlisted steps, creates a fresh ephemeral simulator per invocation, and returns before/after metrics, simulated verification, and an audit trail.
+- Recovery metric deltas show error-rate change in percentage points and p99 latency change in milliseconds, explicitly labelled simulated.
+- Public showcase has no mutation or execution controls.
 
-```text
-> traceback-ai@1.0.0 test
-> node scripts/test-runner.js
+## CI verification — latest branch-head run #42463146365
 
-======================================================
-🧪 TRACEBACK AI — AGENT-NATIVE AUTOMATED TEST RUNNER
-======================================================
+Both jobs passed on commit `1e54a72` (the application source remains `2189847`):
+- `verify`: dependency install, root automated tests, root production build.
+- `agent-native`: dependency install, Agent-Native typecheck, action tests, Agent-Native doctor, Agent-Native production build.
 
-📦 [Suite 1] Simulation Scenarios Initialization
-  ✅ [PASS] Initialized exactly 3 simulated incident scenarios
-  ✅ [PASS] Scenario 1 (inc-8921: Checkout Outage) present
-  ✅ [PASS] Scenario 2 (inc-4402: Session OOMKilled) present
-  ✅ [PASS] Scenario 3 (inc-7119: DB Connection Exhaustion) present
+## Live Preview browser verification — November 8, 2026
 
-⚙️ [Suite 2] Custom Zod Action Registry & Execution
-  ✅ [PASS] getServiceLogs action registered
-  ✅ [PASS] inspectDeploymentDiff action registered
-  ✅ [PASS] rollbackDeployment action registered
-  ✅ [PASS] toggleFeatureFlag action registered
-  ✅ [PASS] getServiceLogs executed successfully
-  ✅ [PASS] getServiceLogs retrieved ERROR logs
-  ✅ [PASS] Logs contain NullPointerException evidence
-  ✅ [PASS] inspectDeploymentDiff executed successfully
-  ✅ [PASS] inspectDeploymentDiff accurately identifies active release v2.4.1
-  ✅ [PASS] inspectDeploymentDiff identifies commit hash a7e89f2
+**Public showcase: PASS**
+- Exact deployment for commit `2189847` loaded.
+- All three incident cards rendered with the expected severity and service.
+- All three cards showed the four-step evidence graph.
+- First incident expanded successfully; correlated logs, full stack traces, deployment diff, and recovery proposal were legible.
+- Long stack traces, diff text, and recovery JSON wrapped inside their containers. No horizontal scrollbars or clipped characters were observed.
+- Evidence-source disclosures were visible and expandable.
+- Synthetic-data, correlation, and read-only disclosures were visible.
+- No public execute/mutate/deploy controls were present.
+- Only a normal vertical page scrollbar was observed.
 
-🛡️ [Suite 3] Safety Protocol & Human Approval Interception
-  ✅ [PASS] Mutating action rollbackDeployment blocked when approval is false
-  ✅ [PASS] Response flags requiresApproval: true
-  ✅ [PASS] Approval details specify high blast radius
+**Signed-out access control: PASS on prior verified Preview**
+- Direct access to `/incidents/inc-8921` redirected to `/sign-in` and preserved the intended return route.
+- The sign-in form rendered with empty credential fields.
+- No demo credentials, API keys, or tokens were exposed.
+- No credentials were entered and no sign-in was attempted.
 
-🤖 [Suite 4] Autonomous Agent Investigation Loop
-  ✅ [PASS] Agent completed 5-phase investigation loop
-  ✅ [PASS] Phase 1: Telemetry Analysis completed
-  ✅ [PASS] Phase 2: Log Evaluation completed
-  ✅ [PASS] Phase 3: Diff Inspection completed
-  ✅ [PASS] Phase 4: Root Cause Hypothesis formulated
-  ✅ [PASS] Phase 5: Recovery Plan synthesized
-  ✅ [PASS] Agent halts at human approval gate
-  ✅ [PASS] Proposed action is rollbackDeployment
-  ✅ [PASS] Proposed target release is v2.4.0
+**Mobile viewport: NOT VERIFIED**
+- Browser automation could not set or confirm a true 390×844 CSS-pixel mobile viewport.
+- The latest visual smoke test was desktop. Dedicated mobile-device QA remains open.
 
-✅ [Suite 5] Human Approval Execution & Deterministic Verification
-  ✅ [PASS] Human approval recorded
-  ✅ [PASS] Deterministic health check confirmed resolution
-  ✅ [PASS] Incident status transitioned to RESOLVED
-  ✅ [PASS] System health status transitioned to HEALTHY
-  ✅ [PASS] Active release successfully rolled back to v2.4.0
-  ✅ [PASS] Generated complete Post-Mortem report
-  ✅ [PASS] Post-mortem includes MTTR metric
+## Build warnings (non-blocking)
 
-🔬 [Suite 6] Multi-Scenario Verification (Memory Leak & Connection Sizing)
-  ✅ [PASS] Scenario 2 proposes disabling unbounded cache flag
-  ✅ [PASS] Scenario 2 resolved and verified
-  ✅ [PASS] Scenario 3 proposes disabling leaking analytics flag
-  ✅ [PASS] Scenario 3 resolved and verified
+- Vite reported a client root chunk of approximately 2.63 MB raw / 652 KB gzip and a 775 KB raw data chunk. This is a performance/code-splitting follow-up, not a failed build.
+- H3 reported partially overlapping preMerge rules for `/icon-*.svg` and `/agent-native-*.svg`, then fell back to plain compilation. The deployment still completed successfully. This framework/configuration warning should be reviewed before production release.
 
-🚫 [Suite 7] Operator Rejection Flow
-  ✅ [PASS] Approval recorded as rejected
-  ✅ [PASS] Incident remains unresolved when rejected
+## Remaining verification / submission gates
 
-======================================================
-📊 TEST RESULTS: 41/41 PASSED (0 FAILED)
-======================================================
-```
+| Check | Status |
+| --- | --- |
+| Application code GitHub Actions tests and builds | PASS — run #42457839580 |
+| Exact application code Preview | READY — deployment `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy` |
+| Public demo evidence graph, expanded logs/diff, disclosures | PASS |
+| Long-text wrapping / horizontal scroll regression | PASS on latest code Preview |
+| Signed-out private-route redirect | PASS on prior verified Preview |
+| True narrow mobile-device viewport QA | Pending; emulation unavailable in browser session |
+| Authenticated recovery UI click-through | Not tested; requires authorized account sign-in |
+| Actual Agent-Native framework approval lifecycle | Not yet end-to-end verified; unit tests call `run()` directly |
+| Live model-provider chat/tool call | Not verified; prior Gemini requests returned quota/availability errors (429/503) |
+| Public Clips recording and signed-out playback | Pending |
+| Creator/team details and eligibility confirmation | User must confirm |
+| Official rules acceptance, final submission, and receipt | User must complete |
 
----
+## Scope and honesty
 
-## 3. Known Limitations & Edge Cases Handled
+All supplied incident data is simulated benchmark data. Recovery simulation changes only a fresh in-memory simulator instance and cannot change production infrastructure. A `SIMULATED_HEALTHY` result is not a live infrastructure health check or proof of production remediation.
 
-1. **Non-Destructive Simulation:** Actions operate against an in-memory state engine representing realistic Kubernetes and service topologies. Real external infrastructure mutations are safely abstracted to ensure reliable hackathon judging without risk of infrastructure billing or security exposure.
-2. **Deterministic Fallback:** Agent reasoning operates deterministically based on structured log/diff telemetry, ensuring the system can be evaluated in offline or rate-limited environments.
+The recovery handler tests validate scenario allowlisting, output schema, expected simulated postconditions, caller provenance mapping, and per-invocation isolation. They do not test the framework's interactive approval lifecycle. Do not claim that the authenticated approval click-through, a successful live model call, a mobile-device test, or a public Clips demonstration has been completed until each is actually verified.

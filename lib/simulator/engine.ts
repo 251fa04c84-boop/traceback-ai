@@ -1,13 +1,17 @@
-import { SCENARIOS, IncidentScenario, MetricPoint } from "./scenarios";
+import { SCENARIOS, IncidentScenario } from "./scenarios";
+
+type ExecutionSource = "agent" | "human" | "api" | "unknown";
+type HealthState = "HEALTHY" | "DEGRADED" | "CRITICAL";
+type AuditStatus = "SUCCESS" | "FAILED" | "REJECTED";
 
 interface ExecutionAuditEntry {
   id: string;
   timestamp: string;
   actionId: string;
-  params: any;
-  executedBy: "agent" | "human" | "api";
-  status: "SUCCESS" | "FAILED" | "REJECTED";
-  resultingHealth: "HEALTHY" | "DEGRADED" | "CRITICAL";
+  params: Record<string, unknown>;
+  executedBy: ExecutionSource;
+  status: AuditStatus;
+  resultingHealth: HealthState;
   notes: string;
 }
 
@@ -15,10 +19,26 @@ interface IncidentRuntimeState {
   scenario: IncidentScenario;
   auditTrail: ExecutionAuditEntry[];
   appliedActions: string[];
-  currentHealth: "HEALTHY" | "DEGRADED" | "CRITICAL";
+  currentHealth: HealthState;
 }
 
-class IncidentSimulator {
+function cloneScenario(scenario: IncidentScenario): IncidentScenario {
+  return JSON.parse(JSON.stringify(scenario)) as IncidentScenario;
+}
+
+function sameExpectedParams(
+  supplied: Record<string, unknown>,
+  expected: Record<string, unknown>,
+): boolean {
+  const suppliedKeys = Object.keys(supplied).sort();
+  const expectedKeys = Object.keys(expected).sort();
+  return (
+    suppliedKeys.length === expectedKeys.length &&
+    suppliedKeys.every((key, index) => key === expectedKeys[index] && supplied[key] === expected[key])
+  );
+}
+
+export class IncidentSimulator {
   private states: Map<string, IncidentRuntimeState> = new Map();
 
   constructor() {
@@ -29,7 +49,7 @@ class IncidentSimulator {
     this.states.clear();
     for (const scenario of SCENARIOS) {
       this.states.set(scenario.id, {
-        scenario: JSON.parse(JSON.stringify(scenario)),
+        scenario: cloneScenario(scenario),
         auditTrail: [
           {
             id: `audit-init-${scenario.id}`,
@@ -39,66 +59,68 @@ class IncidentSimulator {
             executedBy: "api",
             status: "SUCCESS",
             resultingHealth: scenario.severity === "CRITICAL" ? "CRITICAL" : "DEGRADED",
-            notes: `Automated pager alert triggered: ${scenario.title}`
-          }
+            notes: `Automated pager alert triggered: ${scenario.title}`,
+          },
         ],
         appliedActions: [],
-        currentHealth: scenario.severity === "CRITICAL" ? "CRITICAL" : "DEGRADED"
+        currentHealth: scenario.severity === "CRITICAL" ? "CRITICAL" : "DEGRADED",
       });
     }
   }
 
   public getIncident(id: string): IncidentRuntimeState | null {
-    if (!this.states.has(id)) {
-      this.initialize();
-    }
+    if (!this.states.has(id)) this.initialize();
     return this.states.get(id) || null;
   }
 
-  public listIncidents(): { id: string; title: string; severity: string; service: string; status: string; currentHealth: string }[] {
-    const list: { id: string; title: string; severity: string; service: string; status: string; currentHealth: string }[] = [];
-    this.states.forEach((state) => {
-      list.push({
-        id: state.scenario.id,
-        title: state.scenario.title,
-        severity: state.scenario.severity,
-        service: state.scenario.service,
-        status: state.scenario.status,
-        currentHealth: state.currentHealth
-      });
-    });
-    return list;
+  public listIncidents(): {
+    id: string;
+    title: string;
+    severity: string;
+    service: string;
+    status: string;
+    currentHealth: string;
+  }[] {
+    return Array.from(this.states.values(), (state) => ({
+      id: state.scenario.id,
+      title: state.scenario.title,
+      severity: state.scenario.severity,
+      service: state.scenario.service,
+      status: state.scenario.status,
+      currentHealth: state.currentHealth,
+    }));
   }
 
-  public resetIncident(id: string): IncidentRuntimeState | null {
-    const original = SCENARIOS.find((s) => s.id === id);
+  public resetIncident(id: string, source: ExecutionSource = "human"): IncidentRuntimeState | null {
+    const original = SCENARIOS.find((scenario) => scenario.id === id);
     if (!original) return null;
-    const newState: IncidentRuntimeState = {
-      scenario: JSON.parse(JSON.stringify(original)),
+
+    const state: IncidentRuntimeState = {
+      scenario: cloneScenario(original),
       auditTrail: [
         {
           id: `audit-reset-${id}-${Date.now()}`,
           timestamp: new Date().toISOString(),
           actionId: "systemReset",
           params: {},
-          executedBy: "human",
+          executedBy: source,
           status: "SUCCESS",
           resultingHealth: original.severity === "CRITICAL" ? "CRITICAL" : "DEGRADED",
-          notes: "Incident environment reset to original alert state."
-        }
+          notes: "Incident simulation reset to its original benchmark state.",
+        },
       ],
       appliedActions: [],
-      currentHealth: original.severity === "CRITICAL" ? "CRITICAL" : "DEGRADED"
+      currentHealth: original.severity === "CRITICAL" ? "CRITICAL" : "DEGRADED",
     };
-    this.states.set(id, newState);
-    return newState;
+    this.states.set(id, state);
+    return state;
   }
 
   public executeAction(
     incidentId: string,
     actionId: string,
-    params: any,
-    source: "agent" | "human" | "api"
+    params: Record<string, unknown>,
+    source: ExecutionSource,
   ): {
     success: boolean;
     incident: IncidentRuntimeState;
@@ -106,147 +128,163 @@ class IncidentSimulator {
     resolved: boolean;
   } {
     const state = this.getIncident(incidentId);
-    if (!state) {
-      throw new Error(`Incident ${incidentId} not found.`);
-    }
+    if (!state) throw new Error(`Incident ${incidentId} not found.`);
 
     const timestamp = new Date().toISOString();
-    let actionSucceeded = true;
+    const safeParams =
+      params && typeof params === "object" && !Array.isArray(params) ? params : {};
+    const requirement = state.scenario.requiredActions.find((item) => item.actionId === actionId);
+
+    // The scenario itself is the action allowlist. Unknown actions, extra parameters,
+    // and values other than the exact reviewed recovery target are rejected.
+    let actionSucceeded = false;
+    let status: AuditStatus = "REJECTED";
     let message = "";
 
-    // Handle Rollback Deployment
-    if (actionId === "rollbackDeployment") {
-      const targetRelease = params.releaseId;
-      state.scenario.activeRelease = targetRelease;
-      state.appliedActions.push(`rollbackDeployment:${targetRelease}`);
-      message = `Successfully rolled back service ${state.scenario.service} to release ${targetRelease}.`;
-    } 
-    // Handle Feature Flag Toggle
-    else if (actionId === "toggleFeatureFlag") {
-      const flag = state.scenario.featureFlags.find((f) => f.id === params.flagId);
-      if (flag) {
-        flag.enabled = params.enabled;
-        state.appliedActions.push(`toggleFeatureFlag:${params.flagId}=${params.enabled}`);
-        message = `Feature flag ${flag.name} (${params.flagId}) set to ${params.enabled}.`;
+    if (state.scenario.status === "RESOLVED") {
+      message = "Incident is already resolved. Reset the simulation before running another recovery.";
+    } else if (!requirement) {
+      message = `Action ${actionId} is not allowlisted for incident ${incidentId}.`;
+    } else if (!sameExpectedParams(safeParams, requirement.expectedParams)) {
+      message = `Parameters for ${actionId} do not match the scenario's approved recovery target.`;
+    } else if (state.appliedActions.includes(this.actionKey(actionId, requirement.expectedParams))) {
+      actionSucceeded = true;
+      status = "SUCCESS";
+      message = `The approved action ${actionId} was already applied; no duplicate mutation was made.`;
+    } else {
+      if (actionId === "rollbackDeployment") {
+        const targetRelease = String(requirement.expectedParams.releaseId);
+        const knownRelease = state.scenario.deployments.some(
+          (deployment) => deployment.releaseId === targetRelease && deployment.isStable,
+        );
+        if (knownRelease) {
+          state.scenario.activeRelease = targetRelease;
+          state.appliedActions.push(this.actionKey(actionId, requirement.expectedParams));
+          message = `Simulation rolled back ${state.scenario.service} to stable release ${targetRelease}.`;
+          actionSucceeded = true;
+        } else {
+          message = "Rollback target is not a known stable release for this incident.";
+          status = "FAILED";
+        }
+      } else if (actionId === "toggleFeatureFlag") {
+        const flagId = String(requirement.expectedParams.flagId);
+        const flag = state.scenario.featureFlags.find((item) => item.id === flagId);
+        if (flag) {
+          flag.enabled = requirement.expectedParams.enabled as boolean;
+          state.appliedActions.push(this.actionKey(actionId, requirement.expectedParams));
+          message = `Simulation set feature flag ${flag.name} (${flagId}) to ${String(flag.enabled)}.`;
+          actionSucceeded = true;
+        } else {
+          message = `Feature flag ${flagId} does not exist in this incident.`;
+          status = "FAILED";
+        }
+      } else if (actionId === "restartService") {
+        const service = String(requirement.expectedParams.service);
+        if (service === state.scenario.service) {
+          state.appliedActions.push(this.actionKey(actionId, requirement.expectedParams));
+          message = `Simulation completed a rolling restart for ${service}.`;
+          actionSucceeded = true;
+        } else {
+          message = "Restart target does not match the affected service.";
+          status = "FAILED";
+        }
       } else {
-        actionSucceeded = false;
-        message = `Feature flag ${params.flagId} not found.`;
+        // A newly added action must have an explicit implementation above.
+        message = `Action ${actionId} has no simulator implementation and was not executed.`;
+        status = "REJECTED";
       }
-    } 
-    // Handle Service Restart
-    else if (actionId === "restartService") {
-      state.appliedActions.push(`restartService:${params.service}`);
-      message = `Rolling restart completed for service ${params.service}. Pod replicas healthy.`;
-    } 
-    // Unknown or Read-only actions
-    else {
-      message = `Action ${actionId} executed successfully.`;
+
+      if (actionSucceeded) status = "SUCCESS";
     }
 
-    // Run deterministic verification probe
-    const isResolved = this.checkResolution(state);
+    const wasResolved = state.scenario.status === "RESOLVED";
+    const isResolved = actionSucceeded && this.checkResolution(state);
 
     if (isResolved) {
       state.currentHealth = "HEALTHY";
       state.scenario.status = "RESOLVED";
-      // Merge healthy metrics
-      state.scenario.metrics = [...state.scenario.metrics, ...state.scenario.healthyMetrics];
-    } else if (state.appliedActions.length > 0) {
+      if (!wasResolved) {
+        state.scenario.metrics = [...state.scenario.metrics, ...state.scenario.healthyMetrics];
+      }
+    } else if (actionSucceeded && state.appliedActions.length > 0) {
       state.scenario.status = "RECOVERING";
     }
 
     state.auditTrail.push({
-      id: `audit-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       timestamp,
       actionId,
-      params,
+      params: { ...safeParams },
       executedBy: source,
-      status: actionSucceeded ? "SUCCESS" : "FAILED",
+      status,
       resultingHealth: state.currentHealth,
-      notes: message
+      notes: message,
     });
 
-    return {
-      success: actionSucceeded,
-      incident: state,
-      message,
-      resolved: isResolved
-    };
+    return { success: actionSucceeded, incident: state, message, resolved: isResolved };
+  }
+
+  private actionKey(actionId: string, params: Record<string, unknown>): string {
+    if (actionId === "rollbackDeployment") return `rollbackDeployment:${String(params.releaseId)}`;
+    if (actionId === "toggleFeatureFlag") {
+      return `toggleFeatureFlag:${String(params.flagId)}=${String(params.enabled)}`;
+    }
+    if (actionId === "restartService") return `restartService:${String(params.service)}`;
+    return `unsupported:${actionId}`;
   }
 
   private checkResolution(state: IncidentRuntimeState): boolean {
-    const required = state.scenario.requiredActions;
-    for (const req of required) {
-      const matching = state.appliedActions.find((applied) => {
-        if (req.actionId === "rollbackDeployment") {
-          return applied === `rollbackDeployment:${req.expectedParams.releaseId}`;
-        }
-        if (req.actionId === "toggleFeatureFlag") {
-          return applied === `toggleFeatureFlag:${req.expectedParams.flagId}=${req.expectedParams.enabled}`;
-        }
-        if (req.actionId === "restartService") {
-          return applied === `restartService:${req.expectedParams.service}`;
-        }
-        return false;
-      });
-      if (!matching) {
-        return false;
-      }
-    }
-    return true;
+    return state.scenario.requiredActions.every((requirement) =>
+      state.appliedActions.includes(this.actionKey(requirement.actionId, requirement.expectedParams)),
+    );
   }
 
   public generatePostMortem(incidentId: string): string {
     const state = this.getIncident(incidentId);
     if (!state) return "# Incident not found";
 
-    const s = state.scenario;
-    const duration = "6 minutes";
+    const scenario = state.scenario;
+    const duration = "Not measured in this simulation";
     const auditRows = state.auditTrail
       .map(
-        (a) =>
-          `| ${new Date(a.timestamp).toLocaleTimeString()} | \`${a.actionId}\` | **${a.executedBy.toUpperCase()}** | \`${a.status}\` | ${a.notes} |`
+        (entry) =>
+          `| ${new Date(entry.timestamp).toLocaleTimeString()} | \`${entry.actionId}\` | **${entry.executedBy.toUpperCase()}** | \`${entry.status}\` | ${entry.notes} |`,
       )
       .join("\n");
 
-    return `# 🚨 Production Incident Post-Mortem: ${s.title}
+    return `# Simulated Incident Post-Mortem: ${scenario.title}
 
-**Incident ID:** \`${s.id}\`  
-**Severity:** \`${s.severity}\` | **Service Impacted:** \`${s.service}\`  
-**Detected At:** ${s.detectedAt}  
-**Status:** **${s.status}** (${state.currentHealth})  
+**Incident ID:** \`${scenario.id}\`  
+**Severity:** \`${scenario.severity}\` | **Service:** \`${scenario.service}\`  
+**Detected At:** ${scenario.detectedAt}  
+**Status:** **${scenario.status}** (${state.currentHealth})  
 **Mean Time to Recovery (MTTR):** ${duration}  
+
+> This report describes deterministic benchmark data only. No production infrastructure was changed.
 
 ---
 
 ## 1. Executive Summary
-On ${s.detectedAt}, an automated alert flagged critical operational degradation in \`${s.service}\`. TraceBack AI initiated an autonomous investigation, inspected telemetry logs and deployment diffs, and synthesized a safe recovery plan. Human authorization was provided, and automated deterministic probes verified complete recovery.
+TraceBack analyzed the benchmark incident, correlated telemetry with logs and deployment evidence, and recorded the recovery actions and verification state shown below. The audit trail distinguishes successful, failed, and rejected actions.
 
----
+## 2. Root Cause
+- **Direct cause:** ${scenario.postMortemTemplate.rootCause}
+- **Trigger:** ${scenario.postMortemTemplate.trigger}
+- **Impact:** ${scenario.postMortemTemplate.blastRadius}
 
-## 2. Root Cause Analysis (RCA)
-- **Direct Cause:** ${s.postMortemTemplate.rootCause}
-- **Trigger Event:** ${s.postMortemTemplate.trigger}
-- **Customer Blast Radius:** ${s.postMortemTemplate.blastRadius}
-
----
-
-## 3. Verified Timeline & Audit Trail (Agent + Human Shared Actions)
-| Time | Action | Initiator | Status | Outcome / Verification |
+## 3. Recovery Audit Trail
+| Time | Action | Initiator | Status | Outcome |
 | :--- | :--- | :--- | :--- | :--- |
 ${auditRows}
 
----
+## 4. Prevention
+- ${scenario.postMortemTemplate.recommendedPrevention}
+- Add synthetic canary tests before full traffic migration.
+- Configure circuit-breaking for downstream dependency faults.
 
-## 4. Preventative Action Items
-- ${s.postMortemTemplate.recommendedPrevention}
-- Add synthetic canary tests to CI/CD pipeline prior to 100% traffic migration.
-- Configure automatic circuit-breaking for downstream dependency faults.
-
-*Generated by TraceBack AI — Builder.io Agent-Native Architecture*
+*Generated by TraceBack AI — isolated incident simulation.*
 `;
   }
 }
 
-// Global singleton instance
 export const simulator = new IncidentSimulator();

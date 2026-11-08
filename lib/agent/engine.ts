@@ -1,38 +1,84 @@
 import { AgentInvestigationSession, InvestigationStep } from "./types";
 import { dispatchAction } from "../actions";
 import { simulator } from "../simulator/engine";
+import { z } from "zod";
+
+const GeminiOutputSchema = z.object({
+  hypothesis: z.string().min(1).max(4000),
+  thought: z.string().max(4000).default(""),
+  proposedActionId: z.enum(["rollbackDeployment", "toggleFeatureFlag", "restartService"]),
+  proposedParams: z.record(z.unknown()).default({}),
+  proposedReason: z.string().max(2000).default(""),
+  blastRadius: z.enum(["low", "medium", "high", "critical"]).default("high")
+}).strict();
+
+function stripMarkdownCodeFences(value: string): string {
+  return value.trim()
+    .replace(/^\uFEFF/, "")
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs = 10_000
+): Promise<{ response: Response; body: string }> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...init, signal: controller.signal });
+    // Read the body before clearing the timer so stalled response streams are bounded too.
+    const body = await response.text();
+    return { response, body };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 async function queryGeminiLive(prompt: string, apiKey: string) {
-  // Try modern 2026 models with automatic fallback
   const candidateModels = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-2.0-flash"];
   let lastError: Error | null = null;
 
   for (const model of candidateModels) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.1
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const { response: res, body: responseBody } = await fetchWithTimeout(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
+          })
+        });
+
+        if (!res.ok) {
+          const retryable = res.status === 429 || res.status === 503;
+          const errorText = responseBody.slice(0, 1000);
+          if (retryable && attempt < 2) {
+            await new Promise((resolve) => setTimeout(resolve, 500 * (2 ** attempt)));
+            continue;
           }
-        })
-      });
+          throw new Error(`Model ${model} returned HTTP ${res.status}: ${errorText}`);
+        }
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Model ${model} Error ${res.status}: ${errorText}`);
+        const data: unknown = JSON.parse(responseBody);
+        const responseText = (data as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> })
+          .candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!responseText) throw new Error(`Model ${model} returned an empty response`);
+
+        const parsed: unknown = JSON.parse(stripMarkdownCodeFences(responseText));
+        return GeminiOutputSchema.parse(parsed);
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        if (attempt < 2 && (lastError.name === "AbortError" || /fetch|network|timeout/i.test(lastError.message))) {
+          await new Promise((resolve) => setTimeout(resolve, 500 * (2 ** attempt)));
+          continue;
+        }
+        break;
       }
-
-      const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error(`Model ${model} returned empty response`);
-      return JSON.parse(text);
-    } catch (err: any) {
-      lastError = err;
     }
   }
 
@@ -189,15 +235,25 @@ Analyze and output a JSON response matching:
 }`;
 
         const aiOutput = await queryGeminiLive(prompt, effectiveKey);
-        if (aiOutput.hypothesis && aiOutput.proposedActionId) {
-          hypothesisText = aiOutput.hypothesis;
-          proposedActionId = aiOutput.proposedActionId;
-          proposedParams = aiOutput.proposedParams || proposedParams;
-          proposedReason = aiOutput.proposedReason || proposedReason;
-          blastRadius = aiOutput.blastRadius || blastRadius;
-          session.modelUsed = "Gemini Live AI (Autonomous)";
-          session.isLiveAI = true;
+        const allowlistedProposal = s.requiredActions.find((candidate) => {
+          if (candidate.actionId !== aiOutput.proposedActionId) return false;
+          const expected = candidate.expectedParams;
+          const proposed = aiOutput.proposedParams;
+          const expectedKeys = Object.keys(expected);
+          const proposedKeys = Object.keys(proposed);
+          return expectedKeys.length === proposedKeys.length &&
+            expectedKeys.every((key) => proposed[key] === expected[key]);
+        });
+        if (!allowlistedProposal) {
+          throw new Error("Gemini proposal did not match this incident's allowlisted action and exact parameters");
         }
+        hypothesisText = aiOutput.hypothesis;
+        proposedActionId = allowlistedProposal.actionId;
+        proposedParams = allowlistedProposal.expectedParams;
+        proposedReason = aiOutput.proposedReason || proposedReason;
+        blastRadius = aiOutput.blastRadius || blastRadius;
+        session.modelUsed = "Gemini Live AI (proposal only; human approval required)";
+        session.isLiveAI = true;
       } catch (err: any) {
         console.warn("Live Gemini API call failed, falling back to deterministic calibration:", err.message);
       }
@@ -206,7 +262,7 @@ Analyze and output a JSON response matching:
     // Deterministic Calibrated Fallback (if AI not used or call failed)
     if (!hypothesisText) {
       if (s.id === "inc-8921") {
-        hypothesisText = `Release v2.4.1 (commit a7e89f2 by @Alex Rivera) introduced a breaking regression in PaymentGatewayController.java:142 by removing a null-check on request.getCoupon(). When cart payloads lack promotional coupons, getCoupon() returns null, triggering a NullPointerException and spiking 500 errors to 42.8%.`;
+        hypothesisText = `Release v2.4.1 (commit a7e89f2 by @Alex Rivera) introduced a breaking regression in PaymentGatewayController.java:142 by removing a null-check on request.getCoupon(). When cart payloads lack promotional coupons, getCoupon() returns null, triggering a NullPointerException and with the latest recorded HTTP 500 error rate at 43.5% and a peak of 44.1%.`;
         proposedActionId = "rollbackDeployment";
         proposedParams = { releaseId: s.stableRelease };
         proposedReason = `Rollback ${s.service} from degraded release ${s.activeRelease} to last known stable release ${s.stableRelease}.`;
@@ -218,7 +274,7 @@ Analyze and output a JSON response matching:
         proposedReason = `Disable leaking in-memory cache flag FF_UNBOUNDED_SESSION_CACHE to halt memory exhaustion.`;
         blastRadius = "medium";
       } else {
-        hypothesisText = `Release v1.9.4 in commit f891d29 omitted client.release() on database connection pool acquisitions in QueryExecutor.ts. This caused 100% database connection pool saturation, leading to HTTP 504 timeouts.`;
+        hypothesisText = `Release v1.9.4 (commit f891d29) acquires a pooled client in QueryExecutor.ts but does not return it in a finally block. The evidence aligns: active connections reached 100/100 at 18:30; log-301 reports PostgreSQL SQLSTATE 53300 (new connections rejected at the server limit); log-302 reports HikariPool waiters timing out after 30,005 ms. These are the server-side exhaustion and application-side wait symptoms of the same connection leak.`;
         proposedActionId = "toggleFeatureFlag";
         proposedParams = { flagId: "FF_ASYNC_ANALYTICS_V2", enabled: false };
         proposedReason = `Disable leaking async analytics feature flag FF_ASYNC_ANALYTICS_V2 to release database connections.`;
