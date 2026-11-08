@@ -5,7 +5,7 @@
 **Recording rule:** Show the real deployed application. Do not add mock overlays, fake terminal output, fabricated model responses, or claims of production recovery.
 
 ## Before recording
-- Use the latest Preview URL: https://traceback-agent-native-preview-k793j7m08-hackathons8.vercel.app/demo
+- Use the latest Preview URL: https://traceback-agent-native-preview-qhc0956yc-hackathons8.vercel.app/demo
 - Start signed out in a clean browser window.
 - Close unrelated tabs and notifications.
 - Use a desktop-width browser for the main walkthrough. Record a separate narrow-phone pass only after mobile viewport QA.
