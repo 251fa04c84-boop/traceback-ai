@@ -98,6 +98,44 @@ describe("Gemini quota fallback engine", () => {
     expect(text).toContain("inc-7119");
   });
 
+  it("does not guess approval or execution state when recovery appears in history", async () => {
+    const engine = createQuotaFallbackEngine(async () =>
+      fakeEngine({
+        type: "stop",
+        reason: "error",
+        error: "quota exceeded",
+        errorCode: "http_429",
+        statusCode: 429,
+      }),
+    );
+    const input = options("Investigate inc-8921");
+    input.messages.push({
+      role: "assistant",
+      content: [
+        {
+          type: "tool-call",
+          id: "recovery-call-1",
+          name: "execute-recovery-simulation",
+          input: { incidentId: "inc-8921" },
+        },
+      ],
+    });
+    const events: EngineEvent[] = [];
+
+    for await (const event of engine.stream(input)) {
+      events.push(event);
+    }
+
+    const text = events
+      .filter((event) => event.type === "text-delta")
+      .map((event) => event.text)
+      .join("");
+
+    expect(text).toContain("cannot determine whether it was approved or completed");
+    expect(text).toContain("do not submit a duplicate recovery request");
+    expect(text).not.toContain("PROPOSED RECOVERY — NOT EXECUTED");
+  });
+
   it("does not convert HTTP 503 into a quota fallback", async () => {
     const engine = createQuotaFallbackEngine(async () =>
       fakeEngine({
