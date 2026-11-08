@@ -196,36 +196,36 @@ export default function PublicDemoPage() {
                     </ol>
                   </section>
 
-                  <details className="border-t border-white/10">
+                  <details className="min-w-0 max-w-full border-t border-white/10">
                     <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-cyan-200 hover:bg-white/[0.025] lg:px-7">
                       Expand correlated logs, deployment diff, and recovery proposal
                     </summary>
-                    <div className="grid gap-6 border-t border-white/10 p-5 lg:grid-cols-2 lg:p-7">
-                      <div>
+                    <div className="grid min-w-0 gap-6 border-t border-white/10 p-5 lg:grid-cols-2 lg:p-7">
+                      <div className="min-w-0 max-w-full">
                         <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Log evidence</h4>
                         <div className="mt-3 space-y-3">
                           {scenario.logs.map((log) => (
-                            <div key={log.id} className="rounded-lg border border-white/10 bg-black/25 p-3">
+                            <div key={log.id} className="min-w-0 max-w-full rounded-lg border border-white/10 bg-black/25 p-3">
                               <div className="flex flex-wrap justify-between gap-2 text-[10px] text-slate-500">
                                 <span className="font-mono">{log.id} · {log.level}</span>
                                 <span>{log.timestamp}</span>
                               </div>
                               <p className="mt-2 break-words text-xs leading-5 text-slate-200">{log.message}</p>
-                              {log.stackTrace ? <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded bg-black/30 p-2 text-[10px] leading-4 text-slate-400">{log.stackTrace}</pre> : null}
+                              {log.stackTrace ? <pre className="mt-2 min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded bg-black/30 p-2 text-[10px] leading-4 text-slate-400">{log.stackTrace}</pre> : null}
                             </div>
                           ))}
                         </div>
                       </div>
-                      <div>
+                      <div className="min-w-0 max-w-full">
                         <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Deployment change</h4>
-                        {deployment ? <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-lg border border-white/10 bg-black/30 p-3 text-[10px] leading-5 text-slate-300">{deployment.diff}</pre> : null}
+                        {deployment ? <pre className="mt-3 min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded-lg border border-white/10 bg-black/30 p-3 text-[10px] leading-5 text-slate-300">{deployment.diff}</pre> : null}
                         <h4 className="mt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">Proposed recovery · not executed</h4>
                         <div className="mt-3 space-y-2">
                           {scenario.requiredActions.map((action) => (
                             <div key={action.actionId} className="rounded-lg border border-amber-300/20 bg-amber-300/[0.06] p-3">
                               <p className="font-mono text-xs text-amber-200">{action.actionId}</p>
                               <p className="mt-1 text-xs leading-5 text-slate-300">{action.explanation}</p>
-                              <pre className="mt-2 overflow-x-auto text-[10px] text-slate-500">{JSON.stringify(action.expectedParams, null, 2)}</pre>
+                              <pre className="mt-2 min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all text-[10px] text-slate-500">{JSON.stringify(action.expectedParams, null, 2)}</pre>
                             </div>
                           ))}
                         </div>
