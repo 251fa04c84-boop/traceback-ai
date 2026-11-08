@@ -59,7 +59,7 @@ The app uses the Agent-Native Chat starter from `@agent-native/core@0.223.0`, pl
 | Recovery simulation safety | Implemented and unit-tested | Scenario allowlists, exact parameters, per-invocation simulator, caller provenance, concurrency isolation, and `needsApproval: true` |
 | Dependency compatibility | Verified | `@agent-native/otel` pinned to 0.1.30; lockfile peer metadata supports core 0.223.0; frozen install passes |
 | GitHub Actions | Passed | Run #42455373312 on current documentation head passed both `verify` and `agent-native` jobs: tests, typecheck, doctor, and production builds |
-| Vercel Preview | In progress on current head | Previous hardening Preview commit reached READY and passed public smoke tests; the latest deployment is building and must reach READY before recording |
+| Vercel Preview | READY for hardening code | Preview commit `609a212` reached READY; latest browser smoke test passed. Later branch commits are documentation-only. |
 | Public showcase access | Passed on previous hardening Preview | All three cards expand; public surface is read-only; signed-out private incident route redirects to sign-in |
 | Mobile layout | Passed on previous hardening Preview | Narrow viewport check found no horizontal overflow or clipped content |
 | Authenticated recovery UI | Not yet user-verified | User must sign in and click the recovery simulation in the current Preview; do not share passwords in chat |
