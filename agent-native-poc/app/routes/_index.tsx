@@ -123,6 +123,13 @@ export default function PublicDemoPage() {
               const latest = scenario.metrics[scenario.metrics.length - 1];
               const peakError = Math.max(...scenario.metrics.map((point) => point.errorRate));
               const deployment = scenario.deployments.find((item) => !item.isStable) ?? scenario.deployments[0];
+              const peakLatency = Math.max(...scenario.metrics.map((point) => point.latencyP99));
+              const evidenceNodes = [
+                { id: "signal", step: "01 · SIGNAL", title: scenario.metrics.length + " telemetry samples", detail: "Peak " + peakError + "% errors · p99 " + peakLatency.toLocaleString() + " ms", sources: scenario.metrics.map((point) => point.time + " · " + point.errorRate + "% errors · " + point.latencyP99.toLocaleString() + " ms p99") },
+                { id: "logs", step: "02 · RUNTIME", title: scenario.logs.length + " correlated log entries", detail: "Runtime evidence from " + scenario.service, sources: scenario.logs.map((log) => log.id + " · " + log.level + " · " + log.message) },
+                { id: "change", step: "03 · CHANGE", title: deployment?.releaseId + " · " + deployment?.commitHash, detail: deployment?.summary ?? "No deployment record available", sources: deployment ? [deployment.diff] : [] },
+                { id: "diagnosis", step: "04 · DIAGNOSIS", title: "Likely root cause", detail: scenario.postMortemTemplate.rootCause, sources: ["Trigger: " + scenario.postMortemTemplate.trigger, "Impact: " + scenario.postMortemTemplate.blastRadius] },
+              ];
               return (
                 <article key={scenario.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]">
                   <div className="grid gap-5 p-5 lg:grid-cols-[1fr_0.75fr] lg:p-7">
@@ -159,6 +166,35 @@ export default function PublicDemoPage() {
                       </div>
                     </div>
                   </div>
+
+
+                  <section className="border-t border-white/10 px-5 py-5 lg:px-7" aria-label="Inspectable evidence graph">
+                    <div className="mb-4">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">Inspectable evidence graph</p>
+                      <h4 className="mt-1 text-base font-semibold text-slate-100">How the diagnosis is supported</h4>
+                      <p className="mt-1 text-xs leading-5 text-slate-400">Trace the benchmark from observed signals through logs and a suspect code change to the likely diagnosis. These are synthetic correlations, not proof of production causality.</p>
+                    </div>
+                    <ol className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                      {evidenceNodes.map((node, index) => (
+                        <li key={node.id} className="min-w-0 rounded-xl border border-cyan-300/15 bg-black/20 p-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-bold tracking-wide text-cyan-200">{node.step}</span>
+                            <span className="text-[10px] text-slate-500">{index === 3 ? "ASSESSMENT" : "CORRELATED"}</span>
+                          </div>
+                          <p className="mt-3 break-words text-sm font-semibold text-slate-100">{node.title}</p>
+                          <p className="mt-2 break-words text-xs leading-5 text-slate-400">{node.detail}</p>
+                          <details className="mt-3 border-t border-white/10 pt-3">
+                            <summary className="cursor-pointer text-xs font-semibold text-cyan-200">Inspect evidence ({node.sources.length})</summary>
+                            <ul className="mt-2 max-h-48 space-y-2 overflow-y-auto">
+                              {node.sources.map((source, sourceIndex) => (
+                                <li key={node.id + "-" + sourceIndex} className="break-words rounded-md bg-white/[0.04] p-2 text-[10px] leading-4 text-slate-300">{source}</li>
+                              ))}
+                            </ul>
+                          </details>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
 
                   <details className="border-t border-white/10">
                     <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-cyan-200 hover:bg-white/[0.025] lg:px-7">
