@@ -26,7 +26,7 @@ function incidentIdFromMessages(
     .map((part) => part.text)
     .join("\n");
   const matches = [...text.matchAll(INCIDENT_ID_PATTERN)];
-  const last = matches.at(-1)?.[0]?.toLowerCase();
+  const last = matches[matches.length - 1]?.[0]?.toLowerCase();
   return last === "inc-8921" || last === "inc-4402" || last === "inc-7119"
     ? last
     : undefined;
@@ -93,8 +93,12 @@ export function createQuotaFallbackEngine(
     label: "Google Gemini (quota-aware)",
     defaultModel: googleMetadata.defaultModel,
     supportedModels: googleMetadata.supportedModels,
-    acceptsCustomModels: googleMetadata.acceptsCustomModels,
-    preserveCustomModels: googleMetadata.preserveCustomModels,
+    ...(googleMetadata.acceptsCustomModels !== undefined
+      ? { acceptsCustomModels: googleMetadata.acceptsCustomModels }
+      : {}),
+    ...(googleMetadata.preserveCustomModels !== undefined
+      ? { preserveCustomModels: googleMetadata.preserveCustomModels }
+      : {}),
     capabilities: googleMetadata.capabilities,
     async *stream(options: EngineStreamOptions): AsyncIterable<EngineEvent> {
       const innerEngine = await resolveInnerEngine();
