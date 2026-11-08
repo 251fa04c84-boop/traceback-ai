@@ -27,10 +27,10 @@ Submit before the deadline and verify the confirmation receipt. A public reposit
 
 | Criterion | Weight | TraceBack focus |
 | --- | ---: | --- |
-| Usefulness and Execution | 40% | Complete incident investigation, evidence correlation, reviewable recovery plan, and verified simulated outcome |
-| Creativity and Design | 20% | Focused incident command workspace with clear evidence and human control |
-| Innovation | 20% | Agent helps correlate operational evidence and prepare a safe recovery plan |
-| Cleverness and Use of Agent-Native | 20% | Shared typed actions used by both the UI and the in-app agent, with an explicit approval gate |
+| Usefulness and Execution | 40% | Complete evidence-led incident investigation, reviewable recovery plan, and verified simulated outcome |
+| Creativity and Design | 20% | Focused incident command workspace with inspectable provenance and human control |
+| Innovation | 20% | Agent correlates operational evidence and prepares a constrained recovery plan |
+| Cleverness and Use of Agent-Native | 20% | Shared typed actions used by both UI and agent, with explicit approval boundary |
 
 ## TraceBack implementation disclosure
 
@@ -38,7 +38,7 @@ Submit before the deadline and verify the confirmation receipt. A public reposit
 The repository retains an earlier custom Next.js incident workspace and deterministic incident scenarios. This is pre-existing project work and must not be represented as newly authored Agent-Native framework code.
 
 ### Hackathon development
-The Agent-Native app under `agent-native-poc/` adapts the official Chat starter template for TraceBack. The app includes:
+The Agent-Native app under `agent-native-poc/` adapts the official Chat starter template for TraceBack. It includes:
 - `list-incidents`: read-only incident catalog.
 - `get-incident-evidence`: read-only telemetry, logs, deployment and evidence retrieval.
 - `build-investigation-brief`: read-only five-stage evidence-grounded brief.
@@ -46,30 +46,29 @@ The Agent-Native app under `agent-native-poc/` adapts the official Chat starter 
 
 The interface and agent use the same typed action layer. Agent-initiated recovery calls rely on the Agent-Native framework's approval flow. Each recovery handler invocation creates a fresh simulator instance; it does not mutate a process-wide shared simulator.
 
-### Template and third-party dependencies
-The app uses the Agent-Native Chat starter from `@agent-native/core@0.223.0`, plus the framework Toolkit and packages declared in `agent-native-poc/package.json`. Their upstream licenses apply. Disclose the template and third-party packages in the entry.
-
-## Current readiness audit — November 8
+## Current readiness audit — November 8, 2026
 
 | Requirement | Status | Evidence / remaining work |
 | --- | --- | --- |
-| Official Agent-Native implementation | Implemented | `agent-native-poc/actions/` contains four typed `defineAction` actions; the Agent-Native app is the isolated Vercel project entrypoint |
-| Five-stage investigation brief | Implemented and tested | Observe, Correlate, Diagnose, Plan, Human Approval Gate; tests cover all three benchmark incidents |
-| Three incident scenarios | Implemented and browser-checked | Public Preview shows all three IDs, metrics, logs, deployment diffs, and recovery proposals |
+| Official Agent-Native implementation | Implemented | Four typed `defineAction` actions under `agent-native-poc/actions/` |
+| Five-stage investigation brief | CI-tested | Observe, Correlate, Diagnose, Plan, Human Approval Gate |
+| Three incident scenarios | Implemented and browser-checked | All three public cards, metrics, logs, diffs, and proposals render |
+| Public evidence graph | Preview QA passed | Four inspectable nodes per incident, source evidence expandable, synthetic-correlation disclosure visible |
 | Recovery simulation safety | Implemented and unit-tested | Scenario allowlists, exact parameters, per-invocation simulator, caller provenance, concurrency isolation, and `needsApproval: true` |
-| Dependency compatibility | Verified | `@agent-native/otel` pinned to 0.1.30; lockfile peer metadata supports core 0.223.0; frozen install passes |
-| GitHub Actions | Passed | Run #42455373312 on current documentation head passed both `verify` and `agent-native` jobs: tests, typecheck, doctor, and production builds |
-| Vercel Preview | READY for hardening code | Preview commit `609a212` reached READY; latest browser smoke test passed. Later branch commits are documentation-only. |
-| Public showcase access | Passed on previous hardening Preview | All three cards expand; public surface is read-only; signed-out private incident route redirects to sign-in |
-| Mobile layout | Passed on previous hardening Preview | Narrow viewport check found no horizontal overflow or clipped content |
-| Authenticated recovery UI | Not yet user-verified | User must sign in and click the recovery simulation in the current Preview; do not share passwords in chat |
-| Live Agent-Native model chat | Not yet verified | Gemini provider previously returned quota/availability errors. Do not claim a successful live assistant/tool call until a real run succeeds |
-| Public Clips video | Not complete | Record the actual Agent-Native app, publish the clip, and verify public signed-out playback |
-| Official submission | Not complete | Complete the form, accept rules, submit, and confirm receipt |
+| GitHub Actions on code head `b48c0d7` | Passed | Run #42456448902: root tests/build plus Agent-Native typecheck/action tests/doctor/build |
+| Latest Vercel Preview | READY | Deployment `dpl_7ZBhs5sUfzeH4AvTfuE6hhssEzQi` for `b48c0d7` |
+| Public showcase browser QA | Passed | All cards, graph, expanded evidence, read-only boundaries, and disclosures checked |
+| Signed-out private-route protection | Passed | Direct incident URL redirects to sign-in and preserves return route |
+| Narrow mobile viewport | Pending | Latest browser report did not conclusively establish true mobile emulation |
+| Authenticated recovery UI click-through | Pending | Requires authorized account sign-in |
+| Actual Agent-Native framework approval lifecycle | Pending | Unit tests call `run()` directly and do not test interactive approval |
+| Live Agent-Native model chat | Not verified | Gemini provider previously returned 429/503; do not claim success without a real successful run |
+| Public Clips video | Not complete | Record actual app, publish clip, and verify signed-out playback |
+| Official submission | Not complete | User must confirm team/eligibility, accept rules, submit, and save receipt |
 
 ## Scope and honesty
 
-All three incident scenarios are deterministic synthetic benchmark data. The public showcase is read-only. The recovery simulation changes only a fresh ephemeral in-memory benchmark instance; it does not call production APIs, deploys, feature flags, databases, or customer records. Its postconditions are simulated, not a live infrastructure health check.
+All three incident scenarios are deterministic synthetic benchmark data. The public showcase is read-only. The recovery simulation changes only a fresh ephemeral in-memory benchmark instance; it does not call production APIs, deployments, feature flags, databases, or customer records. Its postconditions are simulated, not a live infrastructure health check.
 
 The recovery handler unit tests call `run()` directly and do not exercise the framework approval lifecycle. They verify action behavior, caller attribution, and concurrency isolation. The framework approval gate is declared using `needsApproval: true`; the signed-in UI/agent approval path still requires a real authenticated click-through.
 
