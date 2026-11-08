@@ -272,7 +272,7 @@ export default function IncidentEvidencePage() {
                 <p className="mt-1 text-xs text-muted-foreground">Release {recovery.data.after.activeRelease}</p>
               </article>
             </div>
-            <div className="rounded-lg border p-4">
+            <div className="min-w-0 rounded-lg border p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold">Recovery execution and verification</h3>
                 <span className="rounded-full border border-emerald-500/40 px-2.5 py-1 text-xs font-semibold text-emerald-700">
@@ -339,7 +339,7 @@ export default function IncidentEvidencePage() {
             </article>
           ))}
         </div>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-2">
           <div className="rounded-lg border p-4">
             <h3 className="text-sm font-semibold">Proposed recovery actions</h3>
             {(actionBrief?.recommendedActions ?? scenario.requiredActions.map((action) => ({
@@ -364,29 +364,29 @@ export default function IncidentEvidencePage() {
         </div>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-2">
-        <div className="space-y-3 rounded-xl border bg-card p-4 sm:p-5">
+      <section className="grid min-w-0 gap-5 lg:grid-cols-2">
+        <div className="min-w-0 space-y-3 rounded-xl border bg-card p-4 sm:p-5">
           <h2 className="text-lg font-semibold">Application logs</h2>
           {(actionEvidence?.logs ?? scenario.logs).map((log) => (
-            <article key={log.id} className="space-y-2 border-t pt-3 first:border-0 first:pt-0">
+            <article key={log.id} className="min-w-0 space-y-2 border-t pt-3 first:border-0 first:pt-0">
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="font-semibold">{log.level}</span>
                 <time className="text-muted-foreground">{new Date(log.timestamp).toLocaleString()}</time>
               </div>
-              <p className="text-sm">{log.message}</p>
-              {log.stackTrace ? <pre className="overflow-x-auto whitespace-pre-wrap rounded-md bg-muted p-3 text-xs">{log.stackTrace}</pre> : null}
+              <p className="break-words text-sm">{log.message}</p>
+              {log.stackTrace ? <pre className="min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">{log.stackTrace}</pre> : null}
             </article>
           ))}
         </div>
         <div className="space-y-3 rounded-xl border bg-card p-4 sm:p-5">
           <h2 className="text-lg font-semibold">Deployment evidence</h2>
           {(actionEvidence?.deployments ?? scenario.deployments).map((item) => (
-            <article key={item.releaseId} className="space-y-2 border-t pt-3 first:border-0 first:pt-0">
+            <article key={item.releaseId} className="min-w-0 space-y-2 border-t pt-3 first:border-0 first:pt-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-sm font-semibold">{item.releaseId}</span>
                 <span className="text-xs text-muted-foreground">{item.isStable ? "Stable" : "Active / suspect"}</span>
               </div>
-              <p className="text-sm">{item.summary}</p>
+              <p className="break-words text-sm">{item.summary}</p>
               <p className="text-xs text-muted-foreground">{item.commitHash} · {item.author}</p>
               <pre className="overflow-x-auto whitespace-pre-wrap rounded-md bg-muted p-3 text-xs">{item.diff}</pre>
             </article>
