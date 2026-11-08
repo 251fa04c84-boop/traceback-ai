@@ -6,14 +6,14 @@ export default function HomePage() {
   const { data, isLoading, error } = useActionQuery("list-incidents", {});
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 p-4 sm:p-6 lg:p-8">
-      <header className="relative overflow-hidden rounded-2xl border bg-card p-6 sm:p-9">
+    <main className="tb-workspace mx-auto flex w-full max-w-6xl flex-col gap-8 p-4 sm:p-6 lg:p-8">
+      <header className="tb-workspace-hero relative overflow-hidden rounded-2xl border bg-card p-6 sm:p-9">
         <div className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative max-w-3xl space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
             TraceBack AI · Incident command
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="tb-display text-3xl font-semibold tracking-tight sm:text-5xl">
             From incident signal to evidence-backed recovery.
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
@@ -34,7 +34,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="space-y-4">
+      <section className="tb-section space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Incident queue</p>
@@ -58,12 +58,12 @@ export default function HomePage() {
         ) : !data?.length ? (
           <p className="rounded-lg border p-4 text-sm text-muted-foreground">No benchmark incidents are available.</p>
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="tb-card-grid grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {data.map((incident) => (
               <a
                 key={incident.id}
                 href={`/incidents/${incident.id}`}
-                className="group flex min-h-48 flex-col gap-4 rounded-xl border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="tb-incident-card group flex min-h-48 flex-col gap-4 rounded-xl border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-mono text-xs text-muted-foreground">{incident.id}</span>
@@ -85,7 +85,7 @@ export default function HomePage() {
         )}
       </section>
 
-      <section className="grid gap-3 md:grid-cols-3">
+      <section className="tb-feature-grid grid gap-3 md:grid-cols-3">
         <article className="rounded-xl border p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">01 · Evidence</p>
           <h3 className="mt-2 text-sm font-semibold">Shared incident actions</h3>
