@@ -211,21 +211,21 @@ export default function PublicDemoPage() {
                                 <span>{log.timestamp}</span>
                               </div>
                               <p className="mt-2 break-words text-xs leading-5 text-slate-200">{log.message}</p>
-                              {log.stackTrace ? <pre className="mt-2 min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded bg-black/30 p-2 text-[10px] leading-4 text-slate-400">{log.stackTrace}</pre> : null}
+                              {log.stackTrace ? <pre style={{ overflowWrap: "anywhere" }} className="mt-2 min-w-0 max-w-full overflow-x-hidden whitespace-pre-wrap break-all rounded bg-black/30 p-2 text-[10px] leading-4 text-slate-400">{log.stackTrace}</pre> : null}
                             </div>
                           ))}
                         </div>
                       </div>
                       <div className="min-w-0 max-w-full">
                         <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Deployment change</h4>
-                        {deployment ? <pre className="mt-3 min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded-lg border border-white/10 bg-black/30 p-3 text-[10px] leading-5 text-slate-300">{deployment.diff}</pre> : null}
+                        {deployment ? <pre style={{ overflowWrap: "anywhere" }} className="mt-3 min-w-0 max-w-full overflow-x-hidden whitespace-pre-wrap break-all rounded-lg border border-white/10 bg-black/30 p-3 text-[10px] leading-5 text-slate-300">{deployment.diff}</pre> : null}
                         <h4 className="mt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">Proposed recovery · not executed</h4>
                         <div className="mt-3 space-y-2">
                           {scenario.requiredActions.map((action) => (
                             <div key={action.actionId} className="rounded-lg border border-amber-300/20 bg-amber-300/[0.06] p-3">
                               <p className="font-mono text-xs text-amber-200">{action.actionId}</p>
                               <p className="mt-1 text-xs leading-5 text-slate-300">{action.explanation}</p>
-                              <pre className="mt-2 min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all text-[10px] text-slate-500">{JSON.stringify(action.expectedParams, null, 2)}</pre>
+                              <pre style={{ overflowWrap: "anywhere" }} className="mt-2 min-w-0 max-w-full overflow-x-hidden whitespace-pre-wrap break-all text-[10px] text-slate-500">{JSON.stringify(action.expectedParams, null, 2)}</pre>
                             </div>
                           ))}
                         </div>
