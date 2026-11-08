@@ -374,7 +374,7 @@ export default function IncidentEvidencePage() {
                 <time className="text-muted-foreground">{new Date(log.timestamp).toLocaleString()}</time>
               </div>
               <p className="break-words text-sm">{log.message}</p>
-              {log.stackTrace ? <pre className="min-w-0 max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">{log.stackTrace}</pre> : null}
+              {log.stackTrace ? <pre style={{ overflowWrap: "anywhere" }} className="min-w-0 max-w-full overflow-x-hidden whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">{log.stackTrace}</pre> : null}
             </article>
           ))}
         </div>
@@ -388,7 +388,7 @@ export default function IncidentEvidencePage() {
               </div>
               <p className="break-words text-sm">{item.summary}</p>
               <p className="text-xs text-muted-foreground">{item.commitHash} · {item.author}</p>
-              <pre className="overflow-x-auto whitespace-pre-wrap rounded-md bg-muted p-3 text-xs">{item.diff}</pre>
+              <pre style={{ overflowWrap: "anywhere" }} className="min-w-0 max-w-full overflow-x-hidden whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">{item.diff}</pre>
             </article>
           ))}
         </div>
