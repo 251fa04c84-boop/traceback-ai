@@ -30,7 +30,7 @@ export default function PublicDemoPage() {
   return (
     <main className="min-h-screen bg-[#090d18] text-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <header className="tb-reveal flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
           <a href="/" className="flex items-center gap-3" aria-label="TraceBack AI home">
             <span className="flex size-10 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10 text-lg font-bold text-cyan-200">T</span>
             <span>
@@ -45,7 +45,7 @@ export default function PublicDemoPage() {
           </div>
         </header>
 
-        <section className="grid gap-10 py-14 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:py-20">
+        <section className="tb-hero grid gap-10 py-14 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:py-20">
           <div>
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">From signal to evidence-backed recovery</p>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
@@ -55,15 +55,15 @@ export default function PublicDemoPage() {
               TraceBack correlates service metrics, application logs, and deployment diffs into an explainable investigation. In the signed-in workspace, a human can approve an isolated recovery simulation and inspect its before/after metrics and action audit trail.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#incidents" className="rounded-lg bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-cyan-200">Explore benchmark incidents</a>
-              <a href="#workflow" className="rounded-lg border border-white/15 px-5 py-3 text-sm font-semibold text-slate-100 hover:bg-white/5">See the investigation workflow</a>
-              <a href="/sign-in?return=%2Fincidents%2Finc-8921" className="rounded-lg border border-cyan-300/30 px-5 py-3 text-sm font-semibold text-cyan-200 hover:bg-cyan-300/10">Try recovery lab · sign in</a>
+              <a href="#incidents" className="tb-focus-ring rounded-lg bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-200">Explore benchmark incidents</a>
+              <a href="#workflow" className="tb-focus-ring rounded-lg border border-white/15 px-5 py-3 text-sm font-semibold text-slate-100 transition-colors hover:bg-white/5">See the investigation workflow</a>
+              <a href="/sign-in?return=%2Fincidents%2Finc-8921" className="tb-focus-ring rounded-lg border border-cyan-300/30 px-5 py-3 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-300/10">Try recovery lab · sign in</a>
             </div>
             <p className="mt-5 max-w-xl text-xs leading-5 text-slate-500">
               This public surface is intentionally read-only. It contains no customer records, live telemetry, provider credentials, or remediation controls. The separate signed-in recovery lab changes synthetic benchmark state only; it is not connected to production.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-cyan-950/20">
+          <div className="tb-hero-panel rounded-2xl border border-white/10 p-6 shadow-2xl shadow-cyan-950/20">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Benchmark overview</span>
               <span className="size-2 rounded-full bg-emerald-300" />
@@ -98,9 +98,9 @@ export default function PublicDemoPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Investigation protocol</p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Five stages. One explicit stop.</h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="tb-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {stages.map(([number, title, description]) => (
-              <article key={number} className="rounded-xl border border-white/10 bg-white/[0.035] p-4">
+              <article key={number} className="tb-reveal rounded-xl border border-white/10 bg-white/[0.035] p-4">
                 <p className="font-mono text-xs text-cyan-300">{number}</p>
                 <h3 className="mt-3 text-sm font-semibold">{title}</h3>
                 <p className="mt-2 text-xs leading-5 text-slate-400">{description}</p>
@@ -131,7 +131,7 @@ export default function PublicDemoPage() {
                 { id: "diagnosis", step: "04 · DIAGNOSIS", title: "Template-based hypothesis", detail: "Deterministic Fallback — template-based hypothesis, not a verified root cause. " + scenario.postMortemTemplate.rootCause, sources: ["Trigger hypothesis: " + scenario.postMortemTemplate.trigger, "Potential impact: " + scenario.postMortemTemplate.blastRadius, "Synthetic benchmark evidence; correlation does not establish production causality."] },
               ];
               return (
-                <article key={scenario.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]">
+                <article key={scenario.id} className="tb-incident-card tb-reveal overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]">
                   <div className="grid gap-5 p-5 lg:grid-cols-[1fr_0.75fr] lg:p-7">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
@@ -142,7 +142,7 @@ export default function PublicDemoPage() {
                       <h3 className="mt-3 text-xl font-semibold leading-snug">{scenario.title}</h3>
                       <p className="mt-2 text-sm leading-6 text-slate-400">{scenario.description}</p>
                       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+                        <div className="tb-metric rounded-lg border border-white/10 bg-black/20 p-3">
                           <p className="text-[10px] uppercase tracking-wide text-slate-500">Latest error rate</p>
                           <p className="mt-1 text-xl font-semibold tabular-nums">{latest?.errorRate ?? "—"}%</p>
                         </div>
@@ -177,7 +177,7 @@ export default function PublicDemoPage() {
                     </div>
                     <ol className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       {evidenceNodes.map((node, index) => (
-                        <li key={node.id} className="min-w-0 rounded-xl border border-cyan-300/15 bg-black/20 p-3">
+                        <li key={node.id} className="tb-evidence-node min-w-0 rounded-xl border border-cyan-300/15 bg-black/20 p-3">
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-[10px] font-bold tracking-wide text-cyan-200">{node.step}</span>
                             <span className="text-[10px] text-slate-500">{index === 3 ? "ASSESSMENT" : "CORRELATED"}</span>
