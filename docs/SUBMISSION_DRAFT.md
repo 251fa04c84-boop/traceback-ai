@@ -33,7 +33,7 @@ The interface and Agent-Native assistant share four typed `defineAction()` capab
 - Database connection exhaustion: PostgreSQL connection rejection and HikariPool acquisition timeouts.
 
 ## Links
-- Latest verified Preview showcase: https://traceback-agent-native-preview-ltz8c240q-hackathons8.vercel.app/demo
+- Latest verified Preview showcase: https://traceback-agent-native-preview-k793j7m08-hackathons8.vercel.app/demo
 - Source branch: https://github.com/251fa04c84-boop/traceback-ai/tree/codex/traceback-agent-native-v2
 - Draft PR: https://github.com/251fa04c84-boop/traceback-ai/pull/4
 - Public Clips script: `docs/CLIPS_DEMO_SCRIPT.md`
