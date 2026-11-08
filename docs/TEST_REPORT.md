@@ -1,23 +1,20 @@
 # TraceBack AI — Verification Report
 
 **Last updated:** November 8, 2026  
-**Latest documentation branch head:** `a77b768d48b34bd54473d9278e96ac8a9c89c496`  
+**Latest documentation branch head:** `1e54a72b5b68bb51593c32f90cae3f0cdcb00414`  
 **Verified application code:** `2189847f0a941c293841014bad97c9bd5fc00817`  
-**Latest report commit before this refresh:** `a77b768d48b34bd54473d9278e96ac8a9c89c496`
+**Latest report commit before this refresh:** `1e54a72b5b68bb51593c32f90cae3f0cdcb00414`
 
 ## Current status
 
-**Application CI is green; the exact code Preview is READY and public smoke-tested.** GitHub Actions run #42457839580 passed both `verify` and `agent-native` jobs on application code commit `2189847`; latest branch-head CI run #42458208405 also passed.:
-- Root dependency install, automated tests, and production build.
-- Agent-Native dependency install, typecheck, action tests, doctor, and production build.
+**Latest branch-head CI is green; the latest Agent-Native Preview is READY.** GitHub Actions run **#42463146365** completed successfully on branch head `1e54a72`, with both `verify` and `agent-native` jobs passing. The two Vercel status checks for this commit also report success.
 
-The exact application-code Preview deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` remains the browser-tested build. The latest documentation-only Preview deployment `dpl_GS4F2cizGmMNfzpf1TX3sERT64ex` also reached READY for branch head `a77b768d`; its Vercel checks passed for both the Agent-Native Preview and root project. The application source remains unchanged from the exact code tested above. The docs-only Preview is available at:
-
-https://traceback-agent-native-preview-3cy7uak1i-hackathons8.vercel.app/demo
-
-The latest GitHub Actions run previously recorded for branch head `5d9b300` passed; later commits only corrected documentation. The application source remains unchanged from the exact code tested above.
-
-Production deployment has not been targeted. The Agent-Native Preview project uses a separate Neon project named `traceback-ai-preview`. A read-only migration-history check showed 257 records, with the latest applied at 2026-11-05 15:30:28 UTC; no new migration record was added during the latest November 8 Preview build. The Vercel build invokes the migration runner against this Preview-specific database.
+- Latest branch-head CI: root dependency install, automated tests, production build; Agent-Native dependency install, typecheck, action tests, doctor, and production build.
+- Latest Preview deployment: `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy`, READY for branch head `1e54a72`.
+- Latest Preview URL: https://traceback-agent-native-preview-qhc0956yc-hackathons8.vercel.app/demo
+- The application source itself remains the previously browser-tested code commit `2189847`; the latest commit contains documentation corrections only.
+- The exact application-code Preview at `2189847` was browser-tested for public showcase rendering, evidence expansion, long-text wrapping, and signed-out route protection. The latest deployment is a later docs-only deployment; no new authenticated or mobile browser test is implied.
+- Production deployment has not been targeted. The Agent-Native Preview uses a separate Neon project named `traceback-ai-preview`; migration history was inspected read-only. No Production database or deployment was targeted.
 
 ## Implemented product capabilities
 
@@ -29,9 +26,9 @@ Production deployment has not been targeted. The Agent-Native Preview project us
 - Recovery metric deltas show error-rate change in percentage points and p99 latency change in milliseconds, explicitly labelled simulated.
 - Public showcase has no mutation or execution controls.
 
-## CI verification — run #42457839580
+## CI verification — latest branch-head run #42463146365
 
-Both jobs passed on application code commit `2189847`:
+Both jobs passed on branch head `1e54a72` (the application source remains `2189847`):
 - `verify`: dependency install, root automated tests, root production build.
 - `agent-native`: dependency install, Agent-Native typecheck, action tests, Agent-Native doctor, Agent-Native production build.
 
@@ -68,7 +65,7 @@ Both jobs passed on application code commit `2189847`:
 | Check | Status |
 | --- | --- |
 | Application code GitHub Actions tests and builds | PASS — run #42457839580 |
-| Exact application code Preview | READY — deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` |
+| Exact application code Preview | READY — deployment `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy` |
 | Public demo evidence graph, expanded logs/diff, disclosures | PASS |
 | Long-text wrapping / horizontal scroll regression | PASS on latest code Preview |
 | Signed-out private-route redirect | PASS on prior verified Preview |
