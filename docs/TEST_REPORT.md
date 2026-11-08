@@ -1,20 +1,22 @@
 # TraceBack AI — Verification Report
 
 **Last updated:** November 8, 2026  
-**Current branch head:** `2189847f0a941c293841014bad97c9bd5fc00817`  
-**Latest application code head with CI pass:** same SHA
+**Verified application code:** `2189847f0a941c293841014bad97c9bd5fc00817`  
+**Latest branch documentation commit at update:** `ac560e679ba2e9753249f387f4337991a1c74b0f`
 
 ## Current status
 
-**GitHub CI is green.** Run #42457839580 passed both `verify` and `agent-native` jobs on commit `2189847`:
+**Application CI is green; the exact code Preview is READY and public smoke-tested.** GitHub Actions run #42457839580 passed both `verify` and `agent-native` jobs on application code commit `2189847`:
 - Root dependency install, automated tests, and production build.
 - Agent-Native dependency install, typecheck, action tests, doctor, and production build.
 
-The latest Preview deployment for this exact SHA is currently QUEUED; do not claim the newest overflow fix is deployed until Vercel reports READY and the browser retest passes.
+Vercel Preview deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` reached READY for the same application code commit. It was browser-tested at:
 
-The prior code Preview at `b2a05a0` reached READY and its browser smoke test confirmed the public evidence graph and read-only controls, but reported horizontal scrollbars inside expanded log stack-trace and deployment-diff blocks. A second CSS adjustment is now committed at `2189847`: long code/log content uses `overflow-wrap:anywhere`, wrapping styles, and hidden horizontal overflow. This fix still needs a fresh deployed browser retest.
+https://traceback-agent-native-preview-ltz8c240q-hackathons8.vercel.app/demo
 
-Production deployment has not been targeted. The Agent-Native Preview project uses a separate Neon project named `traceback-ai-preview`. Its read-only migration-history check showed 257 records, with the latest applied at 2026-11-05 15:30:28 UTC; no new migration record was added during the latest November 8 Preview build. The Vercel build invokes the migration runner against this Preview-specific database.
+Five documentation-only commits were made after the prior code CI; the current app source remains the exact code tested above. The latest docs-only Preview may be queued separately, but it does not contain different application code.
+
+Production deployment has not been targeted. The Agent-Native Preview project uses a separate Neon project named `traceback-ai-preview`. A read-only migration-history check showed 257 records, with the latest applied at 2026-11-05 15:30:28 UTC; no new migration record was added during the latest November 8 Preview build. The Vercel build invokes the migration runner against this Preview-specific database.
 
 ## Implemented product capabilities
 
@@ -28,39 +30,47 @@ Production deployment has not been targeted. The Agent-Native Preview project us
 
 ## CI verification — run #42457839580
 
-Both jobs passed on commit `2189847`:
+Both jobs passed on application code commit `2189847`:
 - `verify`: dependency install, root automated tests, root production build.
 - `agent-native`: dependency install, Agent-Native typecheck, action tests, Agent-Native doctor, Agent-Native production build.
 
-## Browser verification
+## Live Preview browser verification — November 8, 2026
 
-### Public showcase — prior Preview `b2a05a0`
-- All three incident cards rendered.
-- All four evidence graph nodes rendered per card.
-- Expanded first-incident details showed source logs, stack trace, deployment diff, and a recovery proposal marked NOT EXECUTED.
+**Public showcase: PASS**
+- Exact deployment for commit `2189847` loaded.
+- All three incident cards rendered with the expected severity and service.
+- All three cards showed the four-step evidence graph.
+- First incident expanded successfully; correlated logs, full stack traces, deployment diff, and recovery proposal were legible.
+- Long stack traces, diff text, and recovery JSON wrapped inside their containers. No horizontal scrollbars or clipped characters were observed.
+- Evidence-source disclosures were visible and expandable.
 - Synthetic-data, correlation, and read-only disclosures were visible.
 - No public execute/mutate/deploy controls were present.
-- The main page body did not show horizontal overflow, but nested log and diff code blocks showed horizontal scrollbars. The latest `2189847` wrapping fix is awaiting deployment and retest.
+- Only a normal vertical page scrollbar was observed.
 
-### Signed-out access control — prior verified Preview
+**Signed-out access control: PASS on prior verified Preview**
 - Direct access to `/incidents/inc-8921` redirected to `/sign-in` and preserved the intended return route.
 - The sign-in form rendered with empty credential fields.
 - No demo credentials, API keys, or tokens were exposed.
 - No credentials were entered and no sign-in was attempted.
 
-### Mobile viewport
+**Mobile viewport: NOT VERIFIED**
 - Browser automation could not set or confirm a true 390×844 CSS-pixel mobile viewport.
-- Dedicated mobile-device QA remains open. Desktop browser tests do not count as mobile verification.
+- The latest visual smoke test was desktop. Dedicated mobile-device QA remains open.
+
+## Build warnings (non-blocking)
+
+- Vite reported a client root chunk of approximately 2.63 MB raw / 652 KB gzip and a 775 KB raw data chunk. This is a performance/code-splitting follow-up, not a failed build.
+- H3 reported partially overlapping preMerge rules for `/icon-*.svg` and `/agent-native-*.svg`, then fell back to plain compilation. The deployment still completed successfully. This framework/configuration warning should be reviewed before production release.
 
 ## Remaining verification / submission gates
 
 | Check | Status |
 | --- | --- |
-| Current-head GitHub Actions tests and builds | PASS |
-| Latest `2189847` Preview deployment | QUEUED at last check |
-| Latest overflow fix browser retest | Pending deployment |
-| Public evidence graph and disclosures | PASS on prior Preview |
-| Signed-out private-route redirect | PASS on prior Preview |
+| Application code GitHub Actions tests and builds | PASS — run #42457839580 |
+| Exact application code Preview | READY — deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` |
+| Public demo evidence graph, expanded logs/diff, disclosures | PASS |
+| Long-text wrapping / horizontal scroll regression | PASS on latest code Preview |
+| Signed-out private-route redirect | PASS on prior verified Preview |
 | True narrow mobile-device viewport QA | Pending; emulation unavailable in browser session |
 | Authenticated recovery UI click-through | Not tested; requires authorized account sign-in |
 | Actual Agent-Native framework approval lifecycle | Not yet end-to-end verified; unit tests call `run()` directly |
