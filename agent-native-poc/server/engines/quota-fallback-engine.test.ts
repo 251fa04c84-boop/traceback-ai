@@ -68,7 +68,7 @@ describe("Gemini quota fallback engine", () => {
       expect(text).toContain("DIAGNOSIS HYPOTHESIS");
       expect(text).toContain("HUMAN APPROVAL GATE");
       expect(events.some((event) => event.type === "tool-call")).toBe(false);
-      expect(events.at(-1)).toEqual({ type: "stop", reason: "end_turn" });
+      expect(events[events.length - 1]).toEqual({ type: "stop", reason: "end_turn" });
     },
   );
 
