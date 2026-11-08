@@ -19,7 +19,7 @@ export function meta() {
 const stages = [
   ["01", "Observe", "Detect the incident from metric changes and service signals."],
   ["02", "Correlate", "Connect telemetry, timestamped logs, and deployment changes."],
-  ["03", "Diagnose", "Explain the likely cause and cite the supporting evidence."],
+  ["03", "Diagnose", "Present a template-based hypothesis with explicit uncertainty and synthetic supporting evidence."],
   ["04", "Plan", "Prepare an allowlisted recovery proposal with explicit parameters."],
   ["05", "Human approval", "Stop for review. No remediation is executed in this demo."],
 ];
@@ -128,7 +128,7 @@ export default function PublicDemoPage() {
                 { id: "signal", step: "01 · SIGNAL", title: scenario.metrics.length + " telemetry samples", detail: "Peak " + peakError + "% errors · p99 " + peakLatency.toLocaleString() + " ms", sources: scenario.metrics.map((point) => point.time + " · " + point.errorRate + "% errors · " + point.latencyP99.toLocaleString() + " ms p99") },
                 { id: "logs", step: "02 · RUNTIME", title: scenario.logs.length + " correlated log entries", detail: "Runtime evidence from " + scenario.service, sources: scenario.logs.map((log) => log.id + " · " + log.level + " · " + log.message) },
                 { id: "change", step: "03 · CHANGE", title: deployment?.releaseId + " · " + deployment?.commitHash, detail: deployment?.summary ?? "No deployment record available", sources: deployment ? [deployment.diff] : [] },
-                { id: "diagnosis", step: "04 · DIAGNOSIS", title: "Likely root cause", detail: scenario.postMortemTemplate.rootCause, sources: ["Trigger: " + scenario.postMortemTemplate.trigger, "Impact: " + scenario.postMortemTemplate.blastRadius] },
+                { id: "diagnosis", step: "04 · DIAGNOSIS", title: "Template-based hypothesis", detail: "Deterministic Fallback — template-based hypothesis, not a verified root cause. " + scenario.postMortemTemplate.rootCause, sources: ["Trigger hypothesis: " + scenario.postMortemTemplate.trigger, "Potential impact: " + scenario.postMortemTemplate.blastRadius, "Synthetic benchmark evidence; correlation does not establish production causality."] },
               ];
               return (
                 <article key={scenario.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035]">
@@ -157,8 +157,9 @@ export default function PublicDemoPage() {
                       </div>
                     </div>
                     <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Evidence-backed diagnosis</p>
-                      <p className="mt-3 text-sm leading-6 text-slate-200">{scenario.postMortemTemplate.rootCause}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Deterministic diagnosis hypothesis</p>
+                      <p className="mt-3 text-sm leading-6 text-slate-200">Deterministic Fallback — template-based hypothesis, not a verified root cause. {scenario.postMortemTemplate.rootCause}</p>
+                      <p className="mt-2 text-xs leading-5 text-amber-200">Template-derived from synthetic benchmark fixtures; not live AI analysis or independent causal verification.</p>
                       <div className="mt-4 border-t border-white/10 pt-3">
                         <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Suspect deployment</p>
                         <p className="mt-1 text-sm font-medium">{deployment?.releaseId} · {deployment?.commitHash}</p>
@@ -171,8 +172,8 @@ export default function PublicDemoPage() {
                   <section className="border-t border-white/10 px-5 py-5 lg:px-7" aria-label="Inspectable evidence graph">
                     <div className="mb-4">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">Inspectable evidence graph</p>
-                      <h4 className="mt-1 text-base font-semibold text-slate-100">How the diagnosis is supported</h4>
-                      <p className="mt-1 text-xs leading-5 text-slate-400">Trace the benchmark from observed signals through logs and a suspect code change to the likely diagnosis. These are synthetic correlations, not proof of production causality.</p>
+                      <h4 className="mt-1 text-base font-semibold text-slate-100">Evidence behind the hypothesis</h4>
+                      <p className="mt-1 text-xs leading-5 text-slate-400">Trace the synthetic benchmark from observed signals through logs and a suspect code change to a template-based hypothesis. These correlations are not proof of production causality.</p>
                     </div>
                     <ol className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       {evidenceNodes.map((node, index) => (
