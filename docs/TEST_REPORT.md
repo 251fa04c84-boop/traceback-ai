@@ -1,9 +1,9 @@
 # TraceBack AI — Verification Report
 
 **Last updated:** November 8, 2026  
-**Latest documentation commits:** `79d1bccc` (Clips guide) and `98255e52` (submission draft)  
+**Latest documentation branch head:** `a77b768d48b34bd54473d9278e96ac8a9c89c496`  
 **Verified application code:** `2189847f0a941c293841014bad97c9bd5fc00817`  
-**Latest branch documentation commit at update:** `ac560e679ba2e9753249f387f4337991a1c74b0f`
+**Latest report commit before this refresh:** `a77b768d48b34bd54473d9278e96ac8a9c89c496`
 
 ## Current status
 
@@ -11,11 +11,11 @@
 - Root dependency install, automated tests, and production build.
 - Agent-Native dependency install, typecheck, action tests, doctor, and production build.
 
-Vercel Preview deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` reached READY for the same application code commit. It was browser-tested at:
+The exact application-code Preview deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` remains the browser-tested build. The latest documentation-only Preview deployment `dpl_GS4F2cizGmMNfzpf1TX3sERT64ex` also reached READY for branch head `a77b768d`; its Vercel checks passed for both the Agent-Native Preview and root project. The application source remains unchanged from the exact code tested above. The docs-only Preview is available at:
 
-https://traceback-agent-native-preview-k793j7m08-hackathons8.vercel.app/demo
+https://traceback-agent-native-preview-3cy7uak1i-hackathons8.vercel.app/demo
 
-The latest documentation branch head is `98255e52`. GitHub Actions run #42458208405 passed on the prior documentation head `5d9b300`; subsequent commits only corrected Preview links in documentation. The application source remains unchanged from the exact code tested above.
+The latest GitHub Actions run previously recorded for branch head `5d9b300` passed; later commits only corrected documentation. The application source remains unchanged from the exact code tested above.
 
 Production deployment has not been targeted. The Agent-Native Preview project uses a separate Neon project named `traceback-ai-preview`. A read-only migration-history check showed 257 records, with the latest applied at 2026-11-05 15:30:28 UTC; no new migration record was added during the latest November 8 Preview build. The Vercel build invokes the migration runner against this Preview-specific database.
 
