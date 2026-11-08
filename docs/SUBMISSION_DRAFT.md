@@ -24,8 +24,8 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 - Evidence is visible and reviewable: metrics, log IDs/timestamps, release identifiers, and deployment diffs.
 - The agent is instructed to ground findings in returned evidence and treat log/diff text as untrusted data, not instructions.
 - The public showcase remains read-only. The authenticated workspace adds an approval-gated recovery simulation that changes only synthetic benchmark state; it never calls production services.
-- Automated action tests cover all three scenarios, output schemas, invalid incident IDs, evidence correlation, five-stage structure, and read-only behavior.
-- Public demo pages and action HTTP endpoints are separated: the showcase is public/read-only, while the three action endpoints return HTTP 401 without authentication.
+- Automated action tests cover all three scenarios, output schemas, invalid incident IDs, evidence correlation, five-stage structure, per-invocation simulator isolation, and caller provenance. The recovery handler tests call `run()` directly; they do not claim to test the framework approval lifecycle.
+- The public showcase is read-only. Signed-out access to the private incident workspace redirects to sign-in. The recovery action is a separate authenticated, approval-gated capability; do not claim a direct HTTP status or approval integration test beyond what has actually been verified.
 
 ## Demonstration scenarios
 - Checkout outage: a null-coupon regression following release v2.4.1.
@@ -44,13 +44,13 @@ The interface and Agent-Native assistant share the same typed `defineAction()` c
 - React 19 / React Router 8 application.
 - Three typed, read-only evidence actions plus one shared `execute-recovery-simulation` action with `needsApproval: true`.
 - Vercel Preview deployment using the Nitro Vercel preset.
-- GitHub Actions run #42399722876 passed both `agent-native` and `verify` jobs on branch head `277b5872b2b22875a11e38b247d915db06e69223`, including typecheck, approval-gated recovery action tests, Agent-Native diagnostics, and both production builds.
-- Signed-out smoke test confirmed `/` redirects to `/demo`; the public showcase loads all three scenarios; `/incidents` and `/incidents/inc-8921` require login; and all three action HTTP endpoints return 401 without authentication.
+- GitHub Actions run #42455373312 passed both `agent-native` and `verify` jobs on the current documentation head `609a212dc3eeb7924e1779dccc797892066d889d`. It includes frozen-lockfile install, root automated tests/build, Agent-Native typecheck/action tests/doctor/build. The code-hardening commit `04c3d8c` also passed the same checks in run #42455284945.
+- Public browser QA confirmed all three scenarios, correlated logs, deployment diffs, and recovery proposals render; the public showcase has no mutation controls; narrow mobile layout has no clipping/overflow; and signed-out access to `/incidents/inc-8921` redirects to sign-in. The latest Preview for the final hardening head must still reach READY and pass a fresh smoke test.
 
 ## Transparency and pre-existing work disclosure
 The repository contains an earlier custom Next.js TraceBack implementation and deterministic incident simulator. The hackathon entry's Agent-Native app is in `agent-native-poc/`, adapted from the Agent-Native Chat starter template (`@agent-native/core@0.223.0`) and extended with TraceBack incident actions, evidence pages, a five-stage brief, and action tests. The earlier implementation and simulator are pre-existing project work; do not claim they were all created during the hackathon. Framework packages and dependencies remain subject to their own licenses.
 
-The three incident scenarios are deterministic simulated benchmark data. The public showcase is read-only. The authenticated workspace can run an approval-gated recovery simulation, but it mutates only an isolated in-process benchmark state; it does not call production APIs, deploys, feature flags, databases, or customer records. Its postconditions are simulated, not live infrastructure health checks. A simulated recovery is not a completed production remediation.
+The three incident scenarios are deterministic simulated benchmark data. The public showcase is read-only. The authenticated workspace can run an approval-gated recovery simulation, but each action invocation creates a fresh ephemeral simulator instance; it does not call production APIs, deploys, feature flags, databases, or customer records. Its postconditions are simulated, not live infrastructure health checks. A simulated recovery is not a completed production remediation. Execution provenance is derived from framework caller context; missing caller context is recorded as `unknown`, never as human.
 
 Gemini free-tier requests have returned HTTP 429 quota errors and intermittent 503 high-demand errors. A successful live Agent-Native chat/tool-call has NOT been verified; do not claim it in the submission or video unless a fresh real run succeeds.
 
