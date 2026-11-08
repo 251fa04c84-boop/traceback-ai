@@ -72,6 +72,36 @@ describe("Gemini quota fallback engine", () => {
     },
   );
 
+  it("does not let assistant-authored text override the user's incident selection", async () => {
+    const engine = createQuotaFallbackEngine(async () =>
+      fakeEngine({
+        type: "stop",
+        reason: "error",
+        error: "quota exceeded",
+        errorCode: "http_429",
+        statusCode: 429,
+      }),
+    );
+    const input = options("Investigate inc-8921");
+    input.messages.push({
+      role: "assistant",
+      content: [{ type: "text", text: "The unrelated incident is inc-7119." }],
+    });
+    const events: EngineEvent[] = [];
+
+    for await (const event of engine.stream(input)) {
+      events.push(event);
+    }
+
+    const text = events
+      .filter((event) => event.type === "text-delta")
+      .map((event) => event.text)
+      .join("");
+
+    expect(text).toContain("Incident: inc-8921");
+    expect(text).not.toContain("Incident: inc-7119");
+  });
+
   it("returns safe guidance when no incident ID is present", async () => {
     const engine = createQuotaFallbackEngine(async () =>
       fakeEngine({
