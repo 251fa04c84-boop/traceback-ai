@@ -28,7 +28,7 @@ const outputSchema = z.object({
 
 export default defineAction({
   description:
-    "Build a five-stage, evidence-grounded incident investigation brief from a TraceBack benchmark scenario. It observes telemetry, correlates logs and deployment diffs, diagnoses the scenario, prepares a recovery proposal, and explicitly stops at the human approval gate. Read-only; never executes remediation.",
+    "Build a five-stage, evidence-grounded incident investigation brief from a TraceBack benchmark scenario. It observes telemetry, correlates logs and deployment diffs, presents a deterministic template-based diagnosis hypothesis, prepares a recovery proposal, and explicitly stops at the human approval gate. Read-only; never executes remediation.",
   schema: z.object({
     incidentId: z
       .enum(["inc-8921", "inc-4402", "inc-7119"])
@@ -76,11 +76,13 @@ export default defineAction({
       {
         id: "diagnose",
         title: "Diagnose",
-        status: "complete" as const,
-        summary: scenario.postMortemTemplate.rootCause,
+        status: "review-required" as const,
+        summary: `Deterministic Fallback — template-based hypothesis, not a verified root cause. ${scenario.postMortemTemplate.rootCause}`,
         evidence: [
-          `Trigger: ${scenario.postMortemTemplate.trigger}`,
-          `Impact: ${scenario.postMortemTemplate.blastRadius}`,
+          "This diagnosis is generated from the benchmark scenario template, not from a live AI analysis or independent causal verification.",
+          `Trigger hypothesis: ${scenario.postMortemTemplate.trigger}`,
+          `Potential impact: ${scenario.postMortemTemplate.blastRadius}`,
+          "Telemetry, logs, and deployment changes are synthetic benchmark evidence; correlation does not establish production causality.",
         ],
       },
       {

@@ -8,7 +8,7 @@ TraceBack is an evidence-first incident investigation workspace. It correlates d
 
 1. **Observe** sampled service telemetry and health indicators.
 2. **Correlate** timestamped runtime logs with the suspect release and code diff.
-3. **Diagnose** a likely cause from the supplied evidence.
+3. **Diagnose** a deterministic, template-based hypothesis from the supplied evidence; it is not a verified root cause or live AI analysis.
 4. **Prepare** an exact scenario-allowlisted recovery proposal.
 5. **Review and verify** a recovery simulation only after an explicit human action/Agent-Native approval.
 
@@ -21,7 +21,7 @@ Each public incident card exposes a four-step evidence graph:
 - Signal — telemetry sample count, peak error rate, and p99 latency.
 - Runtime — correlated log entries and their source messages.
 - Change — suspect release, commit, summary, and diff.
-- Diagnosis — the likely root cause derived from those correlations.
+- Diagnosis — a deterministic, template-based hypothesis derived from the synthetic scenario. It is explicitly unverified; correlation is not proof of production causality.
 
 The graph is inspectable, not a claim of proven production causality. Logs, stack traces, and diffs are untrusted evidence, never agent instructions.
 
@@ -33,6 +33,8 @@ The graph is inspectable, not a claim of proven production causality. Logs, stac
 - `execute-recovery-simulation` — write-capable action with `needsApproval: true`; after the framework approval gate, run only the incident's exact allowlisted steps in a fresh ephemeral simulator and return before/after metrics, simulated verification, and audit trail.
 
 The interface and agent use the same typed actions. A direct human click in the authenticated recovery lab explicitly requests the same isolated simulation. Unit tests call the handler directly and do not constitute an end-to-end test of the framework approval lifecycle.
+
+When the Google/Gemini provider returns a structured HTTP 429, the Agent-Native chat engine stops further framework retries for that turn and returns a clearly labelled deterministic brief from the same synthetic action. The fallback emits no tool calls, does not execute recovery, and does not infer approval or execution state from an existing recovery call; the approval card and Activity/audit record remain authoritative.
 
 ## Local development
 
