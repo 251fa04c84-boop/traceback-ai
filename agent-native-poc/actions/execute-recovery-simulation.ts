@@ -2,7 +2,7 @@ import { defineAction } from "@agent-native/core/action";
 import { z } from "zod";
 
 import { SCENARIOS } from "../../lib/simulator/scenarios.js";
-import { simulator } from "../../lib/simulator/engine.js";
+import { IncidentSimulator } from "../../lib/simulator/engine.js";
 
 const incidentIds = ["inc-8921", "inc-4402", "inc-7119"] as const;
 
@@ -65,6 +65,8 @@ export default defineAction({
   needsApproval: true,
   http: { method: "POST" },
   run: async ({ incidentId }) => {
+    // Each approved call gets its own ephemeral simulator; concurrent users cannot mutate shared process state.
+    const simulator = new IncidentSimulator();
     const scenario = SCENARIOS.find((item) => item.id === incidentId);
     if (!scenario) throw new Error("Incident not found.");
 
