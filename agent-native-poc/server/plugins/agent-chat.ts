@@ -5,7 +5,6 @@ import {
 } from "@agent-native/core/server";
 
 import actionsRegistry from "../../.generated/actions-registry.js";
-import { createQuotaFallbackEngine } from "../engines/quota-fallback-engine.js";
 
 const INITIAL_TOOL_NAMES = [
   // Keep the public incident workflow small to reduce discovery and provider calls.
@@ -17,7 +16,6 @@ const INITIAL_TOOL_NAMES = [
 
 export default createAgentChatPlugin({
   appId: "traceback-ai",
-  engine: createQuotaFallbackEngine(),
   actions: loadActionsFromStaticRegistry(actionsRegistry),
   mcp: { connectorCatalog: [], appApprovalPage: true },
   initialToolNames: INITIAL_TOOL_NAMES,
