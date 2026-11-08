@@ -5,7 +5,7 @@
 
 ## Current status
 
-**Hardening candidate under verification.** The prior PR head `fc4dacb06fce0bf913561c7e449774fccc7dc6ef` passed both GitHub Actions jobs. The November 8 hardening commits pin the Agent-Native telemetry package, isolate each recovery invocation in a fresh simulator instance, expose the recovery action to the agent, and add a concurrency-isolation unit test. A new CI run and deployment of this hardening head are still required before calling the candidate ready.
+**CI-verified hardening candidate.** GitHub Actions run #42455284945 passed both `verify` and `agent-native` jobs on commit `04c3d8cefc93a183cb1369cb8e73b71ceef1c4be`. This includes frozen-lockfile installation, typecheck, action tests, Agent-Native doctor, and both production builds. The latest Vercel Preview deployment for this exact head is still pending; the preceding Preview commit passed public-demo smoke testing.
 
 ## Implemented checks
 
@@ -32,14 +32,16 @@ The first hosted runtime smoke test failed because the deployment could not reso
 | Check | Status |
 | --- | --- |
 | GitHub Actions on prior PR head `fc4dacb` | Passed: `verify` and `agent-native` jobs |
-| GitHub Actions on November 8 hardening head | Pending / not yet verified |
+| Frozen lockfile install, typecheck, action tests, doctor, root tests, and both builds on hardening head | Passed in run #42455284945 |
+| GitHub Actions on November 8 hardening head `04c3d8c` | Passed: `verify` and `agent-native` jobs (run #42455284945) |
 | Agent-Native typecheck | Pending current-head CI result |
 | Agent-Native action tests | Added; pending current-head CI result |
 | Agent-Native doctor | Pending current-head CI result |
 | Agent-Native production build | Pending current-head CI result |
 | Latest Vercel deployment | Pending after runtime dependency fix |
 | Public demo browser QA | Passed read-only inspection of all three incident cards, log/diff presence, recovery explanations, and narrow mobile layout on the prior Preview |
-| Browser smoke test of the authenticated recovery action on the new deployment | Pending; requires user sign-in |
+| Latest Preview deployment for hardening head | Pending / queued at time of report |
+| Browser smoke test of the authenticated recovery action | Pending; requires user sign-in |
 | Agent chat with configured model provider | Not yet completed |
 | Mobile viewport review | Not yet completed |
 | Public Clips recording and signed-out access check | Not yet completed |
@@ -48,4 +50,4 @@ The first hosted runtime smoke test failed because the deployment could not reso
 
 The earlier legacy Next.js app had a user-reported manual test run through all five stages for the three benchmark scenarios. That is not a substitute for testing the Agent-Native deployment.
 
-All supplied incident data is simulated benchmark data. Three Agent-Native evidence actions are read-only; the separate recovery action is approval-gated and changes only a fresh ephemeral in-memory simulator instance per invocation. Its handler unit tests call `run()` directly and therefore do not test the framework approval lifecycle. The framework approval behavior is provided by Agent-Native `needsApproval`; no live infrastructure health probe or production resolution is claimed.
+All supplied incident data is simulated benchmark data. Three Agent-Native evidence actions are read-only; the separate recovery action is approval-gated and changes only a fresh ephemeral in-memory simulator instance per invocation. Its handler unit tests call `run()` directly and therefore do not test the framework approval lifecycle. They verify provenance mapping (`tool` → agent, `frontend` → human, missing context → unknown) and concurrent per-invocation isolation. The framework approval behavior is provided by Agent-Native `needsApproval`; no live infrastructure health probe or production resolution is claimed.
