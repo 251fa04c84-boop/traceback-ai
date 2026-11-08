@@ -1,6 +1,6 @@
 import { SCENARIOS, IncidentScenario } from "./scenarios";
 
-type ExecutionSource = "agent" | "human" | "api";
+type ExecutionSource = "agent" | "human" | "api" | "unknown";
 type HealthState = "HEALTHY" | "DEGRADED" | "CRITICAL";
 type AuditStatus = "SUCCESS" | "FAILED" | "REJECTED";
 
@@ -91,7 +91,7 @@ export class IncidentSimulator {
     }));
   }
 
-  public resetIncident(id: string): IncidentRuntimeState | null {
+  public resetIncident(id: string, source: ExecutionSource = "human"): IncidentRuntimeState | null {
     const original = SCENARIOS.find((scenario) => scenario.id === id);
     if (!original) return null;
 
@@ -103,7 +103,7 @@ export class IncidentSimulator {
           timestamp: new Date().toISOString(),
           actionId: "systemReset",
           params: {},
-          executedBy: "human",
+          executedBy: source,
           status: "SUCCESS",
           resultingHealth: original.severity === "CRITICAL" ? "CRITICAL" : "DEGRADED",
           notes: "Incident simulation reset to its original benchmark state.",
