@@ -1,4 +1,4 @@
-import { defineAction } from "@agent-native/core/action";
+import { defineAction, type ActionRunContext } from "@agent-native/core/action";
 import { z } from "zod";
 
 import { SCENARIOS } from "../../lib/simulator/scenarios.js";
@@ -44,7 +44,7 @@ const outputSchema = z.object({
       id: z.string(),
       timestamp: z.string(),
       actionId: z.string(),
-      executedBy: z.enum(["agent", "human", "api"]),
+      executedBy: z.enum(["agent", "human", "api", "unknown"]),
       status: z.enum(["SUCCESS", "FAILED", "REJECTED"]),
       resultingHealth: z.enum(["HEALTHY", "DEGRADED", "CRITICAL"]),
       notes: z.string(),
@@ -64,13 +64,17 @@ export default defineAction({
   outputSchema,
   needsApproval: true,
   http: { method: "POST" },
-  run: async ({ incidentId }) => {
+  run: async ({ incidentId }, ctx?: ActionRunContext) => {
+    // Missing caller metadata is never attributed to a human.
+    const executionSource = ctx?.caller === "tool" ? "agent"
+      : ctx?.caller === "frontend" ? "human"
+      : ctx?.caller ? "api" : "unknown";
     // Each approved call gets its own ephemeral simulator; concurrent users cannot mutate shared process state.
     const simulator = new IncidentSimulator();
     const scenario = SCENARIOS.find((item) => item.id === incidentId);
     if (!scenario) throw new Error("Incident not found.");
 
-    const initial = simulator.resetIncident(incidentId);
+    const initial = simulator.resetIncident(incidentId, executionSource);
     if (!initial) throw new Error("Unable to initialize the isolated incident simulation.");
 
     const initialMetric = initial.scenario.metrics[initial.scenario.metrics.length - 1];
@@ -90,7 +94,7 @@ export default defineAction({
         incidentId,
         requirement.actionId,
         requirement.expectedParams,
-        "human",
+        executionSource,
       );
       actionResults.push({
         actionId: requirement.actionId,
@@ -159,7 +163,7 @@ export default defineAction({
         notes: entry.notes,
       })),
       safetyNotice:
-        "Human approval was required for this action. This result is a deterministic simulation using synthetic benchmark data; no production service, deployment, feature flag, database, or customer record was changed. Simulated health verification is not a live infrastructure health check.",
+        "This action is configured with Agent-Native needsApproval: true; agent-initiated calls must pass the framework approval flow. This result is a deterministic simulation using synthetic benchmark data; no production service, deployment, feature flag, database, or customer record was changed. Simulated health verification is not a live infrastructure health check.",
     };
   },
 });
