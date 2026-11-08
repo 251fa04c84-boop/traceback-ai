@@ -33,7 +33,7 @@ The interface and Agent-Native assistant share four typed `defineAction()` capab
 - Database connection exhaustion: PostgreSQL connection rejection and HikariPool acquisition timeouts.
 
 ## Links
-- Latest verified Preview showcase: https://traceback-agent-native-preview-k793j7m08-hackathons8.vercel.app/demo
+- Latest verified Preview showcase: https://traceback-agent-native-preview-qhc0956yc-hackathons8.vercel.app/demo
 - Source branch: https://github.com/251fa04c84-boop/traceback-ai/tree/codex/traceback-agent-native-v2
 - Draft PR: https://github.com/251fa04c84-boop/traceback-ai/pull/4
 - Public Clips script: `docs/CLIPS_DEMO_SCRIPT.md`
@@ -42,8 +42,8 @@ The interface and Agent-Native assistant share four typed `defineAction()` capab
 ## Technical implementation and verification
 - Official Agent-Native framework: `@agent-native/core@0.223.0` and `@agent-native/toolkit@0.223.0`.
 - React 19 / React Router 8 application; Vercel Preview deployment using the Nitro Vercel preset.
-- GitHub Actions run **#42457839580** passed both `verify` and `agent-native` jobs on application code head `2189847f0a941c293841014bad97c9bd5fc00817`: root tests/build, Agent-Native typecheck/action tests/doctor/build.
-- Preview deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` reached READY for that same code head.
+- GitHub Actions run **#42463146365** passed both `verify` and `agent-native` jobs on latest branch head `1e54a72b5b68bb51593c32f90cae3f0cdcb00414`; application source remains `2189847f0a941c293841014bad97c9bd5fc00817`: root tests/build, Agent-Native typecheck/action tests/doctor/build.
+- Latest Preview deployment `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy` is READY for branch head `1e54a72`; browser QA was performed on the unchanged app source commit `2189847`.
 - Fresh signed-out public browser QA passed: all three cards, four-step evidence graphs, expandable source evidence, visible synthetic/read-only disclosures, and no public mutation controls.
 - Expanded checkout incident logs, stack traces, deployment diff, and recovery JSON wrap correctly; no horizontal scrollbars or clipped characters were observed.
 - Signed-out direct access to `/incidents/inc-8921` redirected to sign-in and preserved the return route; no credentials or secrets were exposed.
