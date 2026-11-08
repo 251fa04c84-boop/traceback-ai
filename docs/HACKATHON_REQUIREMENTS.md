@@ -55,16 +55,22 @@ The interface and agent use the same typed action layer. Agent-initiated recover
 | Three incident scenarios | Implemented and browser-checked | All three public cards, metrics, logs, diffs, and proposals render |
 | Public evidence graph | Preview QA passed | Four inspectable nodes per incident, source evidence expandable, synthetic-correlation disclosure visible |
 | Recovery simulation safety | Implemented and unit-tested | Scenario allowlists, exact parameters, per-invocation simulator, caller provenance, concurrency isolation, and `needsApproval: true` |
-| GitHub Actions on code head `b48c0d7` | Passed | Run #42456448902: root tests/build plus Agent-Native typecheck/action tests/doctor/build |
-| Latest Vercel Preview | READY | Deployment `dpl_7ZBhs5sUfzeH4AvTfuE6hhssEzQi` for `b48c0d7` |
-| Public showcase browser QA | Passed | All cards, graph, expanded evidence, read-only boundaries, and disclosures checked |
+| GitHub Actions on application code head `2189847` | Passed | Run #42457839580: root tests/build plus Agent-Native typecheck/action tests/doctor/build |
+| Latest code Preview | READY | Deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko`; expanded evidence text-wrap regression passed |
+| Public showcase access | Passed | All three cards, four-stage graph, expanded evidence, disclosures, and no public mutation controls |
 | Signed-out private-route protection | Passed | Direct incident URL redirects to sign-in and preserves return route |
-| Narrow mobile viewport | Pending | Latest browser report did not conclusively establish true mobile emulation |
-| Authenticated recovery UI click-through | Pending | Requires authorized account sign-in |
+| Narrow mobile viewport | Pending | Browser session could not emulate 390×844 CSS pixels |
+| Authenticated recovery UI | Pending | Requires authorized account sign-in and a real click-through |
 | Actual Agent-Native framework approval lifecycle | Pending | Unit tests call `run()` directly and do not test interactive approval |
 | Live Agent-Native model chat | Not verified | Gemini provider previously returned 429/503; do not claim success without a real successful run |
 | Public Clips video | Not complete | Record actual app, publish clip, and verify signed-out playback |
 | Official submission | Not complete | User must confirm team/eligibility, accept rules, submit, and save receipt |
+
+## Build notes
+
+The Preview build completed, with non-blocking warnings for a large client JavaScript chunk and overlapping H3 `preMerge` route rules (the compiler fell back to plain compilation). Review code splitting and the route-rule warning before a Production release.
+
+The Agent-Native Preview project uses a dedicated Neon project named `traceback-ai-preview`. Its migration history was inspected read-only; the latest migration record predates the November 8 Preview build. No Production deployment was triggered.
 
 ## Scope and honesty
 
@@ -77,5 +83,6 @@ The recovery handler unit tests call `run()` directly and do not exercise the fr
 - Rules: https://www.builder.io/hackathon/rules
 - Submission form: https://www.builder.io/hackathon/submit
 - Clips: https://clips.agent-native.com/
+- Recording script: `docs/CLIPS_DEMO_SCRIPT.md`
 
 Do not mark any item complete until the exact current deployment, real recording, or submission receipt has been checked.
