@@ -1,20 +1,21 @@
 # TraceBack AI — Verification Report
 
 **Last updated:** November 8, 2026  
+**Latest documentation commits:** `79d1bccc` (Clips guide) and `98255e52` (submission draft)  
 **Verified application code:** `2189847f0a941c293841014bad97c9bd5fc00817`  
 **Latest branch documentation commit at update:** `ac560e679ba2e9753249f387f4337991a1c74b0f`
 
 ## Current status
 
-**Application CI is green; the exact code Preview is READY and public smoke-tested.** GitHub Actions run #42457839580 passed both `verify` and `agent-native` jobs on application code commit `2189847`:
+**Application CI is green; the exact code Preview is READY and public smoke-tested.** GitHub Actions run #42457839580 passed both `verify` and `agent-native` jobs on application code commit `2189847`; latest branch-head CI run #42458208405 also passed.:
 - Root dependency install, automated tests, and production build.
 - Agent-Native dependency install, typecheck, action tests, doctor, and production build.
 
 Vercel Preview deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` reached READY for the same application code commit. It was browser-tested at:
 
-https://traceback-agent-native-preview-ltz8c240q-hackathons8.vercel.app/demo
+https://traceback-agent-native-preview-k793j7m08-hackathons8.vercel.app/demo
 
-Five documentation-only commits were made after the prior code CI; the current app source remains the exact code tested above. The latest docs-only Preview may be queued separately, but it does not contain different application code.
+The latest documentation branch head is `98255e52`. GitHub Actions run #42458208405 passed on the prior documentation head `5d9b300`; subsequent commits only corrected Preview links in documentation. The application source remains unchanged from the exact code tested above.
 
 Production deployment has not been targeted. The Agent-Native Preview project uses a separate Neon project named `traceback-ai-preview`. A read-only migration-history check showed 257 records, with the latest applied at 2026-11-05 15:30:28 UTC; no new migration record was added during the latest November 8 Preview build. The Vercel build invokes the migration runner against this Preview-specific database.
 
