@@ -38,6 +38,8 @@ The interface and agent use the same typed actions. A direct human click in the 
 
 The app does not hard-code a chat provider. Agent-Native's built-in engine and Settings → Model / API keys determine the active provider and model. Connect the managed Builder.io gateway or configure a supported provider key (for example Anthropic, OpenAI, Google Gemini, OpenRouter, Groq, or Mistral) through the framework's setup/settings flow. Availability in the model picker depends on the provider being connected and its credentials being valid.
 
+If you add a **Personal** provider key, choose its model from the chat composer’s model selector (the model chip beside the message box) or the personal model selection for your account. The **Organization settings → Default model** control is a separate organization-wide setting and may be unavailable to non-admin members; it is not required just to use your own personal key. Do not change the organization-wide personal-key restriction to make a personal key appear.
+
 Provider credentials belong in Agent-Native's encrypted settings or the deployment's server-side environment, never in source control or client code. This change restores framework-managed provider selection; it does not claim automatic cross-provider failover. The deterministic incident brief remains available through the typed TraceBack action and does not execute recovery or infer approval state.
 
 ## Local development
