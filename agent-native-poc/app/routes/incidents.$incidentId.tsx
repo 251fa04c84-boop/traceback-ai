@@ -66,9 +66,9 @@ export default function IncidentEvidencePage() {
     {
       id: "change",
       label: "3 · Change evidence",
-      title: deployment.releaseId + " · " + deployment.commitHash,
-      detail: deployment.summary,
-      sources: [deployment.diff],
+      title: deployment?.releaseId ? deployment.releaseId + " · " + deployment.commitHash : "No deployment record",
+      detail: deployment?.summary ?? "No deployment record available",
+      sources: deployment ? [deployment.diff] : [],
     },
     {
       id: "diagnosis",
