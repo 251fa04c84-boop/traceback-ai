@@ -13,12 +13,12 @@ export default function IncidentsPage() {
   const { data, isLoading, error } = useActionQuery("list-incidents", {});
 
   return (
-    <main className="mx-auto w-full max-w-6xl space-y-6 p-4 sm:p-6">
-      <header className="space-y-2">
+    <main className="tb-workspace mx-auto w-full max-w-6xl space-y-6 p-4 sm:p-6">
+      <header className="tb-section-heading space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           Incident command
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight">Active incident scenarios</h1>
+        <h1 className="tb-display text-3xl font-semibold tracking-tight">Active incident scenarios</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
           Investigate benchmark incidents using shared Agent-Native actions. Evidence shown here is simulated training data, not live production telemetry.
         </p>
@@ -37,9 +37,9 @@ export default function IncidentsPage() {
       ) : !data?.length ? (
         <p className="rounded-lg border p-4 text-sm text-muted-foreground">No incident scenarios are available.</p>
       ) : (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <section className="tb-card-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {data.map((incident) => (
-            <article key={incident.id} className="flex flex-col gap-4 rounded-xl border bg-card p-5 shadow-sm">
+            <article key={incident.id} className="tb-incident-card flex flex-col gap-4 rounded-xl border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <span className="font-mono text-xs text-muted-foreground">{incident.id}</span>
                 <span className="rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide">
@@ -58,7 +58,7 @@ export default function IncidentsPage() {
               </dl>
               <a
                 href={`/incidents/${incident.id}`}
-                className="mt-auto inline-flex min-h-10 items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                className="tb-action-link mt-auto inline-flex min-h-10 items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
               >
                 Review evidence
               </a>
