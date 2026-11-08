@@ -33,20 +33,23 @@ The interface and Agent-Native assistant share four typed `defineAction()` capab
 - Database connection exhaustion: PostgreSQL connection rejection and HikariPool acquisition timeouts.
 
 ## Links
-- Latest READY Preview showcase: https://traceback-agent-native-preview-13x0hk875-hackathons8.vercel.app/demo
+- Latest verified Preview showcase: https://traceback-agent-native-preview-ltz8c240q-hackathons8.vercel.app/demo
 - Source branch: https://github.com/251fa04c84-boop/traceback-ai/tree/codex/traceback-agent-native-v2
 - Draft PR: https://github.com/251fa04c84-boop/traceback-ai/pull/4
+- Public Clips script: `docs/CLIPS_DEMO_SCRIPT.md`
 - Public Clips demo: [ADD THE FINAL PUBLIC CLIPS URL AFTER RECORDING]
 
 ## Technical implementation and verification
 - Official Agent-Native framework: `@agent-native/core@0.223.0` and `@agent-native/toolkit@0.223.0`.
 - React 19 / React Router 8 application; Vercel Preview deployment using the Nitro Vercel preset.
-- GitHub Actions run **#42456448902** passed both `verify` and `agent-native` jobs on code head `b48c0d793184125a00704b8a95b4b483f583888e`: dependency installation, root tests/build, Agent-Native typecheck/action tests/doctor/build.
-- Preview deployment `dpl_7ZBhs5sUfzeH4AvTfuE6hhssEzQi` reached READY for the same code head.
-- Signed-out public browser QA passed: three cards, four-step evidence graphs, expandable evidence, visible synthetic/read-only disclosures, and no public mutation controls.
+- GitHub Actions run **#42457839580** passed both `verify` and `agent-native` jobs on application code head `2189847f0a941c293841014bad97c9bd5fc00817`: root tests/build, Agent-Native typecheck/action tests/doctor/build.
+- Preview deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko` reached READY for that same code head.
+- Fresh signed-out public browser QA passed: all three cards, four-step evidence graphs, expandable source evidence, visible synthetic/read-only disclosures, and no public mutation controls.
+- Expanded checkout incident logs, stack traces, deployment diff, and recovery JSON wrap correctly; no horizontal scrollbars or clipped characters were observed.
 - Signed-out direct access to `/incidents/inc-8921` redirected to sign-in and preserved the return route; no credentials or secrets were exposed.
-- Dedicated mobile-device viewport QA is still pending; the browser smoke test did not conclusively establish narrow-device emulation.
-- Authenticated recovery UI click-through and the real Agent-Native approval lifecycle remain unverified because they require a real authorized sign-in. A successful live Gemini chat/tool call is also not claimed; prior free-tier requests returned quota/availability errors (429/503).
+- Dedicated mobile-device viewport QA remains pending; the browser session could not emulate a true 390×844 viewport.
+- Authenticated recovery UI click-through and the real Agent-Native approval lifecycle remain unverified because they require an authorized sign-in. A successful live Gemini chat/tool call is also not claimed; prior free-tier requests returned quota/availability errors (429/503).
+- Non-blocking build warnings remain: a 2.63 MB raw root client chunk (652 KB gzip) and an H3 overlapping route-rule preMerge warning. Both builds still completed successfully.
 
 ## Transparency and pre-existing work disclosure
 The repository contains an earlier custom Next.js TraceBack implementation and deterministic incident simulator. This is pre-existing project work and must not be represented as newly authored during the hackathon. The Agent-Native app in `agent-native-poc/` adapts the Agent-Native Chat starter template and extends it with TraceBack incident actions, evidence pages, the five-stage brief, recovery simulation, and tests. Framework packages, templates, and third-party dependencies remain subject to their upstream licenses.
