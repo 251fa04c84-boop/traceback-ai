@@ -25,6 +25,8 @@ describe("recovery simulation action handler (unit tests; direct run() calls byp
       expect(result.after.latestErrorRate).toBeLessThan(result.before.latestErrorRate);
       expect(result.after.latestP99Latency).toBeLessThan(result.before.latestP99Latency);
       expect(result.auditTrail.some((entry) => entry.status === "SUCCESS")).toBe(true);
+      // Direct handler tests have no framework request context; never label that as human.
+      expect(result.auditTrail.every((entry) => entry.executedBy === "unknown")).toBe(true);
       expect(result.safetyNotice).toContain("no production service");
       expect(executeRecoverySimulation.outputSchema.safeParse(result).success).toBe(true);
     },
