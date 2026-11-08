@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ActionRunContext } from "@agent-native/core/action";
 
 import executeRecoverySimulation from "./execute-recovery-simulation";
 
@@ -32,6 +33,23 @@ describe("recovery simulation action handler (unit tests; direct run() calls byp
     },
   );
 
+
+
+  it("attributes a framework tool caller to the agent", async () => {
+    const result = await executeRecoverySimulation.run(
+      { incidentId: "inc-8921" },
+      { caller: "tool" } as ActionRunContext,
+    );
+    expect(result.auditTrail.every((entry) => entry.executedBy === "agent")).toBe(true);
+  });
+
+  it("attributes a frontend caller to the human", async () => {
+    const result = await executeRecoverySimulation.run(
+      { incidentId: "inc-8921" },
+      { caller: "frontend" } as ActionRunContext,
+    );
+    expect(result.auditTrail.every((entry) => entry.executedBy === "human")).toBe(true);
+  });
 
   it("keeps concurrent recovery executions isolated from each other", async () => {
     const [first, second] = await Promise.all([
