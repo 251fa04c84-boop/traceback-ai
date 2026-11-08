@@ -1,16 +1,17 @@
 # Builder.io Agent-Native Hackathon 2026 — Requirements and Readiness
 
-**Checked:** November 5, 2026  
+**Last checked:** November 8, 2026  
 **Official rules:** https://www.builder.io/hackathon/rules  
 **Hackathon overview:** https://www.builder.io/hackathon  
-**Framework:** https://github.com/BuilderIO/agent-native
+**Submission form:** https://www.builder.io/hackathon/submit  
+**Clips:** https://clips.agent-native.com/
 
 ## Deadline
 
 **Monday, November 9, 2026 at 11:59 PM Pacific Time**  
 Equivalent to **Tuesday, November 10 at 07:59 UTC / 13:29 India Standard Time**.
 
-Submit before the deadline and verify the confirmation receipt. A public repository or a recorded Clips video does not, by itself, submit an entry.
+Submit before the deadline and verify the confirmation receipt. A public repository or recorded Clips video does not, by itself, submit an entry.
 
 ## Official entry requirements
 
@@ -26,34 +27,51 @@ Submit before the deadline and verify the confirmation receipt. A public reposit
 
 | Criterion | Weight | TraceBack focus |
 | --- | ---: | --- |
-| Usefulness and Execution | 40% | A complete incident investigation flow with traceable telemetry, logs, deployment evidence, and a reviewable plan |
-| Creativity and Design | 20% | A focused incident command workspace rather than a generic chat wrapper |
-| Innovation | 20% | An agent that correlates operational evidence and prepares a recovery plan for human review |
-| Cleverness and Use of Agent-Native | 20% | Official `defineAction` capabilities shared by the agent and the UI |
+| Usefulness and Execution | 40% | Complete incident investigation, evidence correlation, reviewable recovery plan, and verified simulated outcome |
+| Creativity and Design | 20% | Focused incident command workspace with clear evidence and human control |
+| Innovation | 20% | Agent helps correlate operational evidence and prepare a safe recovery plan |
+| Cleverness and Use of Agent-Native | 20% | Shared typed actions used by both the UI and the in-app agent, with an explicit approval gate |
 
 ## TraceBack implementation disclosure
 
 ### Existing project work
-The repository retains an earlier custom Next.js incident workspace and deterministic incident scenarios. It is preserved as prior project work and must not be represented as newly authored Agent-Native framework code.
+The repository retains an earlier custom Next.js incident workspace and deterministic incident scenarios. This is pre-existing project work and must not be represented as newly authored Agent-Native framework code.
 
 ### Hackathon development
-The Agent-Native app under `agent-native-poc/` adapts the official Chat starter template for TraceBack. The project adds typed read-only actions for listing incidents, retrieving incident evidence, and producing a five-stage investigation brief; incident routes; TraceBack-specific agent instructions; action tests; and a domain-specific overview.
+The Agent-Native app under `agent-native-poc/` adapts the official Chat starter template for TraceBack. The app includes:
+- `list-incidents`: read-only incident catalog.
+- `get-incident-evidence`: read-only telemetry, logs, deployment and evidence retrieval.
+- `build-investigation-brief`: read-only five-stage evidence-grounded brief.
+- `execute-recovery-simulation`: shared write-capable action with `needsApproval: true`, restricted to an isolated synthetic simulator.
+
+The interface and agent use the same typed action layer. Agent-initiated recovery calls rely on the Agent-Native framework's approval flow. Each recovery handler invocation creates a fresh simulator instance; it does not mutate a process-wide shared simulator.
 
 ### Template and third-party dependencies
 The app uses the Agent-Native Chat starter from `@agent-native/core@0.223.0`, plus the framework Toolkit and packages declared in `agent-native-poc/package.json`. Their upstream licenses apply. Disclose the template and third-party packages in the entry.
 
-## Current readiness audit — November 5
+## Current readiness audit — November 8
 
 | Requirement | Status | Evidence / remaining work |
 | --- | --- | --- |
-| Official Agent-Native code in the app | Implemented in the isolated app | `agent-native-poc/actions/` contains `defineAction` actions; the Agent-Native Vercel project targets this folder |
-| Five-stage investigation brief | Implemented in source | New action, incident detail UI, and action tests added; latest CI still needs to pass |
-| Three incident scenarios | Implemented as benchmark data | Manual tests were previously completed in the legacy app; repeat them on the Agent-Native deployment |
-| Runtime deployment | Blocked pending redeploy | The generic React Router preset served UI routes but returned 404 for Agent-Native auth/action endpoints. The correct Nitro Vercel preset is now configured in source and project settings. Vercel's free deployment API limit (100/day) blocked the next deployment attempt; retry after the 24-hour reset. Do not use the old preview URL for submission |
-| Agent chat with a configured model | Not yet verified | Confirm an AI provider is configured and test a real chat turn using shared incident actions |
-| Public access without Vercel SSO | Configured on the isolated Vercel project | Verify in an incognito browser; application authentication remains enabled |
-| Public Clips video | Not complete | Record the final Agent-Native app, publish the clip, and verify public access |
-| Official submission | Not complete | Complete the form and confirm receipt |
+| Official Agent-Native implementation | Implemented | `agent-native-poc/actions/` contains four typed `defineAction` actions; the Agent-Native app is the isolated Vercel project entrypoint |
+| Five-stage investigation brief | Implemented and tested | Observe, Correlate, Diagnose, Plan, Human Approval Gate; tests cover all three benchmark incidents |
+| Three incident scenarios | Implemented and browser-checked | Public Preview shows all three IDs, metrics, logs, deployment diffs, and recovery proposals |
+| Recovery simulation safety | Implemented and unit-tested | Scenario allowlists, exact parameters, per-invocation simulator, caller provenance, concurrency isolation, and `needsApproval: true` |
+| Dependency compatibility | Verified | `@agent-native/otel` pinned to 0.1.30; lockfile peer metadata supports core 0.223.0; frozen install passes |
+| GitHub Actions | Passed | Run #42455373312 on current documentation head passed both `verify` and `agent-native` jobs: tests, typecheck, doctor, and production builds |
+| Vercel Preview | In progress on current head | Previous hardening Preview commit reached READY and passed public smoke tests; the latest deployment is building and must reach READY before recording |
+| Public showcase access | Passed on previous hardening Preview | All three cards expand; public surface is read-only; signed-out private incident route redirects to sign-in |
+| Mobile layout | Passed on previous hardening Preview | Narrow viewport check found no horizontal overflow or clipped content |
+| Authenticated recovery UI | Not yet user-verified | User must sign in and click the recovery simulation in the current Preview; do not share passwords in chat |
+| Live Agent-Native model chat | Not yet verified | Gemini provider previously returned quota/availability errors. Do not claim a successful live assistant/tool call until a real run succeeds |
+| Public Clips video | Not complete | Record the actual Agent-Native app, publish the clip, and verify public signed-out playback |
+| Official submission | Not complete | Complete the form, accept rules, submit, and confirm receipt |
+
+## Scope and honesty
+
+All three incident scenarios are deterministic synthetic benchmark data. The public showcase is read-only. The recovery simulation changes only a fresh ephemeral in-memory benchmark instance; it does not call production APIs, deploys, feature flags, databases, or customer records. Its postconditions are simulated, not a live infrastructure health check.
+
+The recovery handler unit tests call `run()` directly and do not exercise the framework approval lifecycle. They verify action behavior, caller attribution, and concurrency isolation. The framework approval gate is declared using `needsApproval: true`; the signed-in UI/agent approval path still requires a real authenticated click-through.
 
 ## Submission links
 
@@ -61,4 +79,4 @@ The app uses the Agent-Native Chat starter from `@agent-native/core@0.223.0`, pl
 - Submission form: https://www.builder.io/hackathon/submit
 - Clips: https://clips.agent-native.com/
 
-Do not mark any item complete until the exact current deployment or submission receipt has been checked.
+Do not mark any item complete until the exact current deployment, real recording, or submission receipt has been checked.
