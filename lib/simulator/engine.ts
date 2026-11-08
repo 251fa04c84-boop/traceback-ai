@@ -38,7 +38,7 @@ function sameExpectedParams(
   );
 }
 
-class IncidentSimulator {
+export class IncidentSimulator {
   private states: Map<string, IncidentRuntimeState> = new Map();
 
   constructor() {
