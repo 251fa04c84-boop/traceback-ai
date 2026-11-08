@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import executeRecoverySimulation from "./execute-recovery-simulation";
 
-describe("recovery simulation action handler (unit tests; framework approval is tested separately by the Agent-Native runtime)", () => {
+describe("recovery simulation action handler (unit tests; direct run() calls bypass framework approval dispatch)", () => {
   it("requires the Agent-Native human approval gate", () => {
     expect(executeRecoverySimulation.needsApproval).toBe(true);
     expect(executeRecoverySimulation.readOnly).not.toBe(true);
