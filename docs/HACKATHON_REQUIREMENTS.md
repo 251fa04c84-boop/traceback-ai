@@ -55,8 +55,8 @@ The interface and agent use the same typed action layer. Agent-initiated recover
 | Three incident scenarios | Implemented and browser-checked | All three public cards, metrics, logs, diffs, and proposals render |
 | Public evidence graph | Preview QA passed | Four inspectable nodes per incident, source evidence expandable, synthetic-correlation disclosure visible |
 | Recovery simulation safety | Implemented and unit-tested | Scenario allowlists, exact parameters, per-invocation simulator, caller provenance, concurrency isolation, and `needsApproval: true` |
-| GitHub Actions on application code head `2189847` | Passed | Run #42457839580: root tests/build plus Agent-Native typecheck/action tests/doctor/build |
-| Latest code Preview | READY | Deployment `dpl_DXUfRhJapGJ8H8S4QYsKANW99rko`; expanded evidence text-wrap regression passed |
+| Latest branch-head GitHub Actions | Passed | Run #42463146365 on `1e54a72`: both `verify` and `agent-native` jobs passed; root tests/build plus Agent-Native typecheck/action tests/doctor/build |
+| Latest Preview | READY | Deployment `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy` for branch head `1e54a72`; app source remains browser-tested commit `2189847` |
 | Public showcase access | Passed | All three cards, four-stage graph, expanded evidence, disclosures, and no public mutation controls |
 | Signed-out private-route protection | Passed | Direct incident URL redirects to sign-in and preserves return route |
 | Narrow mobile viewport | Pending | Browser session could not emulate 390×844 CSS pixels |
