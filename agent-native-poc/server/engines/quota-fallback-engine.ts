@@ -21,6 +21,7 @@ function incidentIdFromMessages(
   messages: EngineStreamOptions["messages"],
 ): "inc-8921" | "inc-4402" | "inc-7119" | undefined {
   const text = messages
+    .filter((message) => message.role === "user")
     .flatMap((message) => message.content)
     .filter((part) => part.type === "text")
     .map((part) => part.text)
