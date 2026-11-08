@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import executeRecoverySimulation from "./execute-recovery-simulation";
 
-describe("approval-gated recovery simulation action", () => {
+describe("recovery simulation action handler (unit tests; framework approval is tested separately by the Agent-Native runtime)", () => {
   it("requires the Agent-Native human approval gate", () => {
     expect(executeRecoverySimulation.needsApproval).toBe(true);
     expect(executeRecoverySimulation.readOnly).not.toBe(true);
@@ -29,6 +29,20 @@ describe("approval-gated recovery simulation action", () => {
       expect(executeRecoverySimulation.outputSchema.safeParse(result).success).toBe(true);
     },
   );
+
+
+  it("keeps concurrent recovery executions isolated from each other", async () => {
+    const [first, second] = await Promise.all([
+      executeRecoverySimulation.run({ incidentId: "inc-8921" }),
+      executeRecoverySimulation.run({ incidentId: "inc-8921" }),
+    ]);
+
+    expect(first.after).toEqual(second.after);
+    // One reset event plus the single allowlisted rollback in each independent run.
+    expect(first.auditTrail).toHaveLength(2);
+    expect(second.auditTrail).toHaveLength(2);
+    expect(first.auditTrail).not.toBe(second.auditTrail);
+  });
 
   it("rejects unknown incident IDs before execution", () => {
     expect(
