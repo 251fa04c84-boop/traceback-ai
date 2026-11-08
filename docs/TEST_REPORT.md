@@ -1,18 +1,18 @@
 # TraceBack AI — Verification Report
 
 **Last updated:** November 8, 2026  
-**Latest documentation branch head:** `1e54a72b5b68bb51593c32f90cae3f0cdcb00414`  
+**Latest documentation branch head:** `005d08e98031894a3d1306d3fd80ed9571d7164e`  
 **Verified application code:** `2189847f0a941c293841014bad97c9bd5fc00817`  
-**Latest report commit before this refresh:** `1e54a72b5b68bb51593c32f90cae3f0cdcb00414`
+**Latest report commit before this refresh:** `005d08e98031894a3d1306d3fd80ed9571d7164e`
 
 ## Current status
 
-**Latest branch-head CI is green; the latest Agent-Native Preview is READY.** GitHub Actions run **#42463146365** completed successfully on branch head `1e54a72`, with both `verify` and `agent-native` jobs passing. The two Vercel status checks for this commit also report success.
+**The latest completed CI run passed on `1e54a72`; documentation-only commits have since advanced the branch to `005d08e`.** Run #42463146365 completed successfully with both `verify` and `agent-native` jobs passing on `1e54a72`. The current docs-only head has not yet reported a completed GitHub Actions run. The latest confirmed READY Preview is for `1e54a72`; no claim is made that the later docs-only commits have a READY deployment.
 
-- Latest branch-head CI: root dependency install, automated tests, production build; Agent-Native dependency install, typecheck, action tests, doctor, and production build.
-- Latest Preview deployment: `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy`, READY for branch head `1e54a72`.
+- Latest completed CI: root dependency install, automated tests, production build; Agent-Native dependency install, typecheck, action tests, doctor, and production build.
+- Latest confirmed READY Preview deployment: `dpl_JBjBTBFbo9gS6KAyjVfxt1A9zSvy`, built from `1e54a72`.
 - Latest Preview URL: https://traceback-agent-native-preview-qhc0956yc-hackathons8.vercel.app/demo
-- The application source itself remains the previously browser-tested code commit `2189847`; the latest commit contains documentation corrections only.
+- The application source remains the previously browser-tested code commit `2189847`; commits after `1e54a72` are documentation corrections only.
 - The exact application-code Preview at `2189847` was browser-tested for public showcase rendering, evidence expansion, long-text wrapping, and signed-out route protection. The latest deployment is a later docs-only deployment; no new authenticated or mobile browser test is implied.
 - Production deployment has not been targeted. The Agent-Native Preview uses a separate Neon project named `traceback-ai-preview`; migration history was inspected read-only. No Production database or deployment was targeted.
 
@@ -28,7 +28,7 @@
 
 ## CI verification — latest branch-head run #42463146365
 
-Both jobs passed on branch head `1e54a72` (the application source remains `2189847`):
+Both jobs passed on commit `1e54a72` (the application source remains `2189847`):
 - `verify`: dependency install, root automated tests, root production build.
 - `agent-native`: dependency install, Agent-Native typecheck, action tests, Agent-Native doctor, Agent-Native production build.
 
